@@ -1,8 +1,19 @@
+set(TEST_ROOT ${PROJECT_SOURCE_DIR}/test)
+set(UNITY_ROOT ${TEST_ROOT}/unity)
+
+include(FetchContent)
+
+# download Unity
+FetchContent_Declare(append_unity
+    GIT_REPOSITORY  git@github.com:ThrowTheSwitch/Unity.git
+    GIT_TAG         v2.5.2
+    SOURCE_DIR      ${UNITY_ROOT}
+)
+FetchContent_MakeAvailable(append_unity)
+
 set(TARGET_TEST_RUNNER_NAME test_runner)
 
-file(GLOB SOURCES ./cases/*.c ./runner/*.c)
-
-set(UNITY_ROOT ${PROJECT_SOURCE_DIR}/test/unity)
+file(GLOB SOURCES ${TEST_ROOT}/cases/*.c ${TEST_ROOT}/runner/*.c)
 
 add_executable(${TARGET_TEST_RUNNER_NAME}
     ${SOURCES}
