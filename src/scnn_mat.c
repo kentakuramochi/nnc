@@ -7,15 +7,32 @@
 
 #include "scnn_mat.h"
 
-scnn_mat *scnn_mat_alloc(const int n, const int c, const int h, const int w)
+scnn_mat *scnn_mat_alloc(void)
 {
-    if ((n < 1) || (c < 1) || (h < 1) || (w < 1)) {
+    scnn_mat *mat = malloc(sizeof(scnn_mat));
+    if (mat == NULL) {
         return NULL;
     }
 
-    scnn_mat *mat = malloc(sizeof(scnn_mat));
+    mat->n     = 0;
+    mat->c     = 0;
+    mat->h     = 0;
+    mat->w     = 0;
+    mat->size  = 0;
+    mat->order = SCNN_MAT_ORDER_NCHW;
+    mat->data  = NULL;
+
+    return mat;
+}
+
+scnn_mat *scnn_mat_init(scnn_mat *mat, const int n, const int c, const int h, const int w)
+{
     if (mat == NULL) {
-        goto FREE_MAT;
+        return NULL;
+    }
+
+    if ((n < 1) || (c < 1) || (h < 1) || (w < 1)) {
+        return NULL;
     }
 
     mat->n    = n;
@@ -26,20 +43,10 @@ scnn_mat *scnn_mat_alloc(const int n, const int c, const int h, const int w)
 
     mat->data = malloc(sizeof(scnn_dtype) * n * c * h * w);
     if (mat->data == NULL) {
-        goto FREE_MAT_DATA;
+        return NULL;
     }
 
     return mat;
-
-FREE_MAT_DATA:
-    free(mat->data);
-    mat->data = NULL;
-
-FREE_MAT:
-    free(mat);
-    mat = NULL;
-
-    return NULL;
 }
 
 void scnn_mat_free(scnn_mat **mat)
