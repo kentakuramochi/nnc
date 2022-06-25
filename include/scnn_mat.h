@@ -59,4 +59,13 @@ scnn_mat *scnn_mat_init(scnn_mat *mat, const int n, const int c, const int h, co
  */
 void scnn_mat_free(scnn_mat **mat);
 
+/**
+ * @brief Fill matrix with specified value
+ * 
+ * @param mat   Pointer to matrix
+ * @param value Filling value
+ * @return      Pointer to matrix, NULL if failed
+ */
+scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value);
+
 #endif // SCNN_MAT_H

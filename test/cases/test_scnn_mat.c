@@ -142,3 +142,32 @@ TEST(scnn_mat, init_fail_w_negative)
 
     scnn_mat_free(&mat);
 }
+
+TEST(scnn_mat, fill)
+{
+    scnn_mat *mat = scnn_mat_alloc();
+
+    scnn_mat_init(mat, 1, 3, 480, 640);
+
+    TEST_ASSERT_EQUAL_PTR(mat, scnn_mat_fill(mat, 1));
+
+    for (int i = 0; i < mat->size; i++) {
+        TEST_ASSERT_EQUAL(1, mat->data[i]);
+    }
+
+    scnn_mat_free(&mat);
+}
+
+TEST(scnn_mat, fill_fail_null)
+{
+    TEST_ASSERT_NULL(scnn_mat_fill(NULL, 1));
+}
+
+TEST(scnn_mat, fill_fail_not_initialized)
+{
+    scnn_mat *mat = scnn_mat_alloc();
+
+    TEST_ASSERT_NULL(scnn_mat_fill(mat, 1));
+
+    scnn_mat_free(&mat);
+}

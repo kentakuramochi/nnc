@@ -61,3 +61,22 @@ void scnn_mat_free(scnn_mat **mat)
     free(*mat);
     *mat = NULL;
 }
+
+scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value)
+{
+    if (mat == NULL) {
+        return NULL;
+    }
+
+    if ((mat->n < 1) || (mat->c < 1) || (mat->h < 1) || (mat->w < 1) ||
+        (mat->size < 1) ||
+        (mat->data == NULL)) {
+        return NULL;
+    }
+
+    for (int i = 0; i < mat->size; i++) {
+        mat->data[i] = value;
+    }
+
+    return mat;
+}
