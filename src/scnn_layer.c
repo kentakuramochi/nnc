@@ -14,6 +14,15 @@ scnn_layer *scnn_layer_alloc(void)
         return NULL;
     }
 
+    layer->x.data = NULL;
+    layer->y.data = NULL;
+    layer->w.data = NULL;
+    layer->b.data = NULL;
+
+    layer->dx.data = NULL;
+    layer->dw.data = NULL;
+    layer->db.data = NULL;
+
     layer->id = 0;
 
     layer->prev_id = 0;
