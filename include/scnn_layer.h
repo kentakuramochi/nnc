@@ -32,6 +32,15 @@ typedef struct scnn_layer {
 } scnn_layer;
 
 /**
+ * @brief Layer parameters
+ * 
+ */
+typedef struct scnn_layer_params {
+    int in;     //!< Input channels
+    int out;    //!< Output channels
+} scnn_layer_params;
+
+/**
  * @brief Allocate layer
  * 
  * @return Pointer to layer, NULL if failed
