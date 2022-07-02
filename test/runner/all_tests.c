@@ -7,6 +7,8 @@
 
 static void RunAllTests(void)
 {
+    RUN_TEST_GROUP(scnn_blas);
+
     RUN_TEST_GROUP(scnn_mat);
 
     RUN_TEST_GROUP(scnn_layer);
