@@ -21,9 +21,9 @@ typedef enum scnn_blas_transpose {
  * 
  * @param[in] n     Length (> 0)
  * @param[in] alpha Scalar alpha
- * @param[in] x     Vector x
+ * @param[in] x     Pointer to vector x
  * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
- * @param[in,out] y Vector y
+ * @param[in,out] y Pointer to vector y
  * @param[in] incy  Stride between elements of y (!= 0, reversal order if negative)
  */
 void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy);
@@ -33,17 +33,17 @@ void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, 
  * 
  * @param[in] transa    Flag for transpose of matrix A
  * @param[in] transb    Flag for transpose of matrix B
- * @param[in] M         Rows of matrix A
- * @param[in] N         Cols of matrix B
- * @param[in] K         Cols of matrix A, Rows of matrix B
+ * @param[in] M         Rows of matrix A (> 0)
+ * @param[in] N         Cols of matrix B (> 0)
+ * @param[in] K         Cols of matrix A, Rows of matrix B (> 0)
  * @param[in] alpha     Scalar alpha
- * @param[in] A         MxK Matrix A
- * @param[in] lda       Leading dimension of A
- * @param[in] B         KxN Matrix B
- * @param[in] ldb       Leading dimension of B
+ * @param[in] A         Pointer to MxK matrix A
+ * @param[in] lda       Leading dimension of A (> 0)
+ * @param[in] B         Pointer to KxN matrix B
+ * @param[in] ldb       Leading dimension of B (> 0)
  * @param[in] beta      Scalar beta
- * @param[in,out] C     MxN Matrix C
- * @param[in] ldc       Leading dimension of C
+ * @param[in,out] C     Pointer to MxN matrix C
+ * @param[in] ldc       Leading dimension of C (> 0)
  * @retval
  */
 void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose transb,
