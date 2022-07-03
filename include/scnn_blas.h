@@ -17,6 +17,18 @@ typedef enum scnn_blas_transpose {
 } scnn_blas_transpose;
 
 /**
+ * @brief Vector addition Y = alpha * X + Y
+ * 
+ * @param[in] n     Length (> 0)
+ * @param[in] alpha Scalar alpha
+ * @param[in] x     Vector x
+ * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
+ * @param[in,out] y Vector y
+ * @param[in] incy  Stride between elements of y (!= 0, reversal order if negative)
+ */
+void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy);
+
+/**
  * @brief General matrix multiplication C = alpha * AB + beta * C 
  * 
  * @param[in] transa    Flag for transpose of matrix A

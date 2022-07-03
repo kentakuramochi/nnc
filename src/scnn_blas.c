@@ -7,6 +7,31 @@
 
 #include <stddef.h>
 
+void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy)
+{
+    if ((x == NULL) || (y == NULL)) {
+        return;
+    }
+    if ((n < 1) || (incx == 0) || (incy == 0)) {
+        return;
+    }
+
+    if ((incx == 1) && (incy == 1)) {
+        for (int i = 0; i < n; i++) {
+            y[i] += alpha * x[i];
+        }
+    } else {
+        // if incx/incy < 0, working backward
+        int x_idx = (incx > 0) ? 0 : (n * -incx - 1);
+        int y_idx = (incy > 0) ? 0 : (n * -incy - 1);
+        for (int i = 0; i < n; i++) {
+            y[y_idx] += alpha * x[x_idx];
+            x_idx += incx;
+            y_idx += incy;
+        }
+    }
+}
+
 void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose transb,
     const int M, const int N, const int K,
     const float alpha, const float *A, const int lda,
