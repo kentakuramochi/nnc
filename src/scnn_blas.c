@@ -6,6 +6,7 @@
 #include "scnn_blas.h"
 
 #include <stddef.h>
+#include <math.h>
 
 float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy)
 {
@@ -33,6 +34,32 @@ float scnn_sdot(const int n, const float *x, const int incx, const float *y, con
     }
 
     return dot;
+}
+
+float scnn_snrm2(const int n, const float *x, const int incx)
+{
+    if (x == NULL) {
+        return 0;
+    }
+    if ((n < 1) || (incx == 0)) {
+        return 0;
+    }
+
+    float nrm2 = 0;
+    if (incx == 1) {
+        for (int i = 0; i < n; i++) {
+            nrm2 += x[i] * x[i];
+        }
+    } else {
+        // if incx < 0, working backward
+        int x_idx = (incx > 0) ? 0 : (n * -incx - 1);
+        for (int i = 0; i < n; i++) {
+            nrm2 += x[x_idx] * x[x_idx];
+            x_idx += incx;
+        }
+    }
+
+    return sqrtf(nrm2);
 }
 
 void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy)

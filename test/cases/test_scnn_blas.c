@@ -169,6 +169,75 @@ TEST(scnn_blas, sdot_fail_invalid_incy)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, y, 0));
 }
 
+TEST(scnn_blas, snrm2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(16.8819, scnn_snrm2(n, x, 1));
+}
+
+TEST(scnn_blas, snrm2_incx_2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(33.7639, scnn_snrm2(n, x, 2));
+}
+
+TEST(scnn_blas, snrm2_rev)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(16.8819, scnn_snrm2(n, x, -1));
+}
+
+TEST(scnn_blas, snrm2_rev_2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(36.4692, scnn_snrm2(n, x, -2));
+}
+
+TEST(scnn_blas, snrm2_fail_invalid_n)
+{
+    int n = 0;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, x, 1));
+}
+
+TEST(scnn_blas, snrm2_fail_x_null)
+{
+    int n = 10;
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, NULL, 1));
+}
+
+TEST(scnn_blas, snrm2_fail_invalid_incx)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, x, 0));
+}
+
 TEST(scnn_blas, saxpy)
 {
     int n = 10;

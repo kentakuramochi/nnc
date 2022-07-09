@@ -20,6 +20,14 @@ TEST_GROUP_RUNNER(scnn_blas)
     RUN_TEST_CASE(scnn_blas, sdot_fail_invalid_incx);
     RUN_TEST_CASE(scnn_blas, sdot_fail_invalid_incy);
 
+    RUN_TEST_CASE(scnn_blas, snrm2);
+    RUN_TEST_CASE(scnn_blas, snrm2_incx_2);
+    RUN_TEST_CASE(scnn_blas, snrm2_rev);
+    RUN_TEST_CASE(scnn_blas, snrm2_rev_2);
+    RUN_TEST_CASE(scnn_blas, snrm2_fail_invalid_n);
+    RUN_TEST_CASE(scnn_blas, snrm2_fail_x_null);
+    RUN_TEST_CASE(scnn_blas, snrm2_fail_invalid_incx);
+
     RUN_TEST_CASE(scnn_blas, saxpy);
     RUN_TEST_CASE(scnn_blas, saxpy_alpha_2);
     RUN_TEST_CASE(scnn_blas, saxpy_incx_2);

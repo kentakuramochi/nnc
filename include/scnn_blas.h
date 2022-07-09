@@ -29,6 +29,16 @@ typedef enum scnn_blas_transpose {
 float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy);
 
 /**
+ * @brief Euqlidean (L2) norm of vector ||x||
+ * 
+ * @param[in] n     Length (> 0)
+ * @param[in] x     Pointer to vector x
+ * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
+ * @return          L2 norm ||x||, 0 if failed
+ */
+float scnn_snrm2(const int n, const float *x, const int incx);
+
+/**
  * @brief Vector addition Y = alpha * X + Y
  * 
  * @param[in] n     Length (> 0)
