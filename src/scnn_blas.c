@@ -7,6 +7,34 @@
 
 #include <stddef.h>
 
+float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy)
+{
+    if ((x == NULL) || (y == NULL)) {
+        return 0;
+    }
+    if ((n < 1) || (incx == 0) || (incy == 0)) {
+        return 0;
+    }
+
+    float dot = 0;
+    if ((incx == 1) && (incy == 1)) {
+        for (int i = 0; i < n; i++) {
+            dot += x[i] * y[i];
+        }
+    } else {
+        // if incx/incy < 0, working backward
+        int x_idx = (incx > 0) ? 0 : (n * -incx - 1);
+        int y_idx = (incy > 0) ? 0 : (n * -incy - 1);
+        for (int i = 0; i < n; i++) {
+            dot += x[x_idx] * y[y_idx];
+            x_idx += incx;
+            y_idx += incy;
+        }
+    }
+
+    return dot;
+}
+
 void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy)
 {
     if ((x == NULL) || (y == NULL)) {

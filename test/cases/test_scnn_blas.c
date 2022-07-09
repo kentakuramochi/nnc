@@ -15,6 +15,160 @@ TEST_SETUP(scnn_blas)
 TEST_TEAR_DOWN(scnn_blas)
 {}
 
+TEST(scnn_blas, sdot)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, 1, y, 1));
+}
+
+TEST(scnn_blas, sdot_incx_2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(660, scnn_sdot(n, x, 2, y, 1));
+}
+
+TEST(scnn_blas, sdot_incy_2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(615, scnn_sdot(n, x, 1, y, 2));
+}
+
+TEST(scnn_blas, sdot_rev_x)
+{
+    int n = 10;
+    float x[] = {
+        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, -1, y, 1));
+}
+
+TEST(scnn_blas, sdot_rev_y)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, 1, y, -1));
+}
+
+TEST(scnn_blas, sdot_rev_x_2)
+{
+    int n = 10;
+    float x[] = {
+        19, 18, 17, 16, 15, 14, 13, 12, 11, 10,
+        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(660, scnn_sdot(n, x, -2, y, 1));
+}
+
+TEST(scnn_blas, sdot_rev_y_2)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        20, 19, 18, 17, 16, 15, 14, 13, 12, 11,
+        10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(615, scnn_sdot(n, x, 1, y, -2));
+}
+
+TEST(scnn_blas, sdot_fail_invalid_n)
+{
+    int n = 0;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, y, 1));
+}
+
+TEST(scnn_blas, sdot_fail_x_null)
+{
+    int n = 10;
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, NULL, 1, y, 1));
+}
+
+TEST(scnn_blas, sdot_fail_y_null)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, NULL, 1));
+}
+
+TEST(scnn_blas, sdot_fail_invalid_incx)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 0, y, 1));
+}
+
+TEST(scnn_blas, sdot_fail_invalid_incy)
+{
+    int n = 10;
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    float y[] = {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, y, 0));
+}
+
 TEST(scnn_blas, saxpy)
 {
     int n = 10;

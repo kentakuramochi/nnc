@@ -17,6 +17,18 @@ typedef enum scnn_blas_transpose {
 } scnn_blas_transpose;
 
 /**
+ * @brief Dot product of 2 vectors (transpose of X) * Y
+ * 
+ * @param[in] n     Length (> 0)
+ * @param[in] x     Pointer to vector x
+ * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
+ * @param[in] y     Pointer to vector x
+ * @param[in] incy  Stride between elements of y (!= 0, reversal order if negative)
+ * @return          Dot product x * y, 0 if failed
+ */
+float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy);
+
+/**
  * @brief Vector addition Y = alpha * X + Y
  * 
  * @param[in] n     Length (> 0)
