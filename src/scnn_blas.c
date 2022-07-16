@@ -87,6 +87,50 @@ void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, 
     }
 }
 
+void scnn_sgemv(const scnn_blas_transpose trans,
+    const int M, const int N,
+    const float alpha, const float *A, const int lda,
+    const float *x, const int incx,
+    const float beta, float *y, const int incy)
+{
+    if ((A == NULL) || (x == NULL) || (y == NULL)) {
+        return;
+    }
+    if ((M < 1) || (N < 1) || (lda < 1) || (incx == 0) || (incy == 0)) {
+        return;
+    }
+
+    if (trans == SCNN_BLAS_NO_TRANS) {
+        // a: NO_TRANS
+        int y_idx = (incy > 0) ? 0 : (M * -incy - 1);
+        for (int i = 0; i < M; i++) {
+            float sum = 0;
+            int x_idx = (incx > 0) ? 0 : (N * -incx - 1);
+            for (int j = 0; j < N; j++) {
+                sum += alpha * A[i * lda + j] * x[x_idx];
+                x_idx += incx;
+            }
+            y[y_idx] *= beta;
+            y[y_idx] += sum;
+            y_idx += incy;
+        }
+    } else {
+        // a: TRANS
+        int y_idx = (incy > 0) ? 0 : (N * -incy - 1);
+        for (int i = 0; i < N; i++) {
+            float sum = 0;
+            int x_idx = (incx > 0) ? 0 : (M * -incx - 1);
+            for (int j = 0; j < M; j++) {
+                sum += alpha * A[j * lda + i] * x[x_idx];
+                x_idx += incx;
+            }
+            y[y_idx] *= beta;
+            y[y_idx] += sum;
+            y_idx += incy;
+        }
+    }
+}
+
 void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose transb,
     const int M, const int N, const int K,
     const float alpha, const float *A, const int lda,

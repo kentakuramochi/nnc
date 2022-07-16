@@ -53,6 +53,27 @@ float scnn_snrm2(const int n, const float *x, const int incx);
 void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy);
 
 /**
+ * @brief Calculate matrix and vector multiplication y = alpha * Ax + beta * y
+ * 
+ * @param[in] trans Flag for transpose of matrix A
+ * @param[in] M     Rows of matrix A (> 0)
+ * @param[in] N     Cols of matrix A (> 0)
+ * @param[in] alpha Scalar alpha
+ * @param[in] A     Pointer to MxN matrix A
+ * @param[in] lda   Leading dimension of A (> 0)
+ * @param[in] x     Pointer to vector x
+ * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
+ * @param[in] beta  Scalar beta
+ * @param[in,out] y Pointer to vector y
+ * @param[in] incy  Stride between elements of y (!= 0, reversal order if negative)
+ */
+void scnn_sgemv(const scnn_blas_transpose trans,
+    const int M, const int N,
+    const float alpha, const float *A, const int lda,
+    const float *x, const int incx,
+    const float beta, float *y, const int incy);
+
+/**
  * @brief Calculate a general matrix multiplication C = alpha * AB + beta * C 
  * 
  * @param[in] transa    Flag for transpose of matrix A

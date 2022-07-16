@@ -42,6 +42,25 @@ TEST_GROUP_RUNNER(scnn_blas)
     RUN_TEST_CASE(scnn_blas, saxpy_fail_invalid_incx);
     RUN_TEST_CASE(scnn_blas, saxpy_fail_invalid_incy);
 
+    RUN_TEST_CASE(scnn_blas, sgemv);
+    RUN_TEST_CASE(scnn_blas, sgemv_trans);
+    RUN_TEST_CASE(scnn_blas, sgemv_alpha_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_beta_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_incx_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_incx_rev);
+    RUN_TEST_CASE(scnn_blas, sgemv_incx_rev_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_incy_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_incy_rev);
+    RUN_TEST_CASE(scnn_blas, sgemv_incy_rev_2);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_a_null);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_x_null);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_c_null);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_invalid_m);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_invalid_n);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_invalid_lda);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_invalid_incx);
+    RUN_TEST_CASE(scnn_blas, sgemv_fail_invalid_incy);
+
     RUN_TEST_CASE(scnn_blas, sgemm_no_trans);
     RUN_TEST_CASE(scnn_blas, sgemm_trans_b);
     RUN_TEST_CASE(scnn_blas, sgemm_trans_a);

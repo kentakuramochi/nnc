@@ -473,6 +473,611 @@ TEST(scnn_blas, saxpy_fail_invalid_incy)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
+TEST(scnn_blas, sgemv)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -0.26,
+        2.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_trans)
+{
+    int lda = 2;
+    float a[3 * 2] = {
+        0.11, 0.21,
+        0.12, 0.22,
+        0.13, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_TRANS,
+        3, 2,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -0.26,
+        2.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_alpha_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        2.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        0.48,
+        3.68
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_beta_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        2.0, y, 1
+    );
+
+    float answer[] = {
+        -1.26,
+        3.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_incx_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[] = {
+        1,
+        0,
+        2,
+        0,
+        3,
+        0
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 2,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -0.26,
+        2.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_incx_rev)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        3,
+        2,
+        1
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, -1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -0.26,
+        2.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_incx_rev_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[] = {
+        0,
+        3,
+        0,
+        2,
+        0,
+        1
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, -2,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -0.26,
+        2.34
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_incy_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[] = {
+        -1,
+        0,
+        1,
+        0
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 2
+    );
+
+    float answer[] = {
+        -0.26,
+        0,
+        2.34,
+        0
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (2 * 2));
+}
+
+TEST(scnn_blas, sgemv_incy_rev)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        1, 
+        -1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, -1
+    );
+
+    float answer[] = {
+        2.34,
+        -0.26
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_incy_rev_2)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[] = {
+        0,
+        1,
+        0,
+        -1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, -2
+    );
+
+    float answer[] = {
+        0,
+        2.34,
+        0,
+        -0.26
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (2 * 2));
+}
+
+TEST(scnn_blas, sgemv_fail_a_null)
+{
+    int lda = 3;
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, NULL, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_x_null)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        NULL, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_c_null)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, NULL, 1
+    );
+}
+
+TEST(scnn_blas, sgemv_fail_invalid_m)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        0, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_invalid_n)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 0,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_invalid_lda)
+{
+    int lda = 0;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_invalid_incx)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1 
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 0,
+        1.0, y, 1
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
+TEST(scnn_blas, sgemv_fail_invalid_incy)
+{
+    int lda = 3;
+    float a[2 * 3] = {
+        0.11, 0.12, 0.13,
+        0.21, 0.22, 0.23
+    };
+
+    float x[3] = {
+        1,
+        2,
+        3
+    };
+
+    float y[2] = {
+        -1,
+        1
+    };
+
+    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+        2, 3,
+        1.0, a, lda,
+        x, 1,
+        1.0, y, 0
+    );
+
+    float answer[] = {
+        -1,
+        1
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
+}
+
 TEST(scnn_blas, sgemm_no_trans)
 {
     int lda = 3;
