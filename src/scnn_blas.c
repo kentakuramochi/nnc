@@ -8,6 +8,25 @@
 #include <stddef.h>
 #include <math.h>
 
+void scnn_scopy(const int n, const float *x, const int incx, float *y, const int incy)
+{
+    if ((x == NULL) || (y == NULL)) {
+        return;
+    }
+    if ((n < 1) || (incx == 0) || (incy == 0)) {
+        return;
+    }
+
+    int x_idx = (incx > 0) ? 0 : (n * -incx - 1);
+    int y_idx = (incy > 0) ? 0 : (n * -incy - 1);
+
+    for (int i = 0; i < n; i++) {
+        y[y_idx] = x[x_idx];
+        x_idx += incx;
+        y_idx += incy;
+    }
+}
+
 float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy)
 {
     if ((x == NULL) || (y == NULL)) {

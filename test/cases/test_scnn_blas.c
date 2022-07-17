@@ -15,6 +15,186 @@ TEST_SETUP(scnn_blas)
 TEST_TEAR_DOWN(scnn_blas)
 {}
 
+TEST(scnn_blas, scopy)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, 1, y, 1);
+
+    float answer[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
+}
+
+TEST(scnn_blas, scopy_incx_2)
+{
+    float x[] = {
+        0, 0, 1, 0, 2, 0, 3, 0, 4, 0,
+        5, 0, 6, 0, 7, 0, 8, 0, 9, 0
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, 2, y, 1);
+
+    float answer[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
+}
+
+TEST(scnn_blas, scopy_rev_x)
+{
+    float x[] = {
+        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, -1, y, 1);
+
+    float answer[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
+}
+
+TEST(scnn_blas, scopy_rev_x_2)
+{
+    float x[] = {
+        0, 9, 0, 8, 0, 7, 0, 6, 0, 5,
+        0, 4, 0, 3, 0, 2, 0, 1, 0, 0
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, -2, y, 1);
+
+    float answer[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
+}
+
+TEST(scnn_blas, scopy_incy_2)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    float y[20] = { 0 };
+    
+    scnn_scopy(10, x, 1, y, 2);
+
+    float answer[] = {
+        0, 0, 1, 0, 2, 0, 3, 0, 4, 0,
+        5, 0, 6, 0, 7, 0, 8, 0, 9, 0
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 20);
+}
+
+TEST(scnn_blas, scopy_rev_y)
+{
+    float x[] = {
+        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, 1, y, -1);
+
+    float answer[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
+}
+
+TEST(scnn_blas, scopy_rev_y_2)
+{
+    float x[] = {
+        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+
+    float y[20] = { 0 };
+    
+    scnn_scopy(10, x, 1, y, -2);
+
+    float answer[] = {
+        0, 0, 0, 1, 0, 2, 0, 3, 0, 4,
+        0, 5, 0, 6, 0, 7, 0, 8, 0, 9
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 20);
+}
+
+TEST(scnn_blas, scopy_fail_x_null)
+{
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, NULL, 1, y, 1);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
+}
+
+TEST(scnn_blas, scopy_fail_y_null)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+    
+    scnn_scopy(10, x, 1, NULL, 1);
+}
+
+TEST(scnn_blas, scopy_fail_invalid_n)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(0, x, 1, y, 1);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
+}
+
+TEST(scnn_blas, scopy_fail_invalid_incx)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, 0, y, 1);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
+}
+
+TEST(scnn_blas, scopy_fail_invalid_incy)
+{
+    float x[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    float y[10] = { 0 };
+    
+    scnn_scopy(10, x, 1, y, 0);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
+}
+
 TEST(scnn_blas, sdot)
 {
     int n = 10;

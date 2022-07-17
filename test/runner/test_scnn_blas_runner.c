@@ -7,6 +7,19 @@
 
 TEST_GROUP_RUNNER(scnn_blas)
 {
+    RUN_TEST_CASE(scnn_blas, scopy);
+    RUN_TEST_CASE(scnn_blas, scopy_incx_2);
+    RUN_TEST_CASE(scnn_blas, scopy_rev_x);
+    RUN_TEST_CASE(scnn_blas, scopy_rev_x_2);
+    RUN_TEST_CASE(scnn_blas, scopy_incy_2);
+    RUN_TEST_CASE(scnn_blas, scopy_rev_y);
+    RUN_TEST_CASE(scnn_blas, scopy_rev_y_2);
+    RUN_TEST_CASE(scnn_blas, scopy_fail_x_null);
+    RUN_TEST_CASE(scnn_blas, scopy_fail_y_null);
+    RUN_TEST_CASE(scnn_blas, scopy_fail_invalid_n);
+    RUN_TEST_CASE(scnn_blas, scopy_fail_invalid_incx);
+    RUN_TEST_CASE(scnn_blas, scopy_fail_invalid_incy);
+
     RUN_TEST_CASE(scnn_blas, sdot);
     RUN_TEST_CASE(scnn_blas, sdot_incx_2);
     RUN_TEST_CASE(scnn_blas, sdot_incy_2);
