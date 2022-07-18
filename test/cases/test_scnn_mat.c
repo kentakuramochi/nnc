@@ -171,3 +171,48 @@ TEST(scnn_mat, fill_fail_not_initialized)
 
     scnn_mat_free(&mat);
 }
+
+TEST(scnn_mat, copy_from_array)
+{
+    scnn_mat *mat = scnn_mat_alloc();
+    scnn_mat_init(mat, 1, 10, 1, 1);
+
+    float array[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_NOT_NULL(scnn_mat_copy_from_array(mat, array, 10));
+
+    scnn_mat_free(&mat);
+}
+
+TEST(scnn_mat, copy_from_array_fail_invalid_size)
+{
+    scnn_mat *mat = scnn_mat_alloc();
+    scnn_mat_init(mat, 1, 10, 1, 1);
+
+    float array[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_NULL(scnn_mat_copy_from_array(mat, array, 0));
+
+    scnn_mat_free(&mat);
+}
+
+TEST(scnn_mat, copy_from_array_fail_mat_null)
+{
+    float array[] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    };
+
+    TEST_ASSERT_NULL(scnn_mat_copy_from_array(NULL, array, 10));
+}
+
+TEST(scnn_mat, copy_from_array_fail_array_null)
+{
+    scnn_mat *mat = scnn_mat_alloc();
+    scnn_mat_init(mat, 1, 10, 1, 1);
+
+    TEST_ASSERT_NULL(scnn_mat_copy_from_array(mat, NULL, 10));
+}

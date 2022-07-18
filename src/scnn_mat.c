@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "scnn_mat.h"
+#include "scnn_blas.h"
 
 scnn_mat *scnn_mat_alloc(void)
 {
@@ -77,6 +78,21 @@ scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value)
     for (int i = 0; i < mat->size; i++) {
         mat->data[i] = value;
     }
+
+    return mat;
+}
+
+scnn_mat *scnn_mat_copy_from_array(scnn_mat *mat, const float *array, const int size)
+{
+    if ((mat == NULL) || (array == NULL)) {
+        return NULL;
+    }
+
+    if (size < 1) {
+        return NULL;
+    }
+
+    scnn_scopy(size, array, 1, mat->data, 1);
 
     return mat;
 }

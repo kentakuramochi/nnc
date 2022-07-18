@@ -68,4 +68,14 @@ void scnn_mat_free(scnn_mat **mat);
  */
 scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value);
 
+/**
+ * @brief Copy matrix elements from array
+ * 
+ * @param[in,out] mat   Pointer to destination matrix
+ * @param[in]     array Pointer to source array 
+ * @param[in]     size  Num of elements to be copied
+ * @return              Pointer to matrix, NULL if failed
+ */
+scnn_mat *scnn_mat_copy_from_array(scnn_mat *mat, const float *array, const int size);
+
 #endif // SCNN_MAT_H

@@ -27,4 +27,9 @@ TEST_GROUP_RUNNER(scnn_mat)
     RUN_TEST_CASE(scnn_mat, fill);
     RUN_TEST_CASE(scnn_mat, fill_fail_null);
     RUN_TEST_CASE(scnn_mat, fill_fail_not_initialized);
+
+    RUN_TEST_CASE(scnn_mat, copy_from_array);
+    RUN_TEST_CASE(scnn_mat, copy_from_array_fail_invalid_size);
+    RUN_TEST_CASE(scnn_mat, copy_from_array_fail_mat_null);
+    RUN_TEST_CASE(scnn_mat, copy_from_array_fail_array_null);
 }
