@@ -50,7 +50,7 @@ scnn_layer *scnn_layer_alloc(void);
 /**
  * @brief Free layer
  * 
- * @param layer Pointer to pointer of layer
+ * @param[in,out] layer Pointer to pointer of layer
  */
 void scnn_layer_free(scnn_layer **layer);
 
