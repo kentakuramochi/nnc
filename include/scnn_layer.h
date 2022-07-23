@@ -9,10 +9,21 @@
 #include "scnn_mat.h"
 
 /**
+ * @brief Layer parameters
+ * 
+ */
+typedef struct scnn_layer_params {
+    int in;     //!< Input channels
+    int out;    //!< Output channels
+} scnn_layer_params;
+
+/**
  * @brief Layer structure
  * 
  */
 typedef struct scnn_layer {
+    scnn_layer_params params;   //!< Layer parameters
+
     int id;         //!< Layer ID
 
     scnn_mat x;     //!< Input matrix
@@ -30,15 +41,6 @@ typedef struct scnn_layer {
     void (*forward)(struct scnn_layer *self, scnn_mat* x);     //!< Forward propagation
     void (*backward)(struct scnn_layer *self, scnn_mat* dy);   //!< Backward propagation
 } scnn_layer;
-
-/**
- * @brief Layer parameters
- * 
- */
-typedef struct scnn_layer_params {
-    int in;     //!< Input channels
-    int out;    //!< Output channels
-} scnn_layer_params;
 
 /**
  * @brief Allocate layer
