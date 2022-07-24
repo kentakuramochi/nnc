@@ -29,6 +29,8 @@ TEST(scnn_layer, alloc_and_free)
     TEST_ASSERT_EQUAL(NULL, layer->forward);
     TEST_ASSERT_EQUAL(NULL, layer->backward);
 
+    TEST_ASSERT_EQUAL(NULL, layer->set_size);
+
     scnn_layer_free(&layer);
 
     TEST_ASSERT_NULL(layer);

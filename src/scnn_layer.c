@@ -31,6 +31,8 @@ scnn_layer *scnn_layer_alloc(void)
     layer->forward  = NULL;
     layer->backward = NULL;
 
+    layer->set_size = NULL;
+
     return layer;
 }
 
