@@ -41,7 +41,7 @@ typedef struct scnn_layer {
     void (*forward)(struct scnn_layer *self, scnn_mat* x);     //!< Forward propagation
     void (*backward)(struct scnn_layer *self, scnn_mat* dy);   //!< Backward propagation
 
-    void (*set_size)(const int n, const int c, const int h, const int w);   //!< Set matrix size
+    void (*set_size)(struct scnn_layer *self, const int n, const int c, const int h, const int w);   //!< Set matrix size
 } scnn_layer;
 
 /**
