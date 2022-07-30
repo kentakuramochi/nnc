@@ -13,6 +13,8 @@ static void RunAllTests(void)
 
     RUN_TEST_GROUP(scnn_layer);
 
+    RUN_TEST_GROUP(scnn_fc);
+
     //RUN_TEST_GROUP(data);
 
     //RUN_TEST_GROUP(util);
