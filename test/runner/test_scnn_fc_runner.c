@@ -11,4 +11,12 @@ TEST_GROUP_RUNNER(scnn_fc)
 
     RUN_TEST_CASE(scnn_fc, alloc_fail_invalid_param_in);
     RUN_TEST_CASE(scnn_fc, alloc_fail_invalid_param_out);
+
+    RUN_TEST_CASE(scnn_fc, set_size);
+
+    RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_n);
+    RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_c);
+    RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_h);
+    RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_w);
+    RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_in_size);
 }

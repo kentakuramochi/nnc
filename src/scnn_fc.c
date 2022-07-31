@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include "scnn_fc.h"
+#include "scnn_mat.h"
 
 /**
  * @brief Set the matrix size
@@ -19,12 +20,27 @@
  */
 static void set_size(struct scnn_layer *self, const int n, const int c, const int h, const int w)
 {
-    // stub
-    assert(self != NULL);
-    assert(n != 0);
-    assert(c != 0);
-    assert(h != 0);
-    assert(w != 0);
+    if (self == NULL) {
+        return;
+    }
+
+    if ((n < 1) || (c < 1) || (h < 1) || (w < 1)) {
+        return;
+    }
+
+    // input channels = (C*H*W) in input matrix
+    if ((c * h * w) != self->params.in) {
+        return;
+    }
+
+    scnn_mat_init(&self->x, n, c, 1, 1);
+    scnn_mat_init(&self->y, n, self->params.out, 1, 1);
+    scnn_mat_init(&self->w, self->params.out, self->params.in, 1, 1);
+    scnn_mat_init(&self->b, n, self->params.out, 1, 1);
+
+    scnn_mat_init(&self->dx, self->x.n, self->x.c, self->x.h, self->x.w);
+    scnn_mat_init(&self->dw, self->w.n, self->w.c, self->w.h, self->w.w);
+    scnn_mat_init(&self->db, self->b.n, self->b.c, self->b.h, self->b.w);
 }
 
 /**
