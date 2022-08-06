@@ -200,3 +200,117 @@ TEST(scnn_fc, set_size_fail_invalid_in_size)
 
     scnn_layer_free(&fc);
 }
+
+TEST(scnn_fc, forward)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat x;
+    scnn_mat_init(&x, 1, 2, 1, 1);
+    scnn_mat_copy_from_array(&x,
+        (float[]){
+            1, 1
+        },
+        fc->x.size);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    fc->forward(fc, &x);
+
+    float answer[] = {
+        4, 6, 8
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, fc->y.data, 3);
+
+    scnn_layer_free(&fc);
+}
+
+TEST(scnn_fc, forward_fail_x_is_null)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    float init[] = {
+        0, 0, 0
+    };
+
+    scnn_mat_copy_from_array(&fc->y,
+        init,
+        fc->y.size);
+
+    fc->forward(fc, NULL);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, fc->y.data, fc->y.size);
+
+    scnn_layer_free(&fc);
+}
+
+TEST(scnn_fc, forward_fail_layer_is_null)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat x;
+    scnn_mat_init(&x, 1, 2, 1, 1);
+    scnn_mat_copy_from_array(&x,
+        (float[]){
+            1, 1
+        },
+        fc->x.size);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    float init[] = {
+        0, 0, 0
+    };
+
+    scnn_mat_copy_from_array(&fc->y,
+        init,
+        fc->y.size);
+
+    fc->forward(NULL, &x);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, fc->y.data, fc->y.size);
+
+    scnn_layer_free(&fc);
+}

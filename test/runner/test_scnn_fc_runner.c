@@ -19,4 +19,8 @@ TEST_GROUP_RUNNER(scnn_fc)
     RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_h);
     RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_w);
     RUN_TEST_CASE(scnn_fc, set_size_fail_invalid_in_size);
+
+    RUN_TEST_CASE(scnn_fc, forward);
+    RUN_TEST_CASE(scnn_fc, forward_fail_x_is_null);
+    RUN_TEST_CASE(scnn_fc, forward_fail_layer_is_null);
 }

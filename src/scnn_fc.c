@@ -9,6 +9,7 @@
 
 #include "scnn_fc.h"
 #include "scnn_mat.h"
+#include "scnn_blas.h"
 
 /**
  * @brief Set the matrix size
@@ -51,9 +52,18 @@ static void set_size(struct scnn_layer *self, const int n, const int c, const in
  */
 static void forward(scnn_layer *self, scnn_mat *x)
 {
-    // stub
-    assert(self != NULL);
-    assert(x != NULL);
+    if ((self == NULL) || (x == NULL)) {
+        return;
+    }
+
+    scnn_scopy(self->x.size, x->data, 1, self->x.data, 1);
+
+    scnn_scopy(self->y.size, self->b.data, 1, self->y.data, 1);
+    scnn_sgemm(SCNN_BLAS_NO_TRANS, SCNN_BLAS_NO_TRANS,
+        self->x.n, self->y.c, self->x.c,
+        1.0,  self->x.data, self->x.c,
+        self->w.data, self->y.c, 1.0,
+        self->y.data, self->y.c);
 }
 
 /**
