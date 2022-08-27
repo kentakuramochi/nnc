@@ -655,7 +655,6 @@ TEST(scnn_blas, saxpy_fail_invalid_incy)
 
 TEST(scnn_blas, sgemv)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -674,7 +673,7 @@ TEST(scnn_blas, sgemv)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 1
     );
@@ -689,7 +688,6 @@ TEST(scnn_blas, sgemv)
 
 TEST(scnn_blas, sgemv_trans)
 {
-    int lda = 2;
     float a[3 * 2] = {
         0.11, 0.21,
         0.12, 0.22,
@@ -709,7 +707,7 @@ TEST(scnn_blas, sgemv_trans)
 
     scnn_sgemv(SCNN_BLAS_TRANS,
         3, 2,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 1
     );
@@ -724,7 +722,6 @@ TEST(scnn_blas, sgemv_trans)
 
 TEST(scnn_blas, sgemv_alpha_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -743,7 +740,7 @@ TEST(scnn_blas, sgemv_alpha_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        2.0, a, lda,
+        2.0, a, 2,
         x, 1,
         1.0, y, 1
     );
@@ -758,7 +755,6 @@ TEST(scnn_blas, sgemv_alpha_2)
 
 TEST(scnn_blas, sgemv_beta_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -777,7 +773,7 @@ TEST(scnn_blas, sgemv_beta_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         2.0, y, 1
     );
@@ -792,7 +788,6 @@ TEST(scnn_blas, sgemv_beta_2)
 
 TEST(scnn_blas, sgemv_incx_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -814,7 +809,7 @@ TEST(scnn_blas, sgemv_incx_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 2,
         1.0, y, 1
     );
@@ -829,7 +824,6 @@ TEST(scnn_blas, sgemv_incx_2)
 
 TEST(scnn_blas, sgemv_incx_rev)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -848,7 +842,7 @@ TEST(scnn_blas, sgemv_incx_rev)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, -1,
         1.0, y, 1
     );
@@ -863,7 +857,6 @@ TEST(scnn_blas, sgemv_incx_rev)
 
 TEST(scnn_blas, sgemv_incx_rev_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -885,7 +878,7 @@ TEST(scnn_blas, sgemv_incx_rev_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, -2,
         1.0, y, 1
     );
@@ -900,7 +893,6 @@ TEST(scnn_blas, sgemv_incx_rev_2)
 
 TEST(scnn_blas, sgemv_incy_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -921,7 +913,7 @@ TEST(scnn_blas, sgemv_incy_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 2
     );
@@ -938,7 +930,6 @@ TEST(scnn_blas, sgemv_incy_2)
 
 TEST(scnn_blas, sgemv_incy_rev)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -957,7 +948,7 @@ TEST(scnn_blas, sgemv_incy_rev)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, -1
     );
@@ -972,7 +963,6 @@ TEST(scnn_blas, sgemv_incy_rev)
 
 TEST(scnn_blas, sgemv_incy_rev_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -993,7 +983,7 @@ TEST(scnn_blas, sgemv_incy_rev_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, -2
     );
@@ -1010,8 +1000,6 @@ TEST(scnn_blas, sgemv_incy_rev_2)
 
 TEST(scnn_blas, sgemv_fail_a_null)
 {
-    int lda = 3;
-
     float x[3] = {
         1,
         2,
@@ -1025,7 +1013,7 @@ TEST(scnn_blas, sgemv_fail_a_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, NULL, lda,
+        1.0, NULL, 2,
         x, 1,
         1.0, y, 1
     );
@@ -1040,7 +1028,6 @@ TEST(scnn_blas, sgemv_fail_a_null)
 
 TEST(scnn_blas, sgemv_fail_x_null)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1053,7 +1040,7 @@ TEST(scnn_blas, sgemv_fail_x_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         NULL, 1,
         1.0, y, 1
     );
@@ -1068,7 +1055,6 @@ TEST(scnn_blas, sgemv_fail_x_null)
 
 TEST(scnn_blas, sgemv_fail_c_null)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1082,7 +1068,7 @@ TEST(scnn_blas, sgemv_fail_c_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, NULL, 1
     );
@@ -1090,7 +1076,6 @@ TEST(scnn_blas, sgemv_fail_c_null)
 
 TEST(scnn_blas, sgemv_fail_invalid_m)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1109,7 +1094,7 @@ TEST(scnn_blas, sgemv_fail_invalid_m)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         0, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 1
     );
@@ -1124,7 +1109,6 @@ TEST(scnn_blas, sgemv_fail_invalid_m)
 
 TEST(scnn_blas, sgemv_fail_invalid_n)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1143,7 +1127,7 @@ TEST(scnn_blas, sgemv_fail_invalid_n)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 0,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 1
     );
@@ -1158,7 +1142,6 @@ TEST(scnn_blas, sgemv_fail_invalid_n)
 
 TEST(scnn_blas, sgemv_fail_invalid_lda)
 {
-    int lda = 0;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1177,7 +1160,7 @@ TEST(scnn_blas, sgemv_fail_invalid_lda)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 0,
         x, 1,
         1.0, y, 1
     );
@@ -1192,7 +1175,6 @@ TEST(scnn_blas, sgemv_fail_invalid_lda)
 
 TEST(scnn_blas, sgemv_fail_invalid_incx)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1211,7 +1193,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incx)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 0,
         1.0, y, 1
     );
@@ -1226,7 +1208,6 @@ TEST(scnn_blas, sgemv_fail_invalid_incx)
 
 TEST(scnn_blas, sgemv_fail_invalid_incy)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
@@ -1245,7 +1226,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incy)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, lda,
+        1.0, a, 2,
         x, 1,
         1.0, y, 0
     );

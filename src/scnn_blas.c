@@ -115,7 +115,11 @@ void scnn_sgemv(const scnn_blas_transpose trans,
     if ((A == NULL) || (x == NULL) || (y == NULL)) {
         return;
     }
-    if ((M < 1) || (N < 1) || (lda < 1) || (incx == 0) || (incy == 0)) {
+    if ((M < 1) || (N < 1) || (lda <= 1) || (incx == 0) || (incy == 0)) {
+        return;
+    }
+    if (((trans == SCNN_BLAS_NO_TRANS) && (lda > M)) ||
+        ((trans == SCNN_BLAS_TRANS) && (lda > N))) {
         return;
     }
 
@@ -126,7 +130,7 @@ void scnn_sgemv(const scnn_blas_transpose trans,
             float sum = 0;
             int x_idx = (incx > 0) ? 0 : (N * -incx - 1);
             for (int j = 0; j < N; j++) {
-                sum += alpha * A[i * lda + j] * x[x_idx];
+                sum += alpha * A[i * N + j] * x[x_idx];
                 x_idx += incx;
             }
             y[y_idx] *= beta;
@@ -140,7 +144,7 @@ void scnn_sgemv(const scnn_blas_transpose trans,
             float sum = 0;
             int x_idx = (incx > 0) ? 0 : (M * -incx - 1);
             for (int j = 0; j < M; j++) {
-                sum += alpha * A[j * lda + i] * x[x_idx];
+                sum += alpha * A[j * N + i] * x[x_idx];
                 x_idx += incx;
             }
             y[y_idx] *= beta;
