@@ -1241,20 +1241,17 @@ TEST(scnn_blas, sgemv_fail_invalid_incy)
 
 TEST(scnn_blas, sgemm_no_trans)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1263,9 +1260,9 @@ TEST(scnn_blas, sgemm_no_trans)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 3,
+        b, 2,
+        1.0, c, 2 
     );
 
     float answer[] = {
@@ -1278,19 +1275,16 @@ TEST(scnn_blas, sgemm_no_trans)
 
 TEST(scnn_blas, sgemm_trans_b)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 3;
     float b[2 * 3] = {
         1011, 1021, 1031,
         1012, 1022, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1299,9 +1293,9 @@ TEST(scnn_blas, sgemm_trans_b)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_TRANS,
         2, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 3,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1314,21 +1308,18 @@ TEST(scnn_blas, sgemm_trans_b)
 
 TEST(scnn_blas, sgemm_trans_a)
 {
-    int lda = 2;
     float a[3 * 2] = {
         0.11, 0.21,
         0.12, 0.22,
         0.13, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1336,10 +1327,10 @@ TEST(scnn_blas, sgemm_trans_a)
 
     scnn_sgemm(SCNN_BLAS_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        3, 2, 2,
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1352,20 +1343,17 @@ TEST(scnn_blas, sgemm_trans_a)
 
 TEST(scnn_blas, sgemm_trans_ab)
 {
-    int lda = 2;
     float a[3 * 2] = {
         0.11, 0.21,
         0.12, 0.22,
         0.13, 0.23
     };
 
-    int ldb = 3;
     float b[2 * 3] = {
         1011, 1021, 1031,
         1012, 1022, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1373,10 +1361,10 @@ TEST(scnn_blas, sgemm_trans_ab)
 
     scnn_sgemm(SCNN_BLAS_TRANS,
         SCNN_BLAS_TRANS,
-        2, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        3, 3, 2,
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 2 
     );
 
     float answer[] = {
@@ -1389,20 +1377,17 @@ TEST(scnn_blas, sgemm_trans_ab)
 
 TEST(scnn_blas, sgemm_alpha_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1411,9 +1396,9 @@ TEST(scnn_blas, sgemm_alpha_2)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
-        2.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        2.0, a, 3,
+        b, 2,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1426,20 +1411,17 @@ TEST(scnn_blas, sgemm_alpha_2)
 
 TEST(scnn_blas, sgemm_beta_2)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1448,9 +1430,9 @@ TEST(scnn_blas, sgemm_beta_2)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        2.0, c, ldc
+        1.0, a, 3,
+        b, 2,
+        2.0, c, 2
     );
 
     float answer[] = {
@@ -1463,16 +1445,12 @@ TEST(scnn_blas, sgemm_beta_2)
 
 TEST(scnn_blas, sgemm_fail_a_null)
 {
-    int lda = 3;
-
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1481,9 +1459,9 @@ TEST(scnn_blas, sgemm_fail_a_null)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, NULL, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, NULL, 3,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1496,15 +1474,11 @@ TEST(scnn_blas, sgemm_fail_a_null)
 
 TEST(scnn_blas, sgemm_fail_b_null)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
-
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1513,9 +1487,9 @@ TEST(scnn_blas, sgemm_fail_b_null)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        NULL, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        NULL, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1528,46 +1502,39 @@ TEST(scnn_blas, sgemm_fail_b_null)
 
 TEST(scnn_blas, sgemm_fail_c_null)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
-
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        b, ldb,
-        1.0, NULL, ldc
+        1.0, a, 2,
+        b, 3,
+        1.0, NULL, 2
     );
 }
 
 TEST(scnn_blas, sgemm_fail_invalid_m)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1576,9 +1543,9 @@ TEST(scnn_blas, sgemm_fail_invalid_m)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         0, 2, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1591,20 +1558,17 @@ TEST(scnn_blas, sgemm_fail_invalid_m)
 
 TEST(scnn_blas, sgemm_fail_invalid_n)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1613,9 +1577,9 @@ TEST(scnn_blas, sgemm_fail_invalid_n)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 0, 3,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1628,20 +1592,17 @@ TEST(scnn_blas, sgemm_fail_invalid_n)
 
 TEST(scnn_blas, sgemm_fail_invalid_k)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1650,9 +1611,9 @@ TEST(scnn_blas, sgemm_fail_invalid_k)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 22
     );
 
     float answer[] = {
@@ -1665,20 +1626,17 @@ TEST(scnn_blas, sgemm_fail_invalid_k)
 
 TEST(scnn_blas, sgemm_fail_invalid_lda)
 {
-    int lda = 0;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1687,9 +1645,9 @@ TEST(scnn_blas, sgemm_fail_invalid_lda)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 0,
+        b, 3,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1702,20 +1660,17 @@ TEST(scnn_blas, sgemm_fail_invalid_lda)
 
 TEST(scnn_blas, sgemm_fail_invalid_ldb)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 0;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 2;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1724,9 +1679,9 @@ TEST(scnn_blas, sgemm_fail_invalid_ldb)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        b, 0,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1739,20 +1694,17 @@ TEST(scnn_blas, sgemm_fail_invalid_ldb)
 
 TEST(scnn_blas, sgemm_fail_invalid_ldc)
 {
-    int lda = 3;
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
         0.21, 0.22, 0.23
     };
 
-    int ldb = 2;
     float b[3 * 2] = {
         1011, 1012,
         1021, 1022,
         1031, 1032
     };
 
-    int ldc = 0;
     float c[2 * 2] = {
         1, 2,
         3, 4
@@ -1761,9 +1713,9 @@ TEST(scnn_blas, sgemm_fail_invalid_ldc)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, lda,
-        b, ldb,
-        1.0, c, ldc
+        1.0, a, 2,
+        b, 3,
+        1.0, c, 0
     );
 
     float answer[] = {
