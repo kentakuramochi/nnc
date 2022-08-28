@@ -76,8 +76,8 @@ TEST_GROUP_RUNNER(scnn_blas)
 
     RUN_TEST_CASE(scnn_blas, sgemm_no_trans);
     RUN_TEST_CASE(scnn_blas, sgemm_trans_b);
-    //RUN_TEST_CASE(scnn_blas, sgemm_trans_a);
-    //RUN_TEST_CASE(scnn_blas, sgemm_trans_ab);
+    RUN_TEST_CASE(scnn_blas, sgemm_trans_a);
+    RUN_TEST_CASE(scnn_blas, sgemm_trans_ab);
     RUN_TEST_CASE(scnn_blas, sgemm_alpha_2);
     RUN_TEST_CASE(scnn_blas, sgemm_beta_2);
     RUN_TEST_CASE(scnn_blas, sgemm_fail_a_null);

@@ -118,8 +118,8 @@ void scnn_sgemv(const scnn_blas_transpose trans,
     if ((M < 1) || (N < 1) || (incx == 0) || (incy == 0)) {
         return;
     }
-    if (((trans == SCNN_BLAS_NO_TRANS) && (lda < M)) ||
-        ((trans == SCNN_BLAS_TRANS) && (lda < N))) {
+    if (((trans == SCNN_BLAS_NO_TRANS) && (lda < N)) ||
+        ((trans == SCNN_BLAS_TRANS) && (lda < M))) {
         return;
     }
 
@@ -130,7 +130,7 @@ void scnn_sgemv(const scnn_blas_transpose trans,
             float sum = 0;
             int x_idx = (incx > 0) ? 0 : (N * -incx - 1);
             for (int j = 0; j < N; j++) {
-                sum += alpha * A[i * N + j] * x[x_idx];
+                sum += alpha * A[i * lda + j] * x[x_idx];
                 x_idx += incx;
             }
             y[y_idx] *= beta;
@@ -139,12 +139,12 @@ void scnn_sgemv(const scnn_blas_transpose trans,
         }
     } else {
         // a: TRANS
-        int y_idx = (incy > 0) ? 0 : (N * -incy - 1);
-        for (int i = 0; i < N; i++) {
+        int y_idx = (incy > 0) ? 0 : (M * -incy - 1);
+        for (int i = 0; i < M; i++) {
             float sum = 0;
-            int x_idx = (incx > 0) ? 0 : (M * -incx - 1);
-            for (int j = 0; j < M; j++) {
-                sum += alpha * A[j * N + i] * x[x_idx];
+            int x_idx = (incx > 0) ? 0 : (N * -incx - 1);
+            for (int j = 0; j < N; j++) {
+                sum += alpha * A[j * lda + i] * x[x_idx];
                 x_idx += incx;
             }
             y[y_idx] *= beta;
@@ -207,26 +207,26 @@ void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose tran
     } else {
         if (transb == SCNN_BLAS_NO_TRANS) {
             // a: TRANS, b: NO_TRANS
-            for (int i = 0; i < lda; i++) {
+            for (int i = 0; i < M; i++) {
                 for (int j = 0; j < N; j++) {
                     float sum = 0;
-                    for (int k = 0; k < M; k++) {
-                        sum += A[k * M + i] * B[k * N + j];
+                    for (int k = 0; k < K; k++) {
+                        sum += A[k * lda + i] * B[k * ldb + j];
                     }
-                    C[i * N + j] *= beta;
-                    C[i * N + j] += alpha * sum;
+                    C[i * ldc + j] *= beta;
+                    C[i * ldc + j] += alpha * sum;
                 }
             }
         } else {
             // a: TRANS, b: TRANS
-            for (int i = 0; i < lda; i++) {
-                for (int j = 0; j < M; j++) {
+            for (int i = 0; i < M; i++) {
+                for (int j = 0; j < N; j++) {
                     float sum = 0;
-                    for (int k = 0; k < ldb; k++) {
-                        sum += A[k * M + i] * B[j * K + k];
+                    for (int k = 0; k < K; k++) {
+                        sum += A[k * lda + i] * B[j * ldb + k];
                     }
-                    C[i * M + j] *= beta;
-                    C[i * M + j] += alpha * sum;
+                    C[i * ldc + j] *= beta;
+                    C[i * ldc + j] += alpha * sum;
                 }
             }
         }

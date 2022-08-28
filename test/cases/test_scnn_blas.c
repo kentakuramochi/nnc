@@ -673,7 +673,7 @@ TEST(scnn_blas, sgemv)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, 1
     );
@@ -706,7 +706,7 @@ TEST(scnn_blas, sgemv_trans)
     };
 
     scnn_sgemv(SCNN_BLAS_TRANS,
-        3, 2,
+        2, 3,
         1.0, a, 2,
         x, 1,
         1.0, y, 1
@@ -740,7 +740,7 @@ TEST(scnn_blas, sgemv_alpha_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        2.0, a, 2,
+        2.0, a, 3,
         x, 1,
         1.0, y, 1
     );
@@ -773,7 +773,7 @@ TEST(scnn_blas, sgemv_beta_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         2.0, y, 1
     );
@@ -809,7 +809,7 @@ TEST(scnn_blas, sgemv_incx_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 2,
         1.0, y, 1
     );
@@ -842,7 +842,7 @@ TEST(scnn_blas, sgemv_incx_rev)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, -1,
         1.0, y, 1
     );
@@ -878,7 +878,7 @@ TEST(scnn_blas, sgemv_incx_rev_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, -2,
         1.0, y, 1
     );
@@ -913,7 +913,7 @@ TEST(scnn_blas, sgemv_incy_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, 2
     );
@@ -948,7 +948,7 @@ TEST(scnn_blas, sgemv_incy_rev)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, -1
     );
@@ -983,7 +983,7 @@ TEST(scnn_blas, sgemv_incy_rev_2)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, -2
     );
@@ -1013,7 +1013,7 @@ TEST(scnn_blas, sgemv_fail_a_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, NULL, 2,
+        1.0, NULL, 3,
         x, 1,
         1.0, y, 1
     );
@@ -1040,7 +1040,7 @@ TEST(scnn_blas, sgemv_fail_x_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         NULL, 1,
         1.0, y, 1
     );
@@ -1068,7 +1068,7 @@ TEST(scnn_blas, sgemv_fail_c_null)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, NULL, 1
     );
@@ -1094,7 +1094,7 @@ TEST(scnn_blas, sgemv_fail_invalid_m)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         0, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, 1
     );
@@ -1127,7 +1127,7 @@ TEST(scnn_blas, sgemv_fail_invalid_n)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 0,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, 1
     );
@@ -1193,7 +1193,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incx)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 0,
         1.0, y, 1
     );
@@ -1226,7 +1226,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incy)
 
     scnn_sgemv(SCNN_BLAS_NO_TRANS,
         2, 3,
-        1.0, a, 2,
+        1.0, a, 3,
         x, 1,
         1.0, y, 0
     );
@@ -1327,9 +1327,9 @@ TEST(scnn_blas, sgemm_trans_a)
 
     scnn_sgemm(SCNN_BLAS_TRANS,
         SCNN_BLAS_NO_TRANS,
-        3, 2, 2,
+        2, 2, 3,
         1.0, a, 2,
-        b, 3,
+        b, 2,
         1.0, c, 2
     );
 
@@ -1361,7 +1361,7 @@ TEST(scnn_blas, sgemm_trans_ab)
 
     scnn_sgemm(SCNN_BLAS_TRANS,
         SCNN_BLAS_TRANS,
-        3, 3, 2,
+        2, 2, 3,
         1.0, a, 2,
         b, 3,
         1.0, c, 2 
@@ -1458,9 +1458,9 @@ TEST(scnn_blas, sgemm_fail_a_null)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
+        2, 2, 3,
         1.0, NULL, 3,
-        b, 3,
+        b, 2,
         1.0, c, 2
     );
 
@@ -1486,9 +1486,9 @@ TEST(scnn_blas, sgemm_fail_b_null)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
-        1.0, a, 2,
-        NULL, 3,
+        2, 2, 3,
+        1.0, a, 3,
+        NULL, 2,
         1.0, c, 2
     );
 
@@ -1515,9 +1515,9 @@ TEST(scnn_blas, sgemm_fail_c_null)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
-        1.0, a, 2,
-        b, 3,
+        2, 2, 3,
+        1.0, a, 3,
+        b, 2,
         1.0, NULL, 2
     );
 }
@@ -1543,8 +1543,8 @@ TEST(scnn_blas, sgemm_fail_invalid_m)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         0, 2, 3,
-        1.0, a, 2,
-        b, 3,
+        1.0, a, 3,
+        b, 2,
         1.0, c, 2
     );
 
@@ -1577,8 +1577,8 @@ TEST(scnn_blas, sgemm_fail_invalid_n)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 0, 3,
-        1.0, a, 2,
-        b, 3,
+        1.0, a, 3,
+        b, 2,
         1.0, c, 2
     );
 
@@ -1611,9 +1611,9 @@ TEST(scnn_blas, sgemm_fail_invalid_k)
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
-        1.0, a, 2,
-        b, 3,
-        1.0, c, 22
+        1.0, a, 3,
+        b, 2,
+        1.0, c, 2
     );
 
     float answer[] = {
@@ -1644,9 +1644,9 @@ TEST(scnn_blas, sgemm_fail_invalid_lda)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
+        2, 2, 3,
         1.0, a, 0,
-        b, 3,
+        b, 2,
         1.0, c, 2
     );
 
@@ -1678,8 +1678,8 @@ TEST(scnn_blas, sgemm_fail_invalid_ldb)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
-        1.0, a, 2,
+        2, 2, 3,
+        1.0, a, 3,
         b, 0,
         1.0, c, 2
     );
@@ -1712,9 +1712,9 @@ TEST(scnn_blas, sgemm_fail_invalid_ldc)
 
     scnn_sgemm(SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
-        2, 2, 0,
+        2, 2, 3,
         1.0, a, 2,
-        b, 3,
+        b, 2,
         1.0, c, 0
     );
 

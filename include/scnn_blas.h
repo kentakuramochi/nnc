@@ -71,7 +71,7 @@ void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, 
  * @param[in] N     Cols of matrix A (> 0)
  * @param[in] alpha Scalar alpha
  * @param[in] A     Pointer to MxN matrix A
- * @param[in] lda   Leading dimension of A (> 0)
+ * @param[in] lda   Leading dimension of A (>= N if A is not transposed, >= M otherwise)
  * @param[in] x     Pointer to vector x
  * @param[in] incx  Stride between elements of x (!= 0, reversal order if negative)
  * @param[in] beta  Scalar beta
@@ -94,12 +94,12 @@ void scnn_sgemv(const scnn_blas_transpose trans,
  * @param[in] K         Cols of matrix A, Rows of matrix B (> 0)
  * @param[in] alpha     Scalar alpha
  * @param[in] A         Pointer to MxK matrix A
- * @param[in] lda       Leading dimension of A (> 0)
+ * @param[in] lda       Leading dimension of A (>= K if A is not transposed, >= M otherwise)
  * @param[in] B         Pointer to KxN matrix B
- * @param[in] ldb       Leading dimension of B (> 0)
+ * @param[in] ldb       Leading dimension of B (>= N if B is not transposed, >= K otherwise)
  * @param[in] beta      Scalar beta
  * @param[in,out] C     Pointer to MxN matrix C
- * @param[in] ldc       Leading dimension of C (> 0)
+ * @param[in] ldc       Leading dimension of C (>= M)
  */
 void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose transb,
     const int M, const int N, const int K,
