@@ -23,4 +23,8 @@ TEST_GROUP_RUNNER(scnn_fc)
     RUN_TEST_CASE(scnn_fc, forward);
     RUN_TEST_CASE(scnn_fc, forward_fail_x_is_null);
     RUN_TEST_CASE(scnn_fc, forward_fail_layer_is_null);
+
+    RUN_TEST_CASE(scnn_fc, backward);
+    RUN_TEST_CASE(scnn_fc, backward_fail_dy_is_null);
+    RUN_TEST_CASE(scnn_fc, backward_fail_layer_is_null);
 }

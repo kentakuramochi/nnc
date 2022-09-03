@@ -4,8 +4,6 @@
  * 
  */
 #include <stddef.h>
-// stub
-#include <assert.h>
 
 #include "scnn_fc.h"
 #include "scnn_mat.h"
@@ -60,9 +58,9 @@ static void forward(scnn_layer *self, scnn_mat *x)
 
     scnn_scopy(self->y.size, self->b.data, 1, self->y.data, 1);
     scnn_sgemm(SCNN_BLAS_NO_TRANS, SCNN_BLAS_NO_TRANS,
-        self->x.n, self->y.c, self->x.c,
-        1.0,  self->x.data, self->x.c,
-        self->w.data, self->y.c, 1.0,
+        self->x.n, self->w.n, self->x.c,
+        1.0, self->x.data, self->x.c,
+        self->w.data, self->w.n, 1.0,
         self->y.data, self->y.c);
 }
 
@@ -74,9 +72,28 @@ static void forward(scnn_layer *self, scnn_mat *x)
  */
 static void backward(scnn_layer *self, scnn_mat *dy)
 {
-    // stub
-    assert(self != NULL);
-    assert(dy != NULL);
+    if ((self == NULL) || (dy == NULL)) {
+        return;
+    }
+
+    // dx = dy W^T
+    scnn_mat_fill(&self->dx, 0);
+    scnn_sgemm(SCNN_BLAS_NO_TRANS, SCNN_BLAS_TRANS,
+        dy->n, self->w.c, dy->c,
+        1.0, dy->data, dy->c,
+        self->w.data, self->w.n, 1.0,
+        self->dx.data, self->dx.c);
+
+    // dW = x^T dy
+    scnn_mat_fill(&self->dw, 0);
+    scnn_sgemm(SCNN_BLAS_TRANS, SCNN_BLAS_NO_TRANS,
+        self->x.c, dy->c, self->x.n,
+        1.0, self->x.data, self->x.c,
+        dy->data, dy->c, 1.0,
+        self->dw.data, self->dw.n);
+
+    // db = dy
+    scnn_scopy(self->db.size, dy->data, 1, self->db.data, 1);
 }
 
 scnn_layer *scnn_fc_layer(const scnn_layer_params params)

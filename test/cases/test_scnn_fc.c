@@ -314,3 +314,154 @@ TEST(scnn_fc, forward_fail_layer_is_null)
 
     scnn_layer_free(&fc);
 }
+
+TEST(scnn_fc, backward)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat x;
+    scnn_mat_init(&x, 1, 2, 1, 1);
+    scnn_mat_copy_from_array(&fc->x,
+        (float[]){
+            1, 2
+        },
+        fc->x.size);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    scnn_mat dy;
+    scnn_mat_init(&dy, 1, 3, 1, 1);
+    scnn_mat_copy_from_array(&dy,
+        (float[]){
+            8, 12, 16
+        },
+        dy.size);
+
+    fc->backward(fc, &dy);
+
+    float answer_dx[] = {
+        44, 152
+    };
+    float answer_dw[] = {
+        8,  12, 16,
+        16, 24, 32
+    };
+    float answer_db[] = {
+        8, 12, 16
+    };
+
+    //printf("\ndw\n");
+    //for (int i = 0; i < fc->dw.n; i++) {
+    //    for (int j = 0; j < fc->dw.c; j++) {
+    //        printf("%f,", fc->dw.data[i * fc->dw.c + j]);
+    //    }
+    //    printf("\n");
+    //}
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dx, fc->dx.data, fc->dx.size);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dw, fc->dw.data, fc->dw.size);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_db, fc->db.data, fc->db.size);
+
+    scnn_layer_free(&fc);
+}
+
+TEST(scnn_fc, backward_fail_dy_is_null)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat x;
+    scnn_mat_init(&x, 1, 2, 1, 1);
+    scnn_mat_copy_from_array(&x,
+        (float[]){
+            1, 1
+        },
+        fc->x.size);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    scnn_mat_fill(&fc->dx, 0);
+    scnn_mat_fill(&fc->dw, 0);
+    scnn_mat_fill(&fc->db, 0);
+
+    fc->backward(fc, NULL);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->dx.data, fc->dx.size);
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->dw.data, fc->dw.size);
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->db.data, fc->db.size);
+
+    scnn_layer_free(&fc);
+}
+
+TEST(scnn_fc, backward_fail_layer_is_null)
+{
+    scnn_layer_params params = { .in = 2, .out = 3 };
+    scnn_layer *fc = scnn_fc_layer(params);
+    fc->set_size(fc, 1, 2, 1, 1);
+
+    scnn_mat x;
+    scnn_mat_init(&x, 1, 2, 1, 1);
+    scnn_mat_copy_from_array(&x,
+        (float[]){
+            1, 1
+        },
+        fc->x.size);
+
+    scnn_mat_copy_from_array(&fc->w,
+        (float[]){
+            0, 1, 2,
+            3, 4, 5
+        },
+        fc->w.size);
+
+    scnn_mat_copy_from_array(&fc->b,
+        (float[]){
+            1, 1, 1
+        },
+        fc->b.size);
+
+    scnn_mat dy;
+    scnn_mat_init(&dy, 1, 3, 1, 1);
+    scnn_mat_copy_from_array(&dy,
+        (float[]){
+            8, 12, 16
+        },
+        dy.size);
+
+    scnn_mat_fill(&fc->dx, 0);
+    scnn_mat_fill(&fc->dw, 0);
+    scnn_mat_fill(&fc->db, 0);
+
+    fc->backward(NULL, &dy);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->dx.data, fc->dx.size);
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->dw.data, fc->dw.size);
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->db.data, fc->db.size);
+
+    scnn_layer_free(&fc);
+}
