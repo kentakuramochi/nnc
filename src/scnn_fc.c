@@ -6,7 +6,6 @@
 #include <stddef.h>
 
 #include "scnn_fc.h"
-#include "scnn_mat.h"
 #include "scnn_blas.h"
 
 /**

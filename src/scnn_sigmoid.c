@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "scnn_sigmoid.h"
-#include "scnn_mat.h"
 #include "scnn_blas.h"
 
 /**

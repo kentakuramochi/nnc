@@ -3,10 +3,10 @@
  * @brief Matrix operations for data array
  * 
  */
-#include "scnn_blas.h"
-
 #include <stddef.h>
 #include <math.h>
+
+#include "scnn_blas.h"
 
 void scnn_scopy(const int n, const float *x, const int incx, float *y, const int incy)
 {
