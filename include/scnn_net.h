@@ -43,7 +43,7 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer);
  * @param[in,out]   net Network
  * @param[in]       x   Network input
  */
-//void scnn_net_forward(scnn_net *net, const scnn_mat *x);
+void scnn_net_forward(scnn_net *net, const scnn_mat *x);
 
 /**
  * @brief Backward propagation of network
@@ -51,7 +51,7 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer);
  * @param[in,out]   net Network
  * @param[in]       t   Training label
  */
-//void scnn_net_backward(scnn_net *net, const scnn_mat *t);
+void scnn_net_backward(scnn_net *net, const scnn_mat *t);
 
 /**
  * @brief Free network

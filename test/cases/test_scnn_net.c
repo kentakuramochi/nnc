@@ -154,3 +154,156 @@ TEST(scnn_net, append_over_max_size)
 
     scnn_net_free(&net);
 }
+
+TEST(scnn_net, forward)
+{
+    scnn_net *net = scnn_net_alloc();
+
+    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
+    fc->set_size(fc, 1, 2, 1, 1);
+    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
+    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
+    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
+    softmax->set_size(softmax, 1, 2, 1, 1);
+
+    scnn_mat_copy_from_array(&fc->w, (float[]){ 1, 2, 3, 4 }, fc->w.size);
+    scnn_mat_copy_from_array(&fc->b, (float[]){ 0, 1 }, fc->w.size);
+
+    scnn_net_append(net, fc);
+    scnn_net_append(net, sigmoid);
+    scnn_net_append(net, softmax);
+
+    scnn_mat *x = scnn_mat_alloc();
+    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+
+    scnn_net_forward(net, x);
+
+    float y_fc[] = { 0.7, 2 };
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_fc, net->layers[0]->y.data, net->layers[0]->y.size);
+
+    float y_sigmoid[] = { 0.66818777, 0.88079708 };
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_sigmoid, net->layers[1]->y.data, net->layers[1]->y.size);
+
+    float y_softmax[] = { 0.44704699, 0.55295301 };
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_softmax, net->layers[2]->y.data, net->layers[2]->y.size);
+
+    scnn_net_free(&net);
+}
+
+TEST(scnn_net, forward_net_is_null)
+{
+    scnn_mat *x = scnn_mat_alloc();
+    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+
+    scnn_net_forward(NULL, x);
+}
+
+TEST(scnn_net, forward_x_is_null)
+{
+    scnn_net *net = scnn_net_alloc();
+
+    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
+    fc->set_size(fc, 1, 2, 1, 1);
+    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
+    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
+    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
+    softmax->set_size(softmax, 1, 2, 1, 1);
+
+    scnn_mat_copy_from_array(&fc->w, (float[]){ 1, 2, 3, 4 }, fc->w.size);
+    scnn_mat_copy_from_array(&fc->b, (float[]){ 0, 1 }, fc->w.size);
+
+    scnn_net_append(net, fc);
+    scnn_net_append(net, sigmoid);
+    scnn_net_append(net, softmax);
+
+    scnn_mat_fill(&net->output->y, 0);
+
+    scnn_net_forward(net, NULL);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, net->output->y.data, net->output->y.size);
+
+    scnn_net_free(&net);
+}
+
+TEST(scnn_net, backward)
+{
+    scnn_net *net = scnn_net_alloc();
+
+    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
+    fc->set_size(fc, 1, 2, 1, 1);
+    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
+    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
+    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
+    softmax->set_size(softmax, 1, 2, 1, 1);
+
+    scnn_mat_copy_from_array(&fc->w, (float[]){ 1, 2, 3, 4 }, fc->w.size);
+    scnn_mat_copy_from_array(&fc->b, (float[]){ 0, 1 }, fc->w.size);
+
+    scnn_net_append(net, fc);
+    scnn_net_append(net, sigmoid);
+    scnn_net_append(net, softmax);
+
+    scnn_mat *x = scnn_mat_alloc();
+    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+
+    scnn_net_forward(net, x);
+
+    scnn_mat *t = scnn_mat_alloc();
+    scnn_mat_init(t, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(t, (float[]){ 0, 1 }, x->size);
+
+    scnn_net_backward(net, t);
+
+    float dx_ans[] = {
+        0.00524194, 0.10959995
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx_ans, net->layers[0]->dx.data, net->layers[0]->y.size);
+
+    scnn_net_free(&net);
+}
+
+TEST(scnn_net, backward_net_is_null)
+{
+    scnn_mat *x = scnn_mat_alloc();
+    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+
+    scnn_net_backward(NULL, x);
+}
+
+TEST(scnn_net, backward_t_is_null)
+{
+    scnn_net *net = scnn_net_alloc();
+
+    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
+    fc->set_size(fc, 1, 2, 1, 1);
+    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
+    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
+    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
+    softmax->set_size(softmax, 1, 2, 1, 1);
+
+    scnn_mat_copy_from_array(&fc->w, (float[]){ 1, 2, 3, 4 }, fc->w.size);
+    scnn_mat_copy_from_array(&fc->b, (float[]){ 0, 1 }, fc->w.size);
+
+    scnn_net_append(net, fc);
+    scnn_net_append(net, sigmoid);
+    scnn_net_append(net, softmax);
+
+    scnn_mat *x = scnn_mat_alloc();
+    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+
+    scnn_mat_fill(&net->input->dx, 0);
+
+    scnn_net_forward(net, x);
+
+    scnn_net_backward(net, NULL);
+
+    TEST_ASSERT_EACH_EQUAL_FLOAT(0, net->input->dx.data, net->input->dx.size);
+
+    scnn_net_free(&net);
+}

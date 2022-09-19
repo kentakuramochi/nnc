@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #include "scnn_net.h"
+#include "scnn_blas.h"
 
 scnn_net *scnn_net_alloc(void)
 {
@@ -75,13 +76,44 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer)
     return net;
 }
 
-//void scnn_net_forward(scnn_net *net, const scnn_mat *x)
-//{
-//}
+void scnn_net_forward(scnn_net *net, const scnn_mat *x)
+{
+    if ((net == NULL) || (x == NULL)) {
+        return;
+    }
 
-//void scnn_net_backward(scnn_net *net, const scnn_mat *t)
-//{
-//}
+    scnn_mat *in = scnn_mat_alloc();
+    scnn_mat_init(in, x->n, x->c, x->h, x->h);
+    scnn_mat_copy_from_array(in, x->data, x->size);
+
+    scnn_layer  *layer;
+    for (int i = 0; i < net->size; i++) {
+        layer = net->layers[i];
+        layer->forward(layer, in);
+        in = &(layer->y);
+    }
+}
+
+void scnn_net_backward(scnn_net *net, const scnn_mat *t)
+{
+    if ((net == NULL) || (t == NULL)) {
+        return;
+    }
+
+    scnn_mat *dy = scnn_mat_alloc();
+    scnn_mat_init(dy, t->n, t->c, t->h, t->w);
+
+    scnn_scopy(net->output->y.size, net->output->y.data, 1, dy->data, 1);
+    scnn_saxpy(t->size, -1, t->data, 1, dy->data, 1);
+
+    scnn_mat    *out = dy;
+    scnn_layer  *layer;
+    for (int i = (net->size - 1); i >= 0; i--) {
+        layer = net->layers[i];
+        layer->backward(layer, out);
+        out = &(layer->dx);
+    }
+}
 
 void scnn_net_free(scnn_net **net)
 {
