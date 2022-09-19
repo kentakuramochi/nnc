@@ -19,6 +19,8 @@ static void RunAllTests(void)
 
     RUN_TEST_GROUP(scnn_softmax);
 
+    RUN_TEST_GROUP(scnn_net);
+
     //RUN_TEST_GROUP(data);
 
     //RUN_TEST_GROUP(util);
