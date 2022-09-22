@@ -29,6 +29,7 @@ TEST(scnn_softmax, alloc_and_free)
     TEST_ASSERT_EQUAL_INT(softmax->params.in, softmax->params.out);
 
     TEST_ASSERT_NOT_NULL(softmax->forward);
+    TEST_ASSERT_NOT_NULL(softmax->backward);
 
     TEST_ASSERT_NOT_NULL(softmax->set_size);
 

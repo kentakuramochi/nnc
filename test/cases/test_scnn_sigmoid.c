@@ -29,6 +29,7 @@ TEST(scnn_sigmoid, alloc_and_free)
     TEST_ASSERT_EQUAL_INT(sigmoid->params.in, sigmoid->params.out);
 
     TEST_ASSERT_NOT_NULL(sigmoid->forward);
+    TEST_ASSERT_NOT_NULL(sigmoid->backward);
 
     TEST_ASSERT_NOT_NULL(sigmoid->set_size);
 

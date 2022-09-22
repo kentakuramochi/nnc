@@ -28,6 +28,7 @@ TEST(scnn_fc, alloc_and_free)
     TEST_ASSERT_EQUAL_INT(params.out, fc->params.out);
 
     TEST_ASSERT_NOT_NULL(fc->forward);
+    TEST_ASSERT_NOT_NULL(fc->backward);
 
     TEST_ASSERT_NOT_NULL(fc->set_size);
 
