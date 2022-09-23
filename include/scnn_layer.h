@@ -13,8 +13,9 @@
  * 
  */
 typedef struct scnn_layer_params {
-    int in;     //!< Input channels
-    int out;    //!< Output channels
+    int in_shape[4];    //!< Input shape
+    int in;             //!< Input channels
+    int out;            //!< Output channels
 } scnn_layer_params;
 
 /**
@@ -49,7 +50,7 @@ typedef struct scnn_layer {
  * 
  * @return Pointer to layer, NULL if failed
  */
-scnn_layer *scnn_layer_alloc(void);
+scnn_layer *scnn_layer_alloc(const scnn_layer_params params);
 
 /**
  * @brief Free layer

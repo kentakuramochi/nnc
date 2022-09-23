@@ -88,7 +88,7 @@ scnn_layer *scnn_softmax_layer(const scnn_layer_params params)
         return NULL;
     }
 
-    scnn_layer *layer = scnn_layer_alloc();
+    scnn_layer *layer = scnn_layer_alloc(params);
     if (layer == NULL) {
         return NULL;
     }
