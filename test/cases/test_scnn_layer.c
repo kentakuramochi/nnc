@@ -98,3 +98,30 @@ TEST(scnn_layer, set_shape_4d)
 
     scnn_layer_free(&layer);
 }
+
+TEST(scnn_layer, set_invalid_shape_2d)
+{
+    scnn_layer *layer = scnn_layer_alloc((scnn_layer_params){ .in_shape = { 0, 1 } });
+
+    TEST_ASSERT_NULL(layer);
+
+    scnn_layer_free(&layer);
+}
+
+TEST(scnn_layer, set_invalid_shape_3d)
+{
+    scnn_layer *layer = scnn_layer_alloc((scnn_layer_params){ .in_shape = { 1, 0, 1 } });
+
+    TEST_ASSERT_NULL(layer);
+
+    scnn_layer_free(&layer);
+}
+
+TEST(scnn_layer, set_invalid_shape_negative)
+{
+    scnn_layer *layer = scnn_layer_alloc((scnn_layer_params){ .in_shape = { -1 } });
+
+    TEST_ASSERT_NULL(layer);
+
+    scnn_layer_free(&layer);
+}

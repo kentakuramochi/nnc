@@ -16,4 +16,8 @@ TEST_GROUP_RUNNER(scnn_layer)
     RUN_TEST_CASE(scnn_layer, set_shape_2d);
     RUN_TEST_CASE(scnn_layer, set_shape_3d);
     RUN_TEST_CASE(scnn_layer, set_shape_4d);
+
+    RUN_TEST_CASE(scnn_layer, set_invalid_shape_2d);
+    RUN_TEST_CASE(scnn_layer, set_invalid_shape_3d);
+    RUN_TEST_CASE(scnn_layer, set_invalid_shape_negative);
 }

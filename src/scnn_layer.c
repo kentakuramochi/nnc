@@ -4,6 +4,7 @@
  * 
  */
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "scnn_layer.h"
 
@@ -15,10 +16,18 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
     }
 
     // count num of dimension
-    int n_dim = 0;
+    int  n_dim = 0;
+    bool has_dim_zero = false;
     for (int i = 0; i < 4; i++) {
         if (params.in_shape[i] > 0) {
+            if (has_dim_zero) {
+                return NULL;
+            }
             n_dim++;
+        } else if (params.in_shape[i] < 0) {
+            return NULL;
+        } else { // zero
+            has_dim_zero = true;
         }
     }
     // set 4-d shape with considering with omitted dimension
