@@ -173,8 +173,7 @@ TEST(scnn_net, forward)
     scnn_net_append(net, sigmoid);
     scnn_net_append(net, softmax);
 
-    scnn_mat *x = scnn_mat_alloc();
-    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
     scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
 
     scnn_net_forward(net, x);
@@ -193,8 +192,7 @@ TEST(scnn_net, forward)
 
 TEST(scnn_net, forward_net_is_null)
 {
-    scnn_mat *x = scnn_mat_alloc();
-    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
     scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
 
     scnn_net_forward(NULL, x);
@@ -245,14 +243,12 @@ TEST(scnn_net, backward)
     scnn_net_append(net, sigmoid);
     scnn_net_append(net, softmax);
 
-    scnn_mat *x = scnn_mat_alloc();
-    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
     scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
 
     scnn_net_forward(net, x);
 
-    scnn_mat *t = scnn_mat_alloc();
-    scnn_mat_init(t, 1, 1, 1, 2);
+    scnn_mat *t = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
     scnn_mat_copy_from_array(t, (float[]){ 0, 1 }, x->size);
 
     scnn_net_backward(net, t);
@@ -268,8 +264,7 @@ TEST(scnn_net, backward)
 
 TEST(scnn_net, backward_net_is_null)
 {
-    scnn_mat *x = scnn_mat_alloc();
-    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 }});
     scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
 
     scnn_net_backward(NULL, x);
@@ -293,8 +288,7 @@ TEST(scnn_net, backward_t_is_null)
     scnn_net_append(net, sigmoid);
     scnn_net_append(net, softmax);
 
-    scnn_mat *x = scnn_mat_alloc();
-    scnn_mat_init(x, 1, 1, 1, 2);
+    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
     scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
 
     scnn_mat_fill(&net->input->dx, 0);

@@ -4,24 +4,55 @@
  * 
  */
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "scnn_mat.h"
 #include "scnn_blas.h"
 
-scnn_mat *scnn_mat_alloc(void)
+scnn_mat *scnn_mat_alloc(const scnn_shape shape)
 {
     scnn_mat *mat = malloc(sizeof(scnn_mat));
     if (mat == NULL) {
         return NULL;
     }
 
-    mat->n     = 0;
-    mat->c     = 0;
-    mat->h     = 0;
-    mat->w     = 0;
-    mat->size  = 0;
+    // count num of dimension
+    int  n_dim = 0;
+    bool has_dim_zero = false;
+    for (int i = 0; i < 4; i++) {
+        if (shape.d[i] > 0) {
+            if (has_dim_zero) {
+                return NULL;
+            }
+            n_dim++;
+        } else if (shape.d[i] < 0) {
+            return NULL;
+        } else { // zero
+            if (n_dim == 0) {
+                // fail when all zero
+                return NULL;
+            }
+            has_dim_zero = true;
+        }
+    }
+    // set 4-d shape with considering with omitted dimension
+    // omitted dimenstion is set to 1
+    int new_shape[4] = { 0 };
+    int size = 1;
+    int shape_idx = n_dim - 4;
+    for (int i = 0; i < 4; i++) {
+        new_shape[i] = ((shape_idx >= 0) ? shape.d[shape_idx] : 1);
+        size *= new_shape[i];
+        shape_idx++;
+    }
+
+    mat->n     = new_shape[0];
+    mat->c     = new_shape[1];
+    mat->h     = new_shape[2];
+    mat->w     = new_shape[3];
+    mat->size  = size;
     mat->order = SCNN_MAT_ORDER_NCHW;
-    mat->data  = NULL;
+    mat->data  = malloc(sizeof(float) * size);
 
     return mat;
 }

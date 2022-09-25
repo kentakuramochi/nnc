@@ -13,6 +13,14 @@
 typedef float scnn_dtype;
 
 /**
+ * @brief Matrix shape
+ * 
+ */
+typedef struct scnn_shape {
+    int d[4]; //!< 4-d shape (NCHW order)
+} scnn_shape;
+
+/**
  * @brief Data order of matrix element
  * 
  */
@@ -37,9 +45,10 @@ typedef struct scnn_mat {
 /**
  * @brief Allocate matrix
  * 
- * @return Pointer to matrix, NULL if failed
+ * @param[in] shape Matrix shape
+ * @return          Pointer to matrix, NULL if failed
  */
-scnn_mat *scnn_mat_alloc(void);
+scnn_mat *scnn_mat_alloc(const scnn_shape shape);
 
 /**
  * @brief Initialize matrix with specified size
