@@ -33,10 +33,7 @@ typedef enum scnn_mat_order {
  * 
  */
 typedef struct scnn_mat {
-    int             n;      //!< Batch size N
-    int             c;      //!< Channel size C
-    int             h;      //!< Height H
-    int             w;      //!< Width W
+    scnn_shape      shape;  //!< Matrix shape
     int             size;   //!< Total size of elements
     scnn_mat_order  order;  //!< Data order
     scnn_dtype      *data;  //!< Data

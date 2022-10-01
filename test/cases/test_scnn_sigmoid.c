@@ -54,17 +54,17 @@ TEST(scnn_sigmoid, set_size)
     sigmoid->set_size(sigmoid, 1, 10, 1, 1);
 
     TEST_ASSERT_NOT_NULL(sigmoid->x.data);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.n);
-    TEST_ASSERT_EQUAL_INT(10, sigmoid->x.c);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.h);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.w);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, sigmoid->x.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, sigmoid->x.size);
 
     TEST_ASSERT_NOT_NULL(sigmoid->y.data);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.n);
-    TEST_ASSERT_EQUAL_INT(10, sigmoid->y.c);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.h);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.w);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, sigmoid->y.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, sigmoid->y.size);
 
     TEST_ASSERT_NULL(sigmoid->w.data);
@@ -72,10 +72,10 @@ TEST(scnn_sigmoid, set_size)
     TEST_ASSERT_NULL(sigmoid->b.data);
 
     TEST_ASSERT_NOT_NULL(sigmoid->dx.data);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x.n, sigmoid->dx.n);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x.c, sigmoid->dx.c);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x.h, sigmoid->dx.h);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x.w, sigmoid->dx.w);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x.shape.d[0], sigmoid->dx.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x.shape.d[1], sigmoid->dx.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x.shape.d[2], sigmoid->dx.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x.shape.d[3], sigmoid->dx.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(sigmoid->x.size, sigmoid->dx.size);
 
     TEST_ASSERT_NULL(sigmoid->dw.data);

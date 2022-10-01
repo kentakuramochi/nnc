@@ -41,10 +41,10 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer)
 
     // check the matrix size
     if (net->output) {
-        if ((net->output->y.n != layer->y.n) ||
-            (net->output->y.c != layer->y.c) ||
-            (net->output->y.h != layer->y.h) ||
-            (net->output->y.w != layer->y.w)) {
+        if ((net->output->y.shape.d[0] != layer->y.shape.d[0]) ||
+            (net->output->y.shape.d[1] != layer->y.shape.d[1]) ||
+            (net->output->y.shape.d[2] != layer->y.shape.d[2]) ||
+            (net->output->y.shape.d[3] != layer->y.shape.d[3])) {
             return NULL;
         }
     }
@@ -82,7 +82,7 @@ void scnn_net_forward(scnn_net *net, const scnn_mat *x)
         return;
     }
 
-    scnn_mat *in = scnn_mat_alloc((scnn_shape){ .d = { x->n, x->c, x->h, x->w } });
+    scnn_mat *in = scnn_mat_alloc(x->shape);
     scnn_mat_copy_from_array(in, x->data, x->size);
 
     scnn_layer  *layer;
@@ -99,7 +99,7 @@ void scnn_net_backward(scnn_net *net, const scnn_mat *t)
         return;
     }
 
-    scnn_mat *dy = scnn_mat_alloc((scnn_shape){ .d = { t->n, t->c, t->h, t->w } });
+    scnn_mat *dy = scnn_mat_alloc(t->shape);
 
     scnn_scopy(net->output->y.size, net->output->y.data, 1, dy->data, 1);
     scnn_saxpy(t->size, -1, t->data, 1, dy->data, 1);

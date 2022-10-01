@@ -35,7 +35,7 @@ static void set_size(struct scnn_layer *self, const int n, const int c, const in
     scnn_mat_init(&self->x, n, c, 1, 1);
     scnn_mat_init(&self->y, n, c, 1, 1);
 
-    scnn_mat_init(&self->dx, self->x.n, self->x.c, self->x.h, self->x.w);
+    scnn_mat_init(&self->dx, self->x.shape.d[0], self->x.shape.d[1], self->x.shape.d[2], self->x.shape.d[3]);
 }
 
 /**

@@ -61,52 +61,52 @@ TEST(scnn_fc, set_size)
     fc->set_size(fc, 1, 2, 1, 1);
 
     TEST_ASSERT_NOT_NULL(fc->x.data);
-    TEST_ASSERT_EQUAL_INT(1, fc->x.n);
-    TEST_ASSERT_EQUAL_INT(2, fc->x.c);
-    TEST_ASSERT_EQUAL_INT(1, fc->x.h);
-    TEST_ASSERT_EQUAL_INT(1, fc->x.w);
+    TEST_ASSERT_EQUAL_INT(1, fc->x.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(2, fc->x.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, fc->x.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, fc->x.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(2, fc->x.size);
 
     TEST_ASSERT_NOT_NULL(fc->y.data);
-    TEST_ASSERT_EQUAL_INT(1, fc->y.n);
-    TEST_ASSERT_EQUAL_INT(10, fc->y.c);
-    TEST_ASSERT_EQUAL_INT(1, fc->y.h);
-    TEST_ASSERT_EQUAL_INT(1, fc->y.w);
+    TEST_ASSERT_EQUAL_INT(1, fc->y.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, fc->y.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, fc->y.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, fc->y.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, fc->y.size);
 
     TEST_ASSERT_NOT_NULL(fc->w.data);
-    TEST_ASSERT_EQUAL_INT(10, fc->w.n);
-    TEST_ASSERT_EQUAL_INT(2, fc->w.c);
-    TEST_ASSERT_EQUAL_INT(1, fc->w.h);
-    TEST_ASSERT_EQUAL_INT(1, fc->w.w);
+    TEST_ASSERT_EQUAL_INT(10, fc->w.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(2, fc->w.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, fc->w.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, fc->w.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(20, fc->w.size);
 
     TEST_ASSERT_NOT_NULL(fc->b.data);
-    TEST_ASSERT_EQUAL_INT(1, fc->b.n);
-    TEST_ASSERT_EQUAL_INT(10, fc->b.c);
-    TEST_ASSERT_EQUAL_INT(1, fc->b.h);
-    TEST_ASSERT_EQUAL_INT(1, fc->b.w);
+    TEST_ASSERT_EQUAL_INT(1, fc->b.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, fc->b.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, fc->b.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, fc->b.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, fc->b.size);
 
     TEST_ASSERT_NOT_NULL(fc->dx.data);
-    TEST_ASSERT_EQUAL_INT(fc->x.n, fc->dx.n);
-    TEST_ASSERT_EQUAL_INT(fc->x.c, fc->dx.c);
-    TEST_ASSERT_EQUAL_INT(fc->x.h, fc->dx.h);
-    TEST_ASSERT_EQUAL_INT(fc->x.w, fc->dx.w);
+    TEST_ASSERT_EQUAL_INT(fc->x.shape.d[0], fc->dx.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(fc->x.shape.d[1], fc->dx.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(fc->x.shape.d[2], fc->dx.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(fc->x.shape.d[3], fc->dx.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(fc->x.size, fc->dx.size);
 
     TEST_ASSERT_NOT_NULL(fc->dw.data);
-    TEST_ASSERT_EQUAL_INT(fc->w.n, fc->dw.n);
-    TEST_ASSERT_EQUAL_INT(fc->w.c, fc->dw.c);
-    TEST_ASSERT_EQUAL_INT(fc->w.h, fc->dw.h);
-    TEST_ASSERT_EQUAL_INT(fc->w.w, fc->dw.w);
+    TEST_ASSERT_EQUAL_INT(fc->w.shape.d[0], fc->dw.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(fc->w.shape.d[1], fc->dw.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(fc->w.shape.d[2], fc->dw.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(fc->w.shape.d[3], fc->dw.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(fc->w.size, fc->dw.size);
 
     TEST_ASSERT_NOT_NULL(fc->db.data);
-    TEST_ASSERT_EQUAL_INT(fc->b.n, fc->db.n);
-    TEST_ASSERT_EQUAL_INT(fc->b.c, fc->db.c);
-    TEST_ASSERT_EQUAL_INT(fc->b.h, fc->db.h);
-    TEST_ASSERT_EQUAL_INT(fc->b.w, fc->db.w);
+    TEST_ASSERT_EQUAL_INT(fc->b.shape.d[0], fc->db.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(fc->b.shape.d[1], fc->db.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(fc->b.shape.d[2], fc->db.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(fc->b.shape.d[3], fc->db.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(fc->b.size, fc->db.size);
 
     scnn_layer_free(&fc);
@@ -363,14 +363,6 @@ TEST(scnn_fc, backward)
     float answer_db[] = {
         8, 12, 16
     };
-
-    //printf("\ndw\n");
-    //for (int i = 0; i < fc->dw.n; i++) {
-    //    for (int j = 0; j < fc->dw.c; j++) {
-    //        printf("%f,", fc->dw.data[i * fc->dw.c + j]);
-    //    }
-    //    printf("\n");
-    //}
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dx, fc->dx.data, fc->dx.size);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dw, fc->dw.data, fc->dw.size);

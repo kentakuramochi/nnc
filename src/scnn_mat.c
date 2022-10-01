@@ -46,13 +46,13 @@ scnn_mat *scnn_mat_alloc(const scnn_shape shape)
         shape_idx++;
     }
 
-    mat->n     = new_shape[0];
-    mat->c     = new_shape[1];
-    mat->h     = new_shape[2];
-    mat->w     = new_shape[3];
-    mat->size  = size;
-    mat->order = SCNN_MAT_ORDER_NCHW;
-    mat->data  = malloc(sizeof(float) * size);
+    mat->shape.d[0] = new_shape[0];
+    mat->shape.d[1] = new_shape[1];
+    mat->shape.d[2] = new_shape[2];
+    mat->shape.d[3] = new_shape[3];
+    mat->size       = size;
+    mat->order      = SCNN_MAT_ORDER_NCHW;
+    mat->data       = malloc(sizeof(float) * size);
 
     return mat;
 }
@@ -67,11 +67,11 @@ scnn_mat *scnn_mat_init(scnn_mat *mat, const int n, const int c, const int h, co
         return NULL;
     }
 
-    mat->n    = n;
-    mat->c    = c;
-    mat->h    = h;
-    mat->w    = w;
-    mat->size = n * c * h * w;
+    mat->shape.d[0] = n;
+    mat->shape.d[1] = c;
+    mat->shape.d[2] = h;
+    mat->shape.d[3] = w;
+    mat->size       = n * c * h * w;
 
     mat->data = malloc(sizeof(scnn_dtype) * n * c * h * w);
     if (mat->data == NULL) {
@@ -100,7 +100,7 @@ scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value)
         return NULL;
     }
 
-    if ((mat->n < 1) || (mat->c < 1) || (mat->h < 1) || (mat->w < 1) ||
+    if ((mat->shape.d[0] < 1) || (mat->shape.d[1] < 1) || (mat->shape.d[2] < 1) || (mat->shape.d[3] < 1) ||
         (mat->size < 1) ||
         (mat->data == NULL)) {
         return NULL;

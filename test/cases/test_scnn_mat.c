@@ -21,10 +21,10 @@ TEST(scnn_mat, alloc_and_free)
 
     TEST_ASSERT_NOT_NULL(mat);
 
-    TEST_ASSERT_EQUAL(1, mat->n);
-    TEST_ASSERT_EQUAL(3, mat->c);
-    TEST_ASSERT_EQUAL(28, mat->h);
-    TEST_ASSERT_EQUAL(28, mat->w);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[0]);
+    TEST_ASSERT_EQUAL(3, mat->shape.d[1]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[2]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[3]);
 
     TEST_ASSERT_EQUAL((1 * 3 * 28 * 28), mat->size);
 
@@ -41,10 +41,10 @@ TEST(scnn_mat, alloc_shape_1d)
 {
     scnn_mat *mat = scnn_mat_alloc((scnn_shape){ .d = { 28 } });
 
-    TEST_ASSERT_EQUAL(1, mat->n);
-    TEST_ASSERT_EQUAL(1, mat->c);
-    TEST_ASSERT_EQUAL(1, mat->h);
-    TEST_ASSERT_EQUAL(28, mat->w);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[0]);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[1]);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[2]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[3]);
 
     TEST_ASSERT_EQUAL(28, mat->size);
 
@@ -57,10 +57,10 @@ TEST(scnn_mat, alloc_shape_2d)
 {
     scnn_mat *mat = scnn_mat_alloc((scnn_shape){ .d = { 28, 28 } });
 
-    TEST_ASSERT_EQUAL(1, mat->n);
-    TEST_ASSERT_EQUAL(1, mat->c);
-    TEST_ASSERT_EQUAL(28, mat->h);
-    TEST_ASSERT_EQUAL(28, mat->w);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[0]);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[1]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[2]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[3]);
 
     TEST_ASSERT_EQUAL((28 * 28), mat->size);
 
@@ -73,10 +73,10 @@ TEST(scnn_mat, alloc_shape_3d)
 {
     scnn_mat *mat = scnn_mat_alloc((scnn_shape){ .d = { 3, 28, 28 } });
 
-    TEST_ASSERT_EQUAL(1, mat->n);
-    TEST_ASSERT_EQUAL(3, mat->c);
-    TEST_ASSERT_EQUAL(28, mat->h);
-    TEST_ASSERT_EQUAL(28, mat->w);
+    TEST_ASSERT_EQUAL(1, mat->shape.d[0]);
+    TEST_ASSERT_EQUAL(3, mat->shape.d[1]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[2]);
+    TEST_ASSERT_EQUAL(28, mat->shape.d[3]);
 
     TEST_ASSERT_EQUAL((3 * 28 * 28), mat->size);
 

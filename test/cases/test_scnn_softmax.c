@@ -54,17 +54,17 @@ TEST(scnn_softmax, set_size)
     softmax->set_size(softmax, 1, 10, 1, 1);
 
     TEST_ASSERT_NOT_NULL(softmax->x.data);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x.n);
-    TEST_ASSERT_EQUAL_INT(10, softmax->x.c);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x.h);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x.w);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, softmax->x.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, softmax->x.size);
 
     TEST_ASSERT_NOT_NULL(softmax->y.data);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y.n);
-    TEST_ASSERT_EQUAL_INT(10, softmax->y.c);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y.h);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y.w);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(10, softmax->y.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(10, softmax->y.size);
 
     TEST_ASSERT_NULL(softmax->w.data);
@@ -72,10 +72,10 @@ TEST(scnn_softmax, set_size)
     TEST_ASSERT_NULL(softmax->b.data);
 
     TEST_ASSERT_NOT_NULL(softmax->dx.data);
-    TEST_ASSERT_EQUAL_INT(softmax->x.n, softmax->dx.n);
-    TEST_ASSERT_EQUAL_INT(softmax->x.c, softmax->dx.c);
-    TEST_ASSERT_EQUAL_INT(softmax->x.h, softmax->dx.h);
-    TEST_ASSERT_EQUAL_INT(softmax->x.w, softmax->dx.w);
+    TEST_ASSERT_EQUAL_INT(softmax->x.shape.d[0], softmax->dx.shape.d[0]);
+    TEST_ASSERT_EQUAL_INT(softmax->x.shape.d[1], softmax->dx.shape.d[1]);
+    TEST_ASSERT_EQUAL_INT(softmax->x.shape.d[2], softmax->dx.shape.d[2]);
+    TEST_ASSERT_EQUAL_INT(softmax->x.shape.d[3], softmax->dx.shape.d[3]);
     TEST_ASSERT_EQUAL_INT(softmax->x.size, softmax->dx.size);
 
     TEST_ASSERT_NULL(softmax->dw.data);
