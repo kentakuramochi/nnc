@@ -38,14 +38,14 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
         shape_idx++;
     }
 
-    layer->x.data = NULL;
-    layer->y.data = NULL;
-    layer->w.data = NULL;
-    layer->b.data = NULL;
+    layer->x = NULL;
+    layer->y = NULL;
+    layer->w = NULL;
+    layer->b = NULL;
 
-    layer->dx.data = NULL;
-    layer->dw.data = NULL;
-    layer->db.data = NULL;
+    layer->dx = NULL;
+    layer->dw = NULL;
+    layer->db = NULL;
 
     layer->id = 0;
 
@@ -68,21 +68,14 @@ void scnn_layer_free(scnn_layer **layer)
 
     scnn_layer *layer_ptr = *layer;
 
-    free(layer_ptr->x.data);
-    layer_ptr->x.data = NULL;
-    free(layer_ptr->y.data);
-    layer_ptr->y.data = NULL;
-    free(layer_ptr->w.data);
-    layer_ptr->w.data = NULL;
-    free(layer_ptr->b.data);
-    layer_ptr->b.data = NULL;
+    scnn_mat_free(&layer_ptr->x);
+    scnn_mat_free(&layer_ptr->y);
+    scnn_mat_free(&layer_ptr->w);
+    scnn_mat_free(&layer_ptr->b);
 
-    free(layer_ptr->dx.data);
-    layer_ptr->dx.data = NULL;
-    free(layer_ptr->dw.data);
-    layer_ptr->dw.data = NULL;
-    free(layer_ptr->db.data);
-    layer_ptr->db.data = NULL;
+    scnn_mat_free(&layer_ptr->dx);
+    scnn_mat_free(&layer_ptr->dw);
+    scnn_mat_free(&layer_ptr->db);
 
     free(*layer);
     *layer = NULL;

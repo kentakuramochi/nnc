@@ -48,17 +48,6 @@ typedef struct scnn_mat {
 scnn_mat *scnn_mat_alloc(const scnn_shape shape);
 
 /**
- * @brief Initialize matrix with specified size
- * 
- * @param[in] n Batch size N
- * @param[in] c Channel size C
- * @param[in] h Height H
- * @param[in] w Width W
- * @return      Pointer to matrix, NULL if failed
- */
-scnn_mat *scnn_mat_init(scnn_mat *mat, const int n, const int c, const int h, const int w);
-
-/**
  * @brief Free matrix
  * 
  * @param[in,out] mat Pointer to pointer of matrix

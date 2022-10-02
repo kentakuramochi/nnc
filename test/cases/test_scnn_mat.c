@@ -117,28 +117,6 @@ TEST(scnn_mat, free_to_ptr_to_null)
     scnn_mat_free(&mat);
 }
 
-/*TEST(scnn_mat, init_and_free)
-{
-    scnn_mat *mat = scnn_mat_alloc();
-
-    TEST_ASSERT_EQUAL_PTR(mat, scnn_mat_init(mat, 1, 3, 480, 640));
-
-    TEST_ASSERT_EQUAL(1, mat->n);
-    TEST_ASSERT_EQUAL(3, mat->c);
-    TEST_ASSERT_EQUAL(480, mat->h);
-    TEST_ASSERT_EQUAL(640, mat->w);
-
-    TEST_ASSERT_EQUAL((1 * 3 * 480 * 640), mat->size);
-
-    TEST_ASSERT_EQUAL(SCNN_MAT_ORDER_NCHW, mat->order);
-
-    TEST_ASSERT_NOT_NULL(mat->data);
-
-    scnn_mat_free(&mat);
-
-    TEST_ASSERT_NULL(mat);
-}*/
-
 TEST(scnn_mat, fill)
 {
     scnn_mat *mat = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 480, 640 } });

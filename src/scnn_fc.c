@@ -31,14 +31,14 @@ static void set_size(struct scnn_layer *self, const int n, const int c, const in
         return;
     }
 
-    scnn_mat_init(&self->x, n, c, 1, 1);
-    scnn_mat_init(&self->y, n, self->params.out, 1, 1);
-    scnn_mat_init(&self->w, self->params.out, self->params.in, 1, 1);
-    scnn_mat_init(&self->b, n, self->params.out, 1, 1);
+    self->x = scnn_mat_alloc((scnn_shape){ .d = { n, c, 1, 1 } });
+    self->y = scnn_mat_alloc((scnn_shape){ .d = { n, self->params.out, 1, 1 } });
+    self->w = scnn_mat_alloc((scnn_shape){ .d = { self->params.out, self->params.in, 1, 1 } });
+    self->b = scnn_mat_alloc((scnn_shape){ .d = { n, self->params.out, 1, 1 } });
 
-    scnn_mat_init(&self->dx, self->x.shape.d[0], self->x.shape.d[1], self->x.shape.d[2], self->x.shape.d[3]);
-    scnn_mat_init(&self->dw, self->w.shape.d[0], self->w.shape.d[1], self->w.shape.d[2], self->w.shape.d[3]);
-    scnn_mat_init(&self->db, self->b.shape.d[0], self->b.shape.d[1], self->b.shape.d[2], self->b.shape.d[3]);
+    self->dx = scnn_mat_alloc(self->x->shape);
+    self->dw = scnn_mat_alloc(self->w->shape);
+    self->db = scnn_mat_alloc(self->b->shape);
 }
 
 /**
@@ -53,14 +53,14 @@ static void forward(scnn_layer *self, scnn_mat *x)
         return;
     }
 
-    scnn_scopy(self->x.size, x->data, 1, self->x.data, 1);
+    scnn_scopy(self->x->size, x->data, 1, self->x->data, 1);
 
-    scnn_scopy(self->y.size, self->b.data, 1, self->y.data, 1);
+    scnn_scopy(self->y->size, self->b->data, 1, self->y->data, 1);
     scnn_sgemm(SCNN_BLAS_NO_TRANS, SCNN_BLAS_NO_TRANS,
-        self->x.shape.d[0], self->w.shape.d[0], self->x.shape.d[1],
-        1.0, self->x.data, self->x.shape.d[1],
-        self->w.data, self->w.shape.d[0], 1.0,
-        self->y.data, self->y.shape.d[1]);
+        self->x->shape.d[0], self->w->shape.d[0], self->x->shape.d[1],
+        1.0, self->x->data, self->x->shape.d[1],
+        self->w->data, self->w->shape.d[0], 1.0,
+        self->y->data, self->y->shape.d[1]);
 }
 
 /**
@@ -76,23 +76,23 @@ static void backward(scnn_layer *self, scnn_mat *dy)
     }
 
     // dx = dy W^T
-    scnn_mat_fill(&self->dx, 0);
+    scnn_mat_fill(self->dx, 0);
     scnn_sgemm(SCNN_BLAS_NO_TRANS, SCNN_BLAS_TRANS,
-        dy->shape.d[0], self->w.shape.d[1], dy->shape.d[1],
+        dy->shape.d[0], self->w->shape.d[1], dy->shape.d[1],
         1.0, dy->data, dy->shape.d[1],
-        self->w.data, self->w.shape.d[0], 1.0,
-        self->dx.data, self->dx.shape.d[1]);
+        self->w->data, self->w->shape.d[0], 1.0,
+        self->dx->data, self->dx->shape.d[1]);
 
     // dW = x^T dy
-    scnn_mat_fill(&self->dw, 0);
+    scnn_mat_fill(self->dw, 0);
     scnn_sgemm(SCNN_BLAS_TRANS, SCNN_BLAS_NO_TRANS,
-        self->x.shape.d[1], dy->shape.d[1], self->x.shape.d[0],
-        1.0, self->x.data, self->x.shape.d[1],
+        self->x->shape.d[1], dy->shape.d[1], self->x->shape.d[0],
+        1.0, self->x->data, self->x->shape.d[1],
         dy->data, dy->shape.d[1], 1.0,
-        self->dw.data, self->dw.shape.d[0]);
+        self->dw->data, self->dw->shape.d[0]);
 
     // db = dy
-    scnn_scopy(self->db.size, dy->data, 1, self->db.data, 1);
+    scnn_scopy(self->db->size, dy->data, 1, self->db->data, 1);
 }
 
 scnn_layer *scnn_fc_layer(const scnn_layer_params params)

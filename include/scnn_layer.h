@@ -27,14 +27,14 @@ typedef struct scnn_layer {
 
     int id;         //!< Layer ID
 
-    scnn_mat x;     //!< Input matrix
-    scnn_mat y;     //!< Output matrix
-    scnn_mat w;     //!< Weight matrix
-    scnn_mat b;     //!< Bias matrix
+    scnn_mat* x;     //!< Input matrix
+    scnn_mat* y;     //!< Output matrix
+    scnn_mat* w;     //!< Weight matrix
+    scnn_mat* b;     //!< Bias matrix
 
-    scnn_mat dx;    //!< Difference of input matrix
-    scnn_mat dw;    //!< Difference of weight matrix
-    scnn_mat db;    //!< Difference of bias matrix
+    scnn_mat* dx;    //!< Difference of input matrix
+    scnn_mat* dw;    //!< Difference of weight matrix
+    scnn_mat* db;    //!< Difference of bias matrix
 
     int prev_id;    //!< Layer ID of the previous
     int next_id;    //!< Layer ID of the next

@@ -57,26 +57,49 @@ scnn_mat *scnn_mat_alloc(const scnn_shape shape)
     return mat;
 }
 
-scnn_mat *scnn_mat_init(scnn_mat *mat, const int n, const int c, const int h, const int w)
+scnn_mat *scnn_mat_set_size(scnn_mat *mat, const scnn_shape shape)
 {
     if (mat == NULL) {
         return NULL;
     }
 
-    if ((n < 1) || (c < 1) || (h < 1) || (w < 1)) {
-        return NULL;
+    // count num of dimension
+    int  n_dim = 0;
+    bool has_dim_zero = false;
+    for (int i = 0; i < 4; i++) {
+        if (shape.d[i] > 0) {
+            if (has_dim_zero) {
+                return NULL;
+            }
+            n_dim++;
+        } else if (shape.d[i] < 0) {
+            return NULL;
+        } else { // zero
+            if (n_dim == 0) {
+                // fail when all zero
+                return NULL;
+            }
+            has_dim_zero = true;
+        }
+    }
+    // set 4-d shape with considering with omitted dimension
+    // omitted dimenstion is set to 1
+    int new_shape[4] = { 0 };
+    int size = 1;
+    int shape_idx = n_dim - 4;
+    for (int i = 0; i < 4; i++) {
+        new_shape[i] = ((shape_idx >= 0) ? shape.d[shape_idx] : 1);
+        size *= new_shape[i];
+        shape_idx++;
     }
 
-    mat->shape.d[0] = n;
-    mat->shape.d[1] = c;
-    mat->shape.d[2] = h;
-    mat->shape.d[3] = w;
-    mat->size       = n * c * h * w;
-
-    mat->data = malloc(sizeof(scnn_dtype) * n * c * h * w);
-    if (mat->data == NULL) {
-        return NULL;
-    }
+    mat->shape.d[0] = new_shape[0];
+    mat->shape.d[1] = new_shape[1];
+    mat->shape.d[2] = new_shape[2];
+    mat->shape.d[3] = new_shape[3];
+    mat->size       = size;
+    mat->order      = SCNN_MAT_ORDER_NCHW;
+    mat->data       = malloc(sizeof(float) * size);
 
     return mat;
 }

@@ -32,10 +32,10 @@ static void set_size(struct scnn_layer *self, const int n, const int c, const in
         return;
     }
 
-    scnn_mat_init(&self->x, n, c, 1, 1);
-    scnn_mat_init(&self->y, n, c, 1, 1);
+    self->x = scnn_mat_alloc((scnn_shape){ .d = { n, c, 1, 1 } });
+    self->y = scnn_mat_alloc((scnn_shape){ .d = { n, c, 1, 1 } });
 
-    scnn_mat_init(&self->dx, self->x.shape.d[0], self->x.shape.d[1], self->x.shape.d[2], self->x.shape.d[3]);
+    self->dx = scnn_mat_alloc(self->x->shape);
 }
 
 /**
@@ -50,17 +50,17 @@ static void forward(scnn_layer *self, scnn_mat *x)
         return;
     }
 
-    scnn_scopy(self->x.size, x->data, 1, self->x.data, 1);
-    for (int i = 0; i < self->x.size; i++) {
-        self->y.data[i] = 1.0 / (1 + exp(-self->x.data[i]));
+    scnn_scopy(self->x->size, x->data, 1, self->x->data, 1);
+    for (int i = 0; i < self->x->size; i++) {
+        self->y->data[i] = 1.0 / (1 + exp(-self->x->data[i]));
     }
 
     float sum = 0;
-    for (int i = 0; i < self->x.size; i++) {
-        sum += exp(self->x.data[i]);
+    for (int i = 0; i < self->x->size; i++) {
+        sum += exp(self->x->data[i]);
     }
-    for (int i = 0; i < self->x.size; i++) {
-        self->y.data[i] = exp(self->x.data[i]) / sum;
+    for (int i = 0; i < self->x->size; i++) {
+        self->y->data[i] = exp(self->x->data[i]) / sum;
     }
 }
 
@@ -77,8 +77,8 @@ static void backward(scnn_layer *self, scnn_mat *dy)
     }
 
     // backward propagation with cross entropy loss
-    for (int i = 0; i < self->y.size; i++) {
-        self->dx.data[i] = dy->data[i];
+    for (int i = 0; i < self->y->size; i++) {
+        self->dx->data[i] = dy->data[i];
     }
 }
 
