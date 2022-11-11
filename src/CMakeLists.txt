@@ -1,4 +1,8 @@
-file(GLOB SOURCES ./*.c)
+#file(GLOB SOURCES ./*.c)
+file(GLOB SOURCES
+    ./scnn_blas.c
+    ./scnn_mat.c
+)
 
 add_library(${TARGET_LIB_NAME}
     ${SOURCES}

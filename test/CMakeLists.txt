@@ -13,7 +13,14 @@ FetchContent_MakeAvailable(append_unity)
 
 set(TARGET_TEST_RUNNER_NAME test_runner)
 
-file(GLOB SOURCES ${TEST_ROOT}/cases/*.c ${TEST_ROOT}/runner/*.c)
+#file(GLOB SOURCES ${TEST_ROOT}/cases/*.c ${TEST_ROOT}/runner/*.c)
+file(GLOB SOURCES
+    ${TEST_ROOT}/cases/test_scnn_blas.c
+    ${TEST_ROOT}/cases/test_scnn_mat.c
+    ${TEST_ROOT}/runner/all_tests.c
+    ${TEST_ROOT}/runner/test_scnn_blas_runner.c
+    ${TEST_ROOT}/runner/test_scnn_mat_runner.c
+)
 
 add_executable(${TARGET_TEST_RUNNER_NAME}
     ${SOURCES}

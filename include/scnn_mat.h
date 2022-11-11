@@ -13,12 +13,10 @@
 typedef float scnn_dtype;
 
 /**
- * @brief Matrix shape
+ * @brief Matrix 4-d shape
  * 
  */
-typedef struct scnn_shape {
-    int d[4]; //!< 4-d shape (NCHW order)
-} scnn_shape;
+#define scnn_shape(...) (int[4]){ __VA_ARGS__ }
 
 /**
  * @brief Data order of matrix element
@@ -33,10 +31,10 @@ typedef enum scnn_mat_order {
  * 
  */
 typedef struct scnn_mat {
-    scnn_shape      shape;  //!< Matrix shape
-    int             size;   //!< Total size of elements
-    scnn_mat_order  order;  //!< Data order
-    scnn_dtype      *data;  //!< Data
+    int             shape[4];   //!< Matrix shape
+    int             size;       //!< Total size of elements
+    scnn_mat_order  order;      //!< Data order
+    scnn_dtype      *data;      //!< Data
 } scnn_mat;
 
 /**
@@ -45,7 +43,7 @@ typedef struct scnn_mat {
  * @param[in] shape Matrix shape
  * @return          Pointer to matrix, NULL if failed
  */
-scnn_mat *scnn_mat_alloc(const scnn_shape shape);
+scnn_mat *scnn_mat_alloc(const int *shape);
 
 /**
  * @brief Free matrix
@@ -64,13 +62,39 @@ void scnn_mat_free(scnn_mat **mat);
 scnn_mat *scnn_mat_fill(scnn_mat *mat, const scnn_dtype value);
 
 /**
- * @brief Copy matrix elements from array
+ * @brief Allocate zero-filled matrix
  * 
- * @param[in,out] mat   Pointer to destination matrix
- * @param[in]     array Pointer to source array 
- * @param[in]     size  Num of elements to be copied
- * @return              Pointer to matrix, NULL if failed
+ * @param[in] shape Matrix shape
+ * @return          Pointer to matrix, NULL if failed
  */
-scnn_mat *scnn_mat_copy_from_array(scnn_mat *mat, const float *array, const int size);
+scnn_mat *scnn_mat_zeros(const int *shape);
+
+/**
+ * @brief Allocate matrix filled with random values from uniform distribution over [0.0, 1.0)
+ * 
+ * @param[in] shape Matrix shape
+ * @return          Pointer to matrix, NULL if failed
+ */
+scnn_mat *scnn_mat_rand(const int *shape);
+
+/**
+ * @brief Allocate matrix filled with random values from normal distribution 
+ * 
+ * @param[in] shape Matrix shape
+ * @param[in] mean  Mean
+ * @param[in] std   Standard deviation
+ * @return          Pointer to matrix, NULL if failed
+ */
+scnn_mat *scnn_mat_randn(const int *shape, const float mean, const float std);
+
+/**
+ * @brief Allocate matrix from data array with specified shape
+ * 
+ * @param[in] array Source array
+ * @param[in] size  Size of source array
+ * @param[in] shape Matrix shape
+ * @return          Pointer to matrix, NULL if failed
+ */
+scnn_mat *scnn_mat_from_array(const scnn_dtype *array, const int size, const int *shape);
 
 #endif // SCNN_MAT_H
