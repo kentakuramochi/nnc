@@ -41,6 +41,11 @@ add_custom_target(test
     DEPENDS ${TARGET_TEST_RUNNER_NAME}
 )
 
+add_custom_target(memcheck
+    COMMAND valgrind -s --tool=memcheck --leak-check=yes --show-reachable=yes ./${TARGET_TEST_RUNNER_NAME}
+    DEPENDS ${TARGET_TEST_RUNNER_NAME}
+)
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
