@@ -10,7 +10,7 @@ TEST_GROUP_RUNNER(scnn_sigmoid)
     RUN_TEST_CASE(scnn_sigmoid, allocate_sigmoid_layer);
 
     RUN_TEST_CASE(scnn_sigmoid, initialize);
-    RUN_TEST_CASE(scnn_sigmoid, cannot_initialize_without_in_shape);
+    RUN_TEST_CASE(scnn_sigmoid, cannot_initialize_with_NULL);
     RUN_TEST_CASE(scnn_sigmoid, cannot_initialize_with_invalid_in_shape);
 
     RUN_TEST_CASE(scnn_sigmoid, forward);

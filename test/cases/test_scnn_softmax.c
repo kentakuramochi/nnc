@@ -97,22 +97,6 @@ TEST(scnn_softmax, cannot_initialize_with_NULL)
     TEST_ASSERT_NULL(softmax->db);
 }
 
-TEST(scnn_softmax, cannot_initialize_without_in_shape)
-{
-    scnn_layer_params params;
-    softmax = scnn_softmax_layer(params);
-
-    TEST_ASSERT_NULL(softmax->init(softmax));
-
-    TEST_ASSERT_NULL(softmax->x);
-    TEST_ASSERT_NULL(softmax->y);
-    TEST_ASSERT_NULL(softmax->w);
-    TEST_ASSERT_NULL(softmax->b);
-    TEST_ASSERT_NULL(softmax->dx);
-    TEST_ASSERT_NULL(softmax->dw);
-    TEST_ASSERT_NULL(softmax->db);
-}
-
 TEST(scnn_softmax, cannot_initialize_with_invalid_in_shape)
 {
     scnn_layer_params params = {.in_shape = {-1, 3, 1, 1}};

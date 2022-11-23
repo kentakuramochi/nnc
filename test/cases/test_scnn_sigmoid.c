@@ -97,22 +97,6 @@ TEST(scnn_sigmoid, cannot_initialize_with_NULL)
     TEST_ASSERT_NULL(sigmoid->db);
 }
 
-TEST(scnn_sigmoid, cannot_initialize_without_in_shape)
-{
-    scnn_layer_params params;
-    sigmoid = scnn_sigmoid_layer(params);
-
-    TEST_ASSERT_NULL(sigmoid->init(sigmoid));
-
-    TEST_ASSERT_NULL(sigmoid->x);
-    TEST_ASSERT_NULL(sigmoid->y);
-    TEST_ASSERT_NULL(sigmoid->w);
-    TEST_ASSERT_NULL(sigmoid->b);
-    TEST_ASSERT_NULL(sigmoid->dx);
-    TEST_ASSERT_NULL(sigmoid->dw);
-    TEST_ASSERT_NULL(sigmoid->db);
-}
-
 TEST(scnn_sigmoid, cannot_initialize_with_invalid_in_shape)
 {
     scnn_layer_params params = { .in_shape={ -1, 10, 1, 1 } };

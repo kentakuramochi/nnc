@@ -124,22 +124,6 @@ TEST(scnn_fc, cannot_initialize_with_NULL)
     TEST_ASSERT_NULL(fc->db);
 }
 
-TEST(scnn_fc, cannot_initialize_without_in_shape)
-{
-    scnn_layer_params params = { .out=10 };
-    fc = scnn_fc_layer(params);
-
-    TEST_ASSERT_NULL(fc->init(fc));
-
-    TEST_ASSERT_NULL(fc->x);
-    TEST_ASSERT_NULL(fc->y);
-    TEST_ASSERT_NULL(fc->w);
-    TEST_ASSERT_NULL(fc->b);
-    TEST_ASSERT_NULL(fc->dx);
-    TEST_ASSERT_NULL(fc->dw);
-    TEST_ASSERT_NULL(fc->db);
-}
-
 TEST(scnn_fc, cannot_initialize_with_invalid_in_shape)
 {
     scnn_layer_params params = { .in_shape={ -1, 2, 28, 28 }, .out=10 };
