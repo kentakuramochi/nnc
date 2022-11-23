@@ -7,23 +7,19 @@
 
 TEST_GROUP_RUNNER(scnn_sigmoid)
 {
-    RUN_TEST_CASE(scnn_sigmoid, alloc_and_free);
+    RUN_TEST_CASE(scnn_sigmoid, allocate_sigmoid_layer);
 
-    RUN_TEST_CASE(scnn_sigmoid, alloc_fail_invalid_param_in);
-
-    RUN_TEST_CASE(scnn_sigmoid, set_size);
-
-    RUN_TEST_CASE(scnn_sigmoid, set_size_fail_invalid_n);
-    RUN_TEST_CASE(scnn_sigmoid, set_size_fail_invalid_c);
-    RUN_TEST_CASE(scnn_sigmoid, set_size_fail_invalid_h);
-    RUN_TEST_CASE(scnn_sigmoid, set_size_fail_invalid_w);
-    RUN_TEST_CASE(scnn_sigmoid, set_size_fail_invalid_in_size);
+    RUN_TEST_CASE(scnn_sigmoid, initialize);
+    RUN_TEST_CASE(scnn_sigmoid, cannot_initialize_without_in_shape);
+    RUN_TEST_CASE(scnn_sigmoid, cannot_initialize_with_invalid_in_shape);
 
     RUN_TEST_CASE(scnn_sigmoid, forward);
-    RUN_TEST_CASE(scnn_sigmoid, forward_fail_x_is_null);
-    RUN_TEST_CASE(scnn_sigmoid, forward_fail_layer_is_null);
+    RUN_TEST_CASE(scnn_sigmoid, forward_with_batch_dim);
+    RUN_TEST_CASE(scnn_sigmoid, forward_fails_when_x_is_NULL);
+    RUN_TEST_CASE(scnn_sigmoid, forward_fails_when_layer_is_NULL);
 
     RUN_TEST_CASE(scnn_sigmoid, backward);
-    RUN_TEST_CASE(scnn_sigmoid, backward_fail_dy_is_null);
-    RUN_TEST_CASE(scnn_sigmoid, backward_fail_layer_is_null);
+    RUN_TEST_CASE(scnn_sigmoid, backward_with_batch_dim);
+    RUN_TEST_CASE(scnn_sigmoid, backward_fails_when_dy_is_NULL);
+    RUN_TEST_CASE(scnn_sigmoid, backward_fails_when_layer_is_NULL);
 }

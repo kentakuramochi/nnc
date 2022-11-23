@@ -11,320 +11,299 @@
 
 TEST_GROUP(scnn_sigmoid);
 
+scnn_layer *sigmoid;
+
 TEST_SETUP(scnn_sigmoid)
-{}
+{
+    sigmoid = NULL;
+}
 
 TEST_TEAR_DOWN(scnn_sigmoid)
-{}
-
-TEST(scnn_sigmoid, alloc_and_free)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-
-    TEST_ASSERT_NOT_NULL(sigmoid);
-
-    TEST_ASSERT_EQUAL_INT(params.in, sigmoid->params.in);
-    TEST_ASSERT_EQUAL_INT(params.in, sigmoid->params.out);
-    TEST_ASSERT_EQUAL_INT(sigmoid->params.in, sigmoid->params.out);
-
-    TEST_ASSERT_NOT_NULL(sigmoid->forward);
-    TEST_ASSERT_NOT_NULL(sigmoid->backward);
-
-    TEST_ASSERT_NOT_NULL(sigmoid->set_size);
-
     scnn_layer_free(&sigmoid);
 
     TEST_ASSERT_NULL(sigmoid);
 }
 
-TEST(scnn_sigmoid, alloc_fail_invalid_param_in)
+TEST(scnn_sigmoid, allocate_sigmoid_layer)
 {
-    scnn_layer_params params = { .in = 0 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
+    scnn_layer_params params = { .in_shape={ 1, 10, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
 
-    TEST_ASSERT_NULL(sigmoid);
+    TEST_ASSERT_NOT_NULL(sigmoid);
+
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->params.in_shape[0]);
+    TEST_ASSERT_EQUAL_INT(10, sigmoid->params.in_shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->params.in_shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->params.in_shape[3]);
+
+    TEST_ASSERT_NOT_NULL(sigmoid->init);
+
+    TEST_ASSERT_NOT_NULL(sigmoid->forward);
+    TEST_ASSERT_NOT_NULL(sigmoid->backward);
 }
 
-TEST(scnn_sigmoid, set_size)
+TEST(scnn_sigmoid, initialize)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
+    scnn_layer_params params = { .in_shape={ 1, 10, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
 
-    sigmoid->set_size(sigmoid, 1, 10, 1, 1);
+    TEST_ASSERT_NOT_NULL(sigmoid->init(sigmoid));
 
     TEST_ASSERT_NOT_NULL(sigmoid->x);
     TEST_ASSERT_NOT_NULL(sigmoid->x->data);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(10, sigmoid->x->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape.d[3]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape[0]);
+    TEST_ASSERT_EQUAL_INT(10, sigmoid->x->shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->x->shape[3]);
     TEST_ASSERT_EQUAL_INT(10, sigmoid->x->size);
 
     TEST_ASSERT_NOT_NULL(sigmoid->y);
     TEST_ASSERT_NOT_NULL(sigmoid->y->data);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(10, sigmoid->y->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape.d[3]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape[0]);
+    TEST_ASSERT_EQUAL_INT(10, sigmoid->y->shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, sigmoid->y->shape[3]);
     TEST_ASSERT_EQUAL_INT(10, sigmoid->y->size);
 
     TEST_ASSERT_NULL(sigmoid->w);
-
     TEST_ASSERT_NULL(sigmoid->b);
 
     TEST_ASSERT_NOT_NULL(sigmoid->dx);
     TEST_ASSERT_NOT_NULL(sigmoid->dx->data);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape.d[0], sigmoid->dx->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape.d[1], sigmoid->dx->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape.d[2], sigmoid->dx->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape.d[3], sigmoid->dx->shape.d[3]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape[0], sigmoid->dx->shape[0]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape[1], sigmoid->dx->shape[1]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape[2], sigmoid->dx->shape[2]);
+    TEST_ASSERT_EQUAL_INT(sigmoid->x->shape[3], sigmoid->dx->shape[3]);
     TEST_ASSERT_EQUAL_INT(sigmoid->x->size, sigmoid->dx->size);
 
     TEST_ASSERT_NULL(sigmoid->dw);
-
     TEST_ASSERT_NULL(sigmoid->db);
-
-    scnn_layer_free(&sigmoid);
 }
 
-TEST(scnn_sigmoid, set_size_fail_invalid_n)
+TEST(scnn_sigmoid, cannot_initialize_with_NULL)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
+    scnn_layer_params params = { .in_shape={ 1, 10, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
 
-    sigmoid->set_size(sigmoid, 0, 10, 1, 1);
+    TEST_ASSERT_NULL(sigmoid->init(NULL));
 
     TEST_ASSERT_NULL(sigmoid->x);
     TEST_ASSERT_NULL(sigmoid->y);
+    TEST_ASSERT_NULL(sigmoid->w);
+    TEST_ASSERT_NULL(sigmoid->b);
     TEST_ASSERT_NULL(sigmoid->dx);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_NULL(sigmoid->dw);
+    TEST_ASSERT_NULL(sigmoid->db);
 }
 
-TEST(scnn_sigmoid, set_size_fail_invalid_c)
+TEST(scnn_sigmoid, cannot_initialize_without_in_shape)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
+    scnn_layer_params params;
+    sigmoid = scnn_sigmoid_layer(params);
 
-    sigmoid->set_size(sigmoid, 1, 0, 1, 1);
+    TEST_ASSERT_NULL(sigmoid->init(sigmoid));
 
     TEST_ASSERT_NULL(sigmoid->x);
     TEST_ASSERT_NULL(sigmoid->y);
+    TEST_ASSERT_NULL(sigmoid->w);
+    TEST_ASSERT_NULL(sigmoid->b);
     TEST_ASSERT_NULL(sigmoid->dx);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_NULL(sigmoid->dw);
+    TEST_ASSERT_NULL(sigmoid->db);
 }
 
-TEST(scnn_sigmoid, set_size_fail_invalid_h)
+TEST(scnn_sigmoid, cannot_initialize_with_invalid_in_shape)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
+    scnn_layer_params params = { .in_shape={ -1, 10, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
 
-    sigmoid->set_size(sigmoid, 1, 10, 0, 1);
+    TEST_ASSERT_NULL(sigmoid->init(sigmoid));
 
     TEST_ASSERT_NULL(sigmoid->x);
     TEST_ASSERT_NULL(sigmoid->y);
+    TEST_ASSERT_NULL(sigmoid->w);
+    TEST_ASSERT_NULL(sigmoid->b);
     TEST_ASSERT_NULL(sigmoid->dx);
-
-    scnn_layer_free(&sigmoid);
-}
-
-TEST(scnn_sigmoid, set_size_fail_invalid_w)
-{
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-
-    sigmoid->set_size(sigmoid, 1, 10, 1, 0);
-
-    TEST_ASSERT_NULL(sigmoid->x);
-    TEST_ASSERT_NULL(sigmoid->y);
-    TEST_ASSERT_NULL(sigmoid->dx);
-
-    scnn_layer_free(&sigmoid);
-}
-
-TEST(scnn_sigmoid, set_size_fail_invalid_in_size)
-{
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-
-    sigmoid->set_size(sigmoid, 1, 10, 3, 3);
-
-    TEST_ASSERT_NULL(sigmoid->x);
-    TEST_ASSERT_NULL(sigmoid->y);
-    TEST_ASSERT_NULL(sigmoid->dx);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_NULL(sigmoid->dw);
+    TEST_ASSERT_NULL(sigmoid->db);
 }
 
 TEST(scnn_sigmoid, forward)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     sigmoid->forward(sigmoid, x);
 
-    float answer[] = {
+    scnn_dtype y[] = {
         0.268941, 0.5, 0.731059
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, sigmoid->y->data, 3);
-
-    scnn_mat_free(&x);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, sigmoid->y->data, 3);
 }
 
-TEST(scnn_sigmoid, forward_fail_x_is_null)
+TEST(scnn_sigmoid, forward_with_batch_dim)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 2, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    float init[] = {
-        0, 0, 0
+    scnn_dtype x[] = {
+        -2, -1, 0,
+        1, 2, 3
     };
 
-    scnn_mat_copy_from_array(sigmoid->y,
-        init,
-        sigmoid->y->size);
+    sigmoid->forward(sigmoid, x);
+
+    scnn_dtype y[] = {
+        0.119203, 0.268941, 0.5,
+        0.731059, 0.880797, 0.952574
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, sigmoid->y->data, (2 * 3));
+}
+
+TEST(scnn_sigmoid, forward_fails_when_x_is_NULL)
+{
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
+
+    scnn_dtype y[] = {
+        0, 1, 2
+    };
+    scnn_scopy(3, y, 1, sigmoid->y->data, 1);
 
     sigmoid->forward(sigmoid, NULL);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, sigmoid->y->data, sigmoid->y->size);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, sigmoid->y->data, 3);
 }
 
-TEST(scnn_sigmoid, forward_fail_layer_is_null)
+TEST(scnn_sigmoid, forward_fails_when_layer_is_NULL)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 2, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
-
-    float init[] = {
-        0, 0, 0
+    scnn_dtype y[] = {
+        0, 1, 2
     };
+    scnn_scopy(3, y, 1, sigmoid->y->data, 1);
 
-    scnn_mat_copy_from_array(sigmoid->y,
-        init,
-        sigmoid->y->size);
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     sigmoid->forward(NULL, x);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, sigmoid->y->data, sigmoid->y->size);
-
-    scnn_mat_free(&x);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, sigmoid->y->data, 3);
 }
 
 TEST(scnn_sigmoid, backward)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     sigmoid->forward(sigmoid, x);
 
-    scnn_mat* dy = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(dy,
-        (float[]){
-            0.53788284, 1, 1.46211716
-        },
-        dy->size);
+    scnn_dtype dy[] = {
+        0.53788284, 1, 1.46211716
+    };
 
     sigmoid->backward(sigmoid, dy);
 
-    float answer_dx[] = {
+    scnn_dtype dx[] = {
         1.05754186e-1, 2.5e-1, 2.87469681e-1
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dx, sigmoid->dx->data, sigmoid->dx->size);
-
-    scnn_mat_free(&x);
-    scnn_mat_free(&dy);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, sigmoid->dx->data, sigmoid->dx->size);
 }
 
-TEST(scnn_sigmoid, backward_fail_dy_is_null)
+TEST(scnn_sigmoid, backward_with_batch_dim)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 2, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
-
-    scnn_mat_fill(sigmoid->dx, 0);
+    scnn_dtype x[] = {
+        -2, -1, 0,
+        1, 2, 3
+    };
 
     sigmoid->forward(sigmoid, x);
+
+    scnn_dtype dy[] = {
+        0.238406, 0.53788284, 1,
+        1.46211716, 1.761594, 1.905148
+    };
+
+    sigmoid->backward(sigmoid, dy);
+
+    scnn_dtype dx[] = {
+        2.503111e-2, 1.05754186e-1, 2.5e-1,
+        2.87469681e-1, 1.8495617e-1, 8.606844e-2
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, sigmoid->dx->data, (2 * 3));
+}
+
+TEST(scnn_sigmoid, backward_fails_when_dy_is_NULL)
+{
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
+
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
+
+    sigmoid->forward(sigmoid, x);
+
+    scnn_dtype dx[] = {
+        0, 1, 2
+    };
+
+    scnn_scopy(3, dx, 1, sigmoid->dx->data, 1);
+
     sigmoid->backward(sigmoid, NULL);
 
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, sigmoid->dx->data, sigmoid->dx->size);
-
-    scnn_mat_free(&x);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, sigmoid->dx->data, sigmoid->dx->size);
 }
 
-TEST(scnn_sigmoid, backward_fail_layer_is_null)
+TEST(scnn_sigmoid, backward_fails_when_layer_is_NULL)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *sigmoid = scnn_sigmoid_layer(params);
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    sigmoid = scnn_sigmoid_layer(params);
+    sigmoid->init(sigmoid);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
-
-    scnn_mat* dy = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(dy,
-        (float[]){
-            8, 12, 16
-        },
-        dy->size);
-
-    scnn_mat_fill(sigmoid->dx, 0);
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     sigmoid->forward(sigmoid, x);
+
+    scnn_dtype dx[] = {
+        0, 1, 2
+    };
+
+    scnn_scopy(3, dx, 1, sigmoid->dx->data, 1);
+
+    scnn_dtype dy[] = {
+        0.53788284, 1, 1.46211716
+    };
+
     sigmoid->backward(NULL, dy);
 
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, sigmoid->dx->data, sigmoid->dx->size);
-
-    scnn_mat_free(&x);
-    scnn_mat_free(&dy);
-
-    scnn_layer_free(&sigmoid);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, sigmoid->dx->data, sigmoid->dx->size);
 }

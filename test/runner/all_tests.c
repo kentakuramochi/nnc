@@ -11,13 +11,13 @@ static void RunAllTests(void)
 
     RUN_TEST_GROUP(scnn_mat);
 
-    //RUN_TEST_GROUP(scnn_layer);
+    RUN_TEST_GROUP(scnn_layer);
 
-    //RUN_TEST_GROUP(scnn_fc);
+    RUN_TEST_GROUP(scnn_fc);
 
-    //RUN_TEST_GROUP(scnn_sigmoid);
+    RUN_TEST_GROUP(scnn_sigmoid);
 
-    //RUN_TEST_GROUP(scnn_softmax);
+    RUN_TEST_GROUP(scnn_softmax);
 
     //RUN_TEST_GROUP(scnn_net);
 

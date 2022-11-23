@@ -1,7 +1,7 @@
 /**
  * @file test_scnn_softmax.c
  * @brief Unit tests of scnn_softmax.c
- * 
+ *
  */
 #include "scnn_softmax.h"
 
@@ -11,322 +11,395 @@
 
 TEST_GROUP(scnn_softmax);
 
+scnn_layer *softmax;
+
 TEST_SETUP(scnn_softmax)
-{}
+{
+    softmax = NULL;
+}
 
 TEST_TEAR_DOWN(scnn_softmax)
-{}
-
-TEST(scnn_softmax, alloc_and_free)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-
-    TEST_ASSERT_NOT_NULL(softmax);
-
-    TEST_ASSERT_EQUAL_INT(params.in, softmax->params.in);
-    TEST_ASSERT_EQUAL_INT(params.in, softmax->params.out);
-    TEST_ASSERT_EQUAL_INT(softmax->params.in, softmax->params.out);
-
-    TEST_ASSERT_NOT_NULL(softmax->forward);
-    TEST_ASSERT_NOT_NULL(softmax->backward);
-
-    TEST_ASSERT_NOT_NULL(softmax->set_size);
-
     scnn_layer_free(&softmax);
 
     TEST_ASSERT_NULL(softmax);
 }
 
-TEST(scnn_softmax, alloc_fail_invalid_param_in)
+TEST(scnn_softmax, allocate_softmax_layer)
 {
-    scnn_layer_params params = { .in = 0 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
+    scnn_layer_params params = {.in_shape = {1, 3, 1, 1}};
+    softmax = scnn_softmax_layer(params);
 
-    TEST_ASSERT_NULL(softmax);
+    TEST_ASSERT_NOT_NULL(softmax);
+
+    TEST_ASSERT_EQUAL_INT(1, softmax->params.in_shape[0]);
+    TEST_ASSERT_EQUAL_INT(3, softmax->params.in_shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->params.in_shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->params.in_shape[3]);
+
+    TEST_ASSERT_NOT_NULL(softmax->init);
+
+    TEST_ASSERT_NOT_NULL(softmax->forward);
+    TEST_ASSERT_NOT_NULL(softmax->backward);
 }
 
-TEST(scnn_softmax, set_size)
+TEST(scnn_softmax, initialize)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
+    scnn_layer_params params = {.in_shape = {1, 3, 1, 1}};
+    softmax = scnn_softmax_layer(params);
 
-    softmax->set_size(softmax, 1, 10, 1, 1);
+    TEST_ASSERT_NOT_NULL(softmax->init(softmax));
 
     TEST_ASSERT_NOT_NULL(softmax->x);
     TEST_ASSERT_NOT_NULL(softmax->x->data);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(10, softmax->x->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape.d[3]);
-    TEST_ASSERT_EQUAL_INT(10, softmax->x->size);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape[0]);
+    TEST_ASSERT_EQUAL_INT(3, softmax->x->shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->x->shape[3]);
+    TEST_ASSERT_EQUAL_INT(3, softmax->x->size);
 
     TEST_ASSERT_NOT_NULL(softmax->y);
     TEST_ASSERT_NOT_NULL(softmax->y->data);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(10, softmax->y->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape.d[3]);
-    TEST_ASSERT_EQUAL_INT(10, softmax->y->size);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape[0]);
+    TEST_ASSERT_EQUAL_INT(3, softmax->y->shape[1]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape[2]);
+    TEST_ASSERT_EQUAL_INT(1, softmax->y->shape[3]);
+    TEST_ASSERT_EQUAL_INT(3, softmax->y->size);
 
     TEST_ASSERT_NULL(softmax->w);
-
     TEST_ASSERT_NULL(softmax->b);
 
     TEST_ASSERT_NOT_NULL(softmax->dx);
     TEST_ASSERT_NOT_NULL(softmax->dx->data);
-    TEST_ASSERT_EQUAL_INT(softmax->x->shape.d[0], softmax->dx->shape.d[0]);
-    TEST_ASSERT_EQUAL_INT(softmax->x->shape.d[1], softmax->dx->shape.d[1]);
-    TEST_ASSERT_EQUAL_INT(softmax->x->shape.d[2], softmax->dx->shape.d[2]);
-    TEST_ASSERT_EQUAL_INT(softmax->x->shape.d[3], softmax->dx->shape.d[3]);
+    TEST_ASSERT_EQUAL_INT(softmax->x->shape[0], softmax->dx->shape[0]);
+    TEST_ASSERT_EQUAL_INT(softmax->x->shape[1], softmax->dx->shape[1]);
+    TEST_ASSERT_EQUAL_INT(softmax->x->shape[2], softmax->dx->shape[2]);
+    TEST_ASSERT_EQUAL_INT(softmax->x->shape[3], softmax->dx->shape[3]);
     TEST_ASSERT_EQUAL_INT(softmax->x->size, softmax->dx->size);
 
     TEST_ASSERT_NULL(softmax->dw);
-
     TEST_ASSERT_NULL(softmax->db);
-
-    scnn_layer_free(&softmax);
 }
 
-TEST(scnn_softmax, set_size_fail_invalid_n)
+TEST(scnn_softmax, cannot_initialize_with_NULL)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
+    scnn_layer_params params = {.in_shape = {1, 3, 1, 1}};
+    softmax = scnn_softmax_layer(params);
 
-    softmax->set_size(softmax, 0, 10, 1, 1);
+    TEST_ASSERT_NULL(softmax->init(NULL));
 
     TEST_ASSERT_NULL(softmax->x);
     TEST_ASSERT_NULL(softmax->y);
+    TEST_ASSERT_NULL(softmax->w);
+    TEST_ASSERT_NULL(softmax->b);
     TEST_ASSERT_NULL(softmax->dx);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_NULL(softmax->dw);
+    TEST_ASSERT_NULL(softmax->db);
 }
 
-TEST(scnn_softmax, set_size_fail_invalid_c)
+TEST(scnn_softmax, cannot_initialize_without_in_shape)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
+    scnn_layer_params params;
+    softmax = scnn_softmax_layer(params);
 
-    softmax->set_size(softmax, 1, 0, 1, 1);
+    TEST_ASSERT_NULL(softmax->init(softmax));
 
     TEST_ASSERT_NULL(softmax->x);
     TEST_ASSERT_NULL(softmax->y);
+    TEST_ASSERT_NULL(softmax->w);
+    TEST_ASSERT_NULL(softmax->b);
     TEST_ASSERT_NULL(softmax->dx);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_NULL(softmax->dw);
+    TEST_ASSERT_NULL(softmax->db);
 }
 
-TEST(scnn_softmax, set_size_fail_invalid_h)
+TEST(scnn_softmax, cannot_initialize_with_invalid_in_shape)
 {
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
+    scnn_layer_params params = {.in_shape = {-1, 3, 1, 1}};
+    softmax = scnn_softmax_layer(params);
 
-    softmax->set_size(softmax, 1, 10, 0, 1);
+    TEST_ASSERT_NULL(softmax->init(softmax));
 
     TEST_ASSERT_NULL(softmax->x);
     TEST_ASSERT_NULL(softmax->y);
+    TEST_ASSERT_NULL(softmax->w);
+    TEST_ASSERT_NULL(softmax->b);
     TEST_ASSERT_NULL(softmax->dx);
-
-    scnn_layer_free(&softmax);
-}
-
-TEST(scnn_softmax, set_size_fail_invalid_w)
-{
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-
-    softmax->set_size(softmax, 1, 10, 1, 0);
-
-    TEST_ASSERT_NULL(softmax->x);
-    TEST_ASSERT_NULL(softmax->y);
-    TEST_ASSERT_NULL(softmax->dx);
-
-    scnn_layer_free(&softmax);
-}
-
-TEST(scnn_softmax, set_size_fail_invalid_in_size)
-{
-    scnn_layer_params params = { .in = 10 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-
-    softmax->set_size(softmax, 1, 10, 3, 3);
-
-    TEST_ASSERT_NULL(softmax->x);
-    TEST_ASSERT_NULL(softmax->y);
-    TEST_ASSERT_NULL(softmax->dx);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_NULL(softmax->dw);
+    TEST_ASSERT_NULL(softmax->db);
 }
 
 TEST(scnn_softmax, forward)
 {
-    scnn_layer_params params = { .in = 4 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 4, 1, 1);
+    scnn_layer_params params = {.in_shape = {1, 3, 1, 1}};
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 4, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 3, 5
-        },
-        x->size);
+    scnn_dtype x[] = {
+        -1, 1, 4};
 
     softmax->forward(softmax, x);
 
-    float answer[] = {
-        0.0021657, 0.00588697, 0.11824302, 0.87370431
-    };
+    scnn_dtype y[] = {
+        0.00637746, 0.04712342, 0.94649912};
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, softmax->y->data, 4);
-
-    scnn_mat_free(&x);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, softmax->y->data, 3);
 }
 
-TEST(scnn_softmax, forward_fail_x_is_null)
+TEST(scnn_softmax, forward_with_xy_dim)
 {
-    scnn_layer_params params = { .in = 4 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 4, 1, 1);
+    scnn_layer_params params = {.in_shape = {1, 3, 2, 2}};
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    float init[] = {
-        0, 0, 0, 0
+    scnn_dtype x[] = {
+        -1, 0,
+        -1, 1,
+        1, 1,
+        1, 1,
+        4, 2,
+        -2, 1,
     };
 
-    scnn_mat_copy_from_array(softmax->y,
-        init,
-        softmax->y->size);
+    softmax->forward(softmax, x);
 
-    softmax->forward(softmax, NULL);
+    scnn_dtype y[] = {
+        0.00637746, 0.09003057,
+        0.1141952, 0.33333333,
+        0.04712342, 0.24472847,
+        0.84379473, 0.33333333,
+        0.94649912, 0.66524096,
+        0.04201007, 0.33333333
+    };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, softmax->y->data, softmax->y->size);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, softmax->y->data, (3 * 2 * 2));
 }
 
-TEST(scnn_softmax, forward_fail_layer_is_null)
+TEST(scnn_softmax, forward_with_batch_dim)
 {
-    scnn_layer_params params = { .in = 4 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 4, 1, 1);
+    scnn_layer_params params = { .in_shape = { 2, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 4, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 3, 5
-        },
-        x->size);
-
-    float init[] = {
-        0, 0, 0, 0
+    scnn_dtype x[] = {
+        -1, 1, 4,
+        0, 1, 2
     };
 
-    scnn_mat_copy_from_array(softmax->y,
-        init,
-        softmax->y->size);
+    softmax->forward(softmax, x);
+
+    scnn_dtype y[] = {
+        0.00637746, 0.04712342, 0.94649912,
+        0.09003057, 0.24472847, 0.66524096
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, softmax->y->data, (2 * 3));
+}
+
+TEST(scnn_softmax, forward_fails_when_layer_is_NULL)
+{
+    scnn_layer_params params = { .in_shape = { 1, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
+
+    scnn_dtype y[] = {
+        0, 1, 2
+    };
+    scnn_scopy(3, y, 1, softmax->y->data, 1);
+
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     softmax->forward(NULL, x);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(init, softmax->y->data, softmax->y->size);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, softmax->y->data, 3);
+}
 
-    scnn_mat_free(&x);
+TEST(scnn_softmax, forward_fails_when_x_is_NULL)
+{
+    scnn_layer_params params = { .in_shape = { 1, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_layer_free(&softmax);
+    scnn_dtype y[] = {
+        0, 1, 2
+    };
+    scnn_scopy(3, y, 1, softmax->y->data, 1);
+
+    softmax->forward(softmax, NULL);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, softmax->y->data, 3);
 }
 
 TEST(scnn_softmax, backward)
 {
-    scnn_layer_params params = { .in = 4 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 4, 1, 1);
+    scnn_layer_params params = { .in_shape = { 1, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 4, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 3, 5
-        },
-        x->size);
-
-    softmax->forward(softmax, x);
-
-    float t[] = {
-        0, 0, 1, 0
+    scnn_dtype x[] = {
+        -1, 1, 4
     };
 
-    scnn_mat* dy = scnn_mat_alloc((scnn_shape){ .d = { 1, 4, 1, 1 } });
-    for (int i = 0; i < dy->size; i++)
-    {
-        dy->data[i] = softmax->y->data[i] - t[i];
+    softmax->forward(softmax, x);
+    // scnn_dtype y[] = {
+    //     0.00637746, 0.04712342, 0.94649912
+    // };
+
+    scnn_dtype t[] = {
+        0, 0, 1
+    };
+    scnn_dtype dy[3];
+    for (int i = 0; i < 3; i++) {
+        dy[i] = softmax->y->data[i] - t[i];
     }
 
     softmax->backward(softmax, dy);
 
-    float answer_dx[] = {
-        0.0021657, 0.00588697, -0.88175698, 0.87370431
+    scnn_dtype dx[] = {
+        0.00637746, 0.04712342, -0.053500880
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer_dx, softmax->dx->data, softmax->dx->size);
-
-    scnn_mat_free(&x);
-    scnn_mat_free(&dy);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, softmax->dx->data, 3);
 }
 
-TEST(scnn_softmax, backward_fail_dy_is_null)
+TEST(scnn_softmax, backward_with_xy_dim)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape = { 1, 3, 2, 2 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
-    scnn_mat_fill(softmax->dx, 0);
+    scnn_dtype x[] = {
+        -1, 0,
+        -1, 1,
+        1, 1,
+        1, 1,
+        4, 2,
+        -2, 1,
+    };
 
     softmax->forward(softmax, x);
+
+    // scnn_dtype y[] = {
+    //     0.00637746, 0.09003057,
+    //     0.1141952, 0.33333333,
+    //     0.04712342, 0.24472847,
+    //     0.84379473, 0.33333333,
+    //     0.94649912, 0.66524096,
+    //     0.04201007, 0.33333333
+    // };
+
+    scnn_dtype t[] = {
+        0, 0,
+        1, 0,
+        0, 1,
+        0, 0,
+        1, 0,
+        0, 1
+    };
+    scnn_dtype dy[3 * 2 * 2];
+    for (int i = 0; i < (3 * 2 * 2); i++) {
+        dy[i] = softmax->y->data[i] - t[i];
+    }
+
+    softmax->backward(softmax, dy);
+
+    scnn_dtype dx[] = {
+        0.00637746, 0.09003057,
+        -0.8858048, 0.33333333,
+        0.04712342, -0.75527153,
+        0.84379473, 0.33333333,
+        -0.05350088, 0.66524096,
+        0.04201007, -0.66666667
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, softmax->dx->data, (3 * 2 * 2));
+}
+
+TEST(scnn_softmax, backward_with_batch_dim)
+{
+    scnn_layer_params params = { .in_shape = { 2, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
+
+    scnn_dtype x[] = {
+        -1, 1, 4,
+        0, 1, 2
+    };
+
+    softmax->forward(softmax, x);
+    // scnn_dtype y[] = {
+    //     0.00637746, 0.04712342, 0.94649912,
+    //     0.09003057, 0.24472847, 0.66524096
+    // };
+
+    scnn_dtype t[] = {
+        0, 0, 1,
+        0, 1, 0
+    };
+    scnn_dtype dy[2 * 3];
+    for (int i = 0; i < (2 * 3); i++)
+    {
+        dy[i] = softmax->y->data[i] - t[i];
+    }
+
+    softmax->backward(softmax, dy);
+
+    scnn_dtype dx[] = {
+        0.00637746, 0.04712342, -0.05350087,
+        0.09003057, -0.75527153, 0.66524096
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, softmax->dx->data, (2 * 3));
+}
+
+TEST(scnn_softmax, backward_fails_when_dy_is_NULL)
+{
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
+
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
+
+    softmax->forward(softmax, x);
+
+    scnn_dtype dx[] = {
+        0, 1, 2
+    };
+
+    scnn_scopy(3, dx, 1, softmax->dx->data, 1);
+
     softmax->backward(softmax, NULL);
 
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, softmax->dx->data, softmax->dx->size);
-
-    scnn_mat_free(&x);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, softmax->dx->data, softmax->dx->size);
 }
 
-TEST(scnn_softmax, backward_fail_layer_is_null)
+TEST(scnn_softmax, backward_fails_when_layer_is_NULL)
 {
-    scnn_layer_params params = { .in = 3 };
-    scnn_layer *softmax = scnn_softmax_layer(params);
-    softmax->set_size(softmax, 1, 3, 1, 1);
+    scnn_layer_params params = { .in_shape={ 1, 3, 1, 1 } };
+    softmax = scnn_softmax_layer(params);
+    softmax->init(softmax);
 
-    scnn_mat* x = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(x,
-        (float[]){
-            -1, 0, 1
-        },
-        x->size);
-
-    scnn_mat* dy = scnn_mat_alloc((scnn_shape){ .d = { 1, 3, 1, 1 } });
-    scnn_mat_copy_from_array(dy,
-        (float[]){
-            8, 12, 16
-        },
-        dy->size);
-
-    scnn_mat_fill(softmax->dx, 0);
+    scnn_dtype x[] = {
+        -1, 0, 1
+    };
 
     softmax->forward(softmax, x);
+
+    scnn_dtype dx[] = {
+        0, 1, 2
+    };
+
+    scnn_scopy(3, dx, 1, softmax->dx->data, 1);
+
+    scnn_dtype dy[] = {
+        0.53788284, 1, 1.46211716
+    };
+
     softmax->backward(NULL, dy);
 
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, softmax->dx->data, softmax->dx->size);
-
-    scnn_mat_free(&x);
-    scnn_mat_free(&dy);
-
-    scnn_layer_free(&softmax);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, softmax->dx->data, softmax->dx->size);
 }

@@ -10,57 +10,78 @@
 #include "scnn_blas.h"
 
 /**
- * @brief Set the matrix size
+ * @brief Initialize Softmax layer
  * 
- * @param[in] n Batch size N
- * @param[in] c Channel size C
- * @param[in] h Height H
- * @param[in] w Width W
+ * @param[in,out] self  Softmax layer
+ * @return              Pointer to initialized layer, NULL if failed
  */
-static void set_size(struct scnn_layer *self, const int n, const int c, const int h, const int w)
+static scnn_layer *init(struct scnn_layer *self)
 {
     if (self == NULL) {
-        return;
+        return NULL;
     }
 
-    if ((n < 1) || (c < 1) || (h < 1) || (w < 1)) {
-        return;
+    self->x = scnn_mat_alloc(self->params.in_shape);
+    if (self->x == NULL) {
+        return NULL;
     }
-
-    // input channels = (C*H*W) in input matrix
-    if ((c * h * w) != self->params.in) {
-        return;
+    self->y = scnn_mat_alloc(self->params.in_shape);
+    if (self->y == NULL) {
+        goto FREE_X;
     }
-
-    self->x = scnn_mat_alloc((scnn_shape){ .d = { n, c, 1, 1 } });
-    self->y = scnn_mat_alloc((scnn_shape){ .d = { n, c, 1, 1 } });
 
     self->dx = scnn_mat_alloc(self->x->shape);
+    if (self->dx == NULL) {
+        goto FREE_Y;
+    }
+
+    return self;
+
+FREE_Y:
+    scnn_mat_free(&self->y);
+FREE_X:
+    scnn_mat_free(&self->x);
+
+    return NULL;
 }
 
 /**
  * @brief Forward propagation
  * 
- * @param[in,out] self  Pointer to target layer
+ * @param[in,out] self  Sigmoid layer
  * @param[in]     x     Input matrix
  */
-static void forward(scnn_layer *self, scnn_mat *x)
+static void forward(scnn_layer *self, scnn_dtype *x)
 {
     if ((self == NULL) || (x == NULL)) {
         return;
     }
 
-    scnn_scopy(self->x->size, x->data, 1, self->x->data, 1);
-    for (int i = 0; i < self->x->size; i++) {
-        self->y->data[i] = 1.0 / (1 + exp(-self->x->data[i]));
-    }
+    scnn_scopy(self->x->size, x, 1, self->x->data, 1);
 
-    float sum = 0;
-    for (int i = 0; i < self->x->size; i++) {
-        sum += exp(self->x->data[i]);
-    }
-    for (int i = 0; i < self->x->size; i++) {
-        self->y->data[i] = exp(self->x->data[i]) / sum;
+    // NCHW order
+    // shape[0] (N): batch dimension
+    // shape[1] (C): axis
+    const int dim_c  = self->x->shape[1] * self->x->shape[2] * self->x->shape[3];
+    const int dim_xy = self->x->shape[2] * self->x->shape[3];
+
+    scnn_dtype *px = self->x->data;
+    scnn_dtype *py = self->y->data;
+
+    for (int n = 0; n < self->x->shape[0]; n++) {
+        for (int m = 0; m < dim_xy; m++) {
+            scnn_dtype sum = 0;
+            for (int i = 0; i < self->x->shape[1]; i++) {
+                sum += exp(px[i * dim_xy]);
+            }
+            for (int i = 0; i < self->x->shape[1]; i++) {
+                py[i * dim_xy] = exp(px[i * dim_xy]) / sum;
+            }
+            px++;
+            py++;
+        }
+        px += (dim_c - dim_xy);
+        py += (dim_c - dim_xy);
     }
 }
 
@@ -70,7 +91,7 @@ static void forward(scnn_layer *self, scnn_mat *x)
  * @param[in,out] self  Pointer to layer
  * @param[in]     dy    Diffirential of output matrix
  */
-static void backward(scnn_layer *self, scnn_mat *dy)
+static void backward(scnn_layer *self, scnn_dtype *dy)
 {
     if ((self == NULL) || (dy == NULL)) {
         return;
@@ -78,29 +99,21 @@ static void backward(scnn_layer *self, scnn_mat *dy)
 
     // backward propagation with cross entropy loss
     for (int i = 0; i < self->y->size; i++) {
-        self->dx->data[i] = dy->data[i];
+        self->dx->data[i] = dy[i];
     }
 }
 
 scnn_layer *scnn_softmax_layer(const scnn_layer_params params)
 {
-    if (params.in < 1) {
-        return NULL;
-    }
-
     scnn_layer *layer = scnn_layer_alloc(params);
     if (layer == NULL) {
         return NULL;
     }
 
-    // (input size) == (output size)
-    layer->params.in  = params.in;
-    layer->params.out = params.in;
+    layer->init = init;
 
     layer->forward  = forward;
     layer->backward = backward;
-
-    layer->set_size = set_size;
 
     return layer;
 }

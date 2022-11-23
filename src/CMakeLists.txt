@@ -2,6 +2,10 @@
 file(GLOB SOURCES
     ./scnn_blas.c
     ./scnn_mat.c
+    ./scnn_layer.c
+    ./scnn_fc.c
+    ./scnn_sigmoid.c
+    ./scnn_softmax.c
 )
 
 add_library(${TARGET_LIB_NAME}

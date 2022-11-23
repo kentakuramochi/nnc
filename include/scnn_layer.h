@@ -23,9 +23,11 @@ typedef struct scnn_layer_params {
  * 
  */
 typedef struct scnn_layer {
-    scnn_layer_params params;   //!< Layer parameters
-
     int id;         //!< Layer ID
+    int prev_id;    //!< Layer ID of the previous
+    int next_id;    //!< Layer ID of the next
+
+    scnn_layer_params params;   //!< Layer parameters
 
     scnn_mat* x;     //!< Input matrix
     scnn_mat* y;     //!< Output matrix
@@ -36,13 +38,10 @@ typedef struct scnn_layer {
     scnn_mat* dw;    //!< Difference of weight matrix
     scnn_mat* db;    //!< Difference of bias matrix
 
-    int prev_id;    //!< Layer ID of the previous
-    int next_id;    //!< Layer ID of the next
+    struct scnn_layer* (*init)(struct scnn_layer *self);  //!< Initialize layer
 
-    void (*forward)(struct scnn_layer *self, scnn_mat* x);     //!< Forward propagation
-    void (*backward)(struct scnn_layer *self, scnn_mat* dy);   //!< Backward propagation
-
-    void (*set_size)(struct scnn_layer *self, const int n, const int c, const int h, const int w);   //!< Set matrix size
+    void (*forward)(struct scnn_layer *self, scnn_dtype* x);     //!< Forward propagation
+    void (*backward)(struct scnn_layer *self, scnn_dtype* dy);   //!< Backward propagation
 } scnn_layer;
 
 /**

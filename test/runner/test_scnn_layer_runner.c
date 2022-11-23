@@ -7,17 +7,8 @@
 
 TEST_GROUP_RUNNER(scnn_layer)
 {
-    RUN_TEST_CASE(scnn_layer, alloc_and_free);
+    RUN_TEST_CASE(scnn_layer, allocate_layer);
 
-    RUN_TEST_CASE(scnn_layer, free_to_null);
-    RUN_TEST_CASE(scnn_layer, free_to_ptr_to_null);
-
-    RUN_TEST_CASE(scnn_layer, set_shape_1d);
-    RUN_TEST_CASE(scnn_layer, set_shape_2d);
-    RUN_TEST_CASE(scnn_layer, set_shape_3d);
-    RUN_TEST_CASE(scnn_layer, set_shape_4d);
-
-    RUN_TEST_CASE(scnn_layer, set_invalid_shape_2d);
-    RUN_TEST_CASE(scnn_layer, set_invalid_shape_3d);
-    RUN_TEST_CASE(scnn_layer, set_invalid_shape_negative);
+    RUN_TEST_CASE(scnn_layer, free_to_NULL_does_no_harm);
+    RUN_TEST_CASE(scnn_layer, double_free_is_avoided);
 }
