@@ -69,11 +69,11 @@ TEST(scnn_fc, initialize)
 
     TEST_ASSERT_NOT_NULL(fc->w);
     TEST_ASSERT_NOT_NULL(fc->w->data);
-    TEST_ASSERT_EQUAL_INT(10, fc->w->shape[0]);
-    TEST_ASSERT_EQUAL_INT(2, fc->w->shape[1]);
+    TEST_ASSERT_EQUAL_INT((2 * 28 * 28), fc->w->shape[0]);
+    TEST_ASSERT_EQUAL_INT(10, fc->w->shape[1]);
     TEST_ASSERT_EQUAL_INT(1, fc->w->shape[2]);
     TEST_ASSERT_EQUAL_INT(1, fc->w->shape[3]);
-    TEST_ASSERT_EQUAL_INT((10 * 2), fc->w->size);
+    TEST_ASSERT_EQUAL_INT((10 * 2 * 28 * 28), fc->w->size);
 
     TEST_ASSERT_NOT_NULL(fc->b);
     TEST_ASSERT_NOT_NULL(fc->b->data);
@@ -179,11 +179,11 @@ TEST(scnn_fc, forward)
 
     fc->forward(fc, x);
 
-    scnn_dtype answer[] = {
+    scnn_dtype y[] = {
         4, 6, 8
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, fc->y->data, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, fc->y->data, 3);
 }
 
 TEST(scnn_fc, forward_with_batch_dim)
@@ -211,13 +211,13 @@ TEST(scnn_fc, forward_with_batch_dim)
 
     fc->forward(fc, x);
 
-    scnn_dtype answer[] = {
+    scnn_dtype y[] = {
         4, 6, 8,
         7, 10, 13,
         7, 11, 15
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, fc->y->data, (3 * 3));
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y, fc->y->data, (3 * 3));
 }
 
 TEST(scnn_fc, forward_fails_when_x_is_NULL)
@@ -361,7 +361,7 @@ TEST(scnn_fc, backward_with_batch_dim)
         18, 23, 28
     };
     scnn_dtype db[] = {
-        9, 12, 15
+        3, 4, 5
     };
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx, fc->dx->data, fc->dx->size);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(dw, fc->dw->data, fc->dw->size);
