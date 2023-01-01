@@ -13,10 +13,16 @@
 typedef float scnn_dtype;
 
 /**
- * @brief Matrix 4-d shape
+ * @brief Max dimension of matrix
  * 
  */
-#define scnn_shape(...) (int[4]){ __VA_ARGS__ }
+#define SCNN_MAT_DIM 4
+
+/**
+ * @brief Utility to indicate 4-d matrix shape
+ * 
+ */
+#define scnn_shape(...) (int[SCNN_MAT_DIM]){ __VA_ARGS__ }
 
 /**
  * @brief Data order of matrix element
@@ -31,10 +37,10 @@ typedef enum scnn_mat_order {
  * 
  */
 typedef struct scnn_mat {
-    int             shape[4];   //!< Matrix shape
-    int             size;       //!< Total size of elements
-    scnn_mat_order  order;      //!< Data order
-    scnn_dtype      *data;      //!< Data
+    int             shape[SCNN_MAT_DIM];    //!< Matrix shape
+    int             size;                   //!< Total size of elements
+    scnn_mat_order  order;                  //!< Data order
+    scnn_dtype      *data;                  //!< Data
 } scnn_mat;
 
 /**

@@ -32,6 +32,7 @@ TEST(scnn_fc, allocate_fc_layer)
 
     TEST_ASSERT_NOT_NULL(fc);
 
+    TEST_ASSERT_EQUAL(SCNN_LAYER_FC, fc->params.type);
     TEST_ASSERT_EQUAL_INT(1, fc->params.in_shape[0]);
     TEST_ASSERT_EQUAL_INT(2, fc->params.in_shape[1]);
     TEST_ASSERT_EQUAL_INT(28, fc->params.in_shape[2]);

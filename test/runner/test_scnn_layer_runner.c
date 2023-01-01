@@ -9,6 +9,7 @@ TEST_GROUP_RUNNER(scnn_layer)
 {
     RUN_TEST_CASE(scnn_layer, allocate_layer);
 
-    RUN_TEST_CASE(scnn_layer, free_to_NULL_does_no_harm);
-    RUN_TEST_CASE(scnn_layer, double_free_is_avoided);
+    RUN_TEST_CASE(scnn_layer, free_NULL);
+
+    RUN_TEST_CASE(scnn_layer, free_twice);
 }

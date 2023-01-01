@@ -9,13 +9,27 @@
 #include "scnn_mat.h"
 
 /**
+ * @brief Layer type
+ * 
+ */
+typedef enum scnn_layer_type {
+    SCNN_LAYER_NONE,    //!< None type
+    SCNN_LAYER_FC,      //!< FullyConnected layer
+    SCNN_LAYER_SIGMOID, //!< Sigmoid layer
+    SCNN_LAYER_SOFTMAX  //!< Softmax layer
+} scnn_layer_type;
+
+/**
  * @brief Layer parameters
  * 
  */
 typedef struct scnn_layer_params {
-    int in_shape[4];    //!< Input shape
-    int in;             //!< Input channels
-    int out;            //!< Output channels
+    scnn_layer_type type;       //!< Layer type
+    int in_shape[SCNN_MAT_DIM]; //!< Input shape
+    int out;                    //!< Output channels
+    int id;                     //!< ID of a layer
+    int prev_id;                //!< ID of the previous layer
+    int next_id;                //!< ID of the next layer
 } scnn_layer_params;
 
 /**

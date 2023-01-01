@@ -30,12 +30,12 @@ TEST(scnn_layer, allocate_layer)
 
     TEST_ASSERT_NOT_NULL(layer);
 
-    TEST_ASSERT_EQUAL(0, layer->id);
-
-    TEST_ASSERT_EQUAL(0, layer->prev_id);
-    TEST_ASSERT_EQUAL(0, layer->next_id);
-
+    TEST_ASSERT_EQUAL(SCNN_LAYER_NONE, layer->params.type);
     TEST_ASSERT_EQUAL_INT_ARRAY(params.in_shape, layer->params.in_shape, 4);
+
+    TEST_ASSERT_EQUAL(0, layer->params.id);
+    TEST_ASSERT_EQUAL(0, layer->params.prev_id);
+    TEST_ASSERT_EQUAL(0, layer->params.next_id);
 
     TEST_ASSERT_NULL(layer->x);
     TEST_ASSERT_NULL(layer->y);
@@ -51,12 +51,12 @@ TEST(scnn_layer, allocate_layer)
     TEST_ASSERT_EQUAL(NULL, layer->backward);
 }
 
-TEST(scnn_layer, free_to_NULL_does_no_harm)
+TEST(scnn_layer, free_NULL)
 {
     scnn_layer_free(NULL);
 }
 
-TEST(scnn_layer, double_free_is_avoided)
+TEST(scnn_layer, free_twice)
 {
     scnn_layer_params params = { .in_shape = { 1, 3, 28, 28 } };
     scnn_layer *layer = scnn_layer_alloc(params);

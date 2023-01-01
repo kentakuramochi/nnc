@@ -15,11 +15,11 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
         return NULL;
     }
 
-    layer->id       = 0;
-    layer->prev_id  = 0;
-    layer->next_id  = 0;
-
     layer->params = params;
+
+    layer->params.id       = 0;
+    layer->params.prev_id  = 0;
+    layer->params.next_id  = 0;
 
     layer->x = NULL;
     layer->y = NULL;

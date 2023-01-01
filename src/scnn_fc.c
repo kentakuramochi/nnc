@@ -148,6 +148,8 @@ scnn_layer *scnn_fc_layer(const scnn_layer_params params)
         return NULL;
     }
 
+    layer->params.type = SCNN_LAYER_FC;
+
     layer->init = init;
 
     layer->forward  = forward;

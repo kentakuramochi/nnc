@@ -32,6 +32,8 @@ TEST(scnn_sigmoid, allocate_sigmoid_layer)
 
     TEST_ASSERT_NOT_NULL(sigmoid);
 
+    TEST_ASSERT_EQUAL(SCNN_LAYER_SIGMOID, sigmoid->params.type);
+
     TEST_ASSERT_EQUAL_INT(1, sigmoid->params.in_shape[0]);
     TEST_ASSERT_EQUAL_INT(10, sigmoid->params.in_shape[1]);
     TEST_ASSERT_EQUAL_INT(1, sigmoid->params.in_shape[2]);
