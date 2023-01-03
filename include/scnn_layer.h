@@ -37,10 +37,6 @@ typedef struct scnn_layer_params {
  * 
  */
 typedef struct scnn_layer {
-    int id;         //!< Layer ID
-    int prev_id;    //!< Layer ID of the previous
-    int next_id;    //!< Layer ID of the next
-
     scnn_layer_params params;   //!< Layer parameters
 
     scnn_mat* x;     //!< Input matrix
