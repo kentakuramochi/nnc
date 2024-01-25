@@ -4,300 +4,391 @@
  * 
  */
 #include "scnn_net.h"
-#include "scnn_layers.h"
 
-#include "unity_fixture.h"
+#include "unity.h"
 
-TEST_GROUP(scnn_net);
+#include "mock_scnn_layer.h"
+#include "scnn_layer_impl.h"
 
-TEST_SETUP(scnn_net)
-{}
+#define INIT_LAYER_SIZE 128
 
-TEST_TEAR_DOWN(scnn_net)
-{}
+scnn_net *net;
 
-TEST(scnn_net, alloc_and_free)
+scnn_layer dummy_layer;
+scnn_layer dummy_layers[INIT_LAYER_SIZE];
+
+void setUp(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    net = NULL;
+}
+
+void tearDown(void)
+{}
+
+void test_allocate_and_free(void)
+{
+    net = scnn_net_alloc();
 
     TEST_ASSERT_NOT_NULL(net);
 
-    TEST_ASSERT_EQUAL(0, net->size);
+    TEST_ASSERT_EQUAL_INT(0, scnn_net_size(net));
 
-    for (int i = 0; i < SCNN_NET_MAX_SIZE; i++) {
-        TEST_ASSERT_NULL(net->layers[i]);
+    TEST_ASSERT_EQUAL_INT(1, scnn_net_batch_size(net));
+
+    for (int i = 0; i < INIT_LAYER_SIZE; i++) {
+        TEST_ASSERT_NULL(scnn_net_layers(net)[i]);
     }
 
-    TEST_ASSERT_NULL(net->input);
-    TEST_ASSERT_NULL(net->output);
+    TEST_ASSERT_NULL(scnn_net_input(net));
+    TEST_ASSERT_NULL(scnn_net_output(net));
 
+    scnn_net_free(&net);
+    TEST_ASSERT_NULL(net);
+}
+
+void test_free_pointer_to_NULL(void)
+{
+    scnn_net_free(&net);
+}
+
+void test_free_NULL(void)
+{
+    scnn_net_free(NULL);
+}
+
+void test_append_layer(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Expect(NULL, &dummy_layer);
+    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, &dummy_layer));
+
+    TEST_ASSERT_EQUAL_INT(1, scnn_net_size(net));
+
+    TEST_ASSERT_EQUAL_PTR(&dummy_layer, scnn_net_layers(net)[0]);
+
+    TEST_ASSERT_EQUAL_PTR(&dummy_layer, scnn_net_input(net));
+    TEST_ASSERT_EQUAL_PTR(&dummy_layer, scnn_net_output(net));
+
+    scnn_layer_free_Expect(&(scnn_net_layers(net)[0]));
+    scnn_net_free(&net);
+    TEST_ASSERT_NULL(net);
+}
+
+void test_append_3layers(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Expect(NULL, &dummy_layers[0]);
+    scnn_layer_connect_Expect(&dummy_layers[0], &dummy_layers[1]);
+    scnn_layer_connect_Expect(&dummy_layers[1], &dummy_layers[2]);
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, &dummy_layers[i]));
+    }
+
+    TEST_ASSERT_EQUAL_INT(3, scnn_net_size(net));
+
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL_PTR(&dummy_layers[i], scnn_net_layers(net)[i]);
+    }
+
+    TEST_ASSERT_EQUAL_PTR(&dummy_layers[0], scnn_net_input(net));
+    TEST_ASSERT_EQUAL_PTR(&dummy_layers[2], scnn_net_output(net));
+
+    for (int i = 0; i < 3; i++) {
+        scnn_layer_free_Expect(&(scnn_net_layers(net)[i]));
+    }
+    scnn_net_free(&net);
+    TEST_ASSERT_NULL(net);
+}
+
+void test_append_fail_if_net_is_NULL(void)
+{
+    TEST_ASSERT_NULL(scnn_net_append(NULL, &dummy_layer));
+}
+
+void test_append_fail_if_layer_is_NULL(void)
+{
+    net = scnn_net_alloc();
+
+    TEST_ASSERT_NULL(scnn_net_append(net, NULL));
+
+    TEST_ASSERT_EQUAL_INT(0, scnn_net_size(net));
+
+    TEST_ASSERT_EQUAL_PTR(NULL, scnn_net_input(net));
+    TEST_ASSERT_EQUAL_PTR(NULL, scnn_net_output(net));
+
+    scnn_net_free(&net);
+}
+
+void test_append_extend_layer_size(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Expect(NULL, &dummy_layers[0]);
+    for (int i = 1; i < INIT_LAYER_SIZE; i++) {
+        scnn_layer_connect_Expect(&dummy_layers[i - 1], &dummy_layers[i]);
+    }
+    for (int i = 0; i < INIT_LAYER_SIZE; i++) {
+        TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, &dummy_layers[i]));
+    }
+
+    TEST_ASSERT_EQUAL_INT(INIT_LAYER_SIZE, scnn_net_size(net));
+    TEST_ASSERT_EQUAL_PTR(&dummy_layers[0], scnn_net_input(net));
+    TEST_ASSERT_EQUAL_PTR(&dummy_layers[INIT_LAYER_SIZE - 1], scnn_net_output(net));
+
+    scnn_layer extra_dummy_layer;
+    scnn_layer_connect_Expect(&dummy_layers[INIT_LAYER_SIZE - 1], &extra_dummy_layer);
+    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, &extra_dummy_layer));
+
+    TEST_ASSERT_EQUAL_INT((INIT_LAYER_SIZE + 1), scnn_net_size(net));
+    TEST_ASSERT_EQUAL_PTR(&dummy_layers[0], scnn_net_input(net));
+    TEST_ASSERT_EQUAL_PTR(&extra_dummy_layer, scnn_net_output(net));
+
+    for (int i = 0; i < (INIT_LAYER_SIZE + 1); i++) {
+        scnn_layer_free_Expect(&(scnn_net_layers(net)[i]));
+    }
     scnn_net_free(&net);
 
     TEST_ASSERT_NULL(net);
 }
 
-TEST(scnn_net, append)
+void test_init(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    net = scnn_net_alloc();
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=10 });
-    fc->set_size(fc, 1, 2, 1, 1);
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, &dummy_layer);
 
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, fc));
+    scnn_layer_init_ExpectAndReturn(&dummy_layer, &dummy_layer);
+    TEST_ASSERT_EQUAL_PTR(net, scnn_net_init(net));
 
-    TEST_ASSERT_EQUAL(1, net->size);
-
-    TEST_ASSERT_EQUAL_PTR(fc, net->layers[0]);
-
-    TEST_ASSERT_EQUAL_PTR(fc, net->input);
-    TEST_ASSERT_EQUAL_PTR(fc, net->output);
-
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
-TEST(scnn_net, append_2layers)
+void test_init_3layers(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    net = scnn_net_alloc();
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=10 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=10 });
-    sigmoid->set_size(sigmoid, 1, 10, 1, 1);
-
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, fc));
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, sigmoid));
-
-    TEST_ASSERT_EQUAL(2, net->size);
-
-    TEST_ASSERT_EQUAL_PTR(fc, net->layers[0]);
-    TEST_ASSERT_EQUAL_PTR(sigmoid, net->layers[1]);
-
-    TEST_ASSERT_EQUAL_PTR(fc, net->input);
-    TEST_ASSERT_EQUAL_PTR(sigmoid, net->output);
-
-    scnn_net_free(&net);
-}
-
-TEST(scnn_net, append_3layers)
-{
-    scnn_net *net = scnn_net_alloc();
-
-    scnn_layer *fc1 = scnn_fc_layer((scnn_layer_params){ .in=2, .out=10 });
-    fc1->set_size(fc1, 1, 2, 1, 1);
-    scnn_layer *fc2 = scnn_fc_layer((scnn_layer_params){ .in=10, .out=10 });
-    fc2->set_size(fc2, 1, 10, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=10 });
-    sigmoid->set_size(sigmoid, 1, 10, 1, 1);
-
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, fc1));
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, fc2));
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, sigmoid));
-
-    TEST_ASSERT_EQUAL(3, net->size);
-
-    TEST_ASSERT_EQUAL_PTR(fc1, net->layers[0]);
-    TEST_ASSERT_EQUAL_PTR(fc2, net->layers[1]);
-    TEST_ASSERT_EQUAL_PTR(sigmoid, net->layers[2]);
-
-    TEST_ASSERT_EQUAL_PTR(fc1, net->input);
-    TEST_ASSERT_EQUAL_PTR(sigmoid, net->output);
-
-    scnn_net_free(&net);
-}
-
-TEST(scnn_net, append_net_is_null)
-{
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=10 });
-    fc->set_size(fc, 1, 2, 1, 1);
-
-    TEST_ASSERT_NULL(scnn_net_append(NULL, fc));
-}
-
-TEST(scnn_net, append_layer_is_null)
-{
-    scnn_net *net = scnn_net_alloc();
-
-    TEST_ASSERT_NULL(scnn_net_append(net, NULL));
-
-    scnn_net_free(&net);
-}
-
-TEST(scnn_net, append_unmatched_size)
-{
-    scnn_net *net = scnn_net_alloc();
-
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=10 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=3 });
-    sigmoid->set_size(sigmoid, 1, 3, 1, 1);
-
-    scnn_net_append(net, fc);
-
-    TEST_ASSERT_NULL(scnn_net_append(net, sigmoid));
-
-    scnn_net_free(&net);
-}
-
-TEST(scnn_net, append_over_max_size)
-{
-    scnn_net *net = scnn_net_alloc();
-
-    for (int i = 0; i < SCNN_NET_MAX_SIZE; i++) {
-        scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-        fc->set_size(fc, 1, 2, 1, 1);
-        TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, fc));
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
     }
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    TEST_ASSERT_NULL(scnn_net_append(net, fc));
+    for (int i = 0; i < 3; i++) {
+        scnn_layer_init_ExpectAndReturn(&dummy_layers[i], &dummy_layers[i]);
+    }
+    TEST_ASSERT_EQUAL_PTR(net, scnn_net_init(net));
 
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
-TEST(scnn_net, forward)
+void test_init_fail_if_net_is_NULL(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    TEST_ASSERT_NULL(scnn_net_init(NULL));
+}
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
-    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
-    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
-    softmax->set_size(softmax, 1, 2, 1, 1);
+void test_init_fail_if_net_size_is_0(void)
+{
+    net = scnn_net_alloc();
 
-    scnn_mat_copy_from_array(fc->w, (float[]){ 1, 2, 3, 4 }, fc->w->size);
-    scnn_mat_copy_from_array(fc->b, (float[]){ 0, 1 }, fc->w->size);
+    TEST_ASSERT_NULL(scnn_net_init(net));
 
-    scnn_net_append(net, fc);
-    scnn_net_append(net, sigmoid);
-    scnn_net_append(net, softmax);
-
-    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
-    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
-
-    scnn_net_forward(net, x);
-
-    float y_fc[] = { 0.7, 2 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_fc, net->layers[0]->y->data, net->layers[0]->y->size);
-
-    float y_sigmoid[] = { 0.66818777, 0.88079708 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_sigmoid, net->layers[1]->y->data, net->layers[1]->y->size);
-
-    float y_softmax[] = { 0.44704699, 0.55295301 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_softmax, net->layers[2]->y->data, net->layers[2]->y->size);
-
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
-TEST(scnn_net, forward_net_is_null)
+void test_init_fail_if_layer_init_fail(void)
 {
-    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
-    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+    net = scnn_net_alloc();
 
-    scnn_net_forward(NULL, x);
-}
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
+    }
 
-TEST(scnn_net, forward_x_is_null)
-{
-    scnn_net *net = scnn_net_alloc();
+    scnn_layer_init_ExpectAndReturn(&dummy_layers[0], &dummy_layers[0]);
+    scnn_layer_init_ExpectAndReturn(&dummy_layers[1], NULL);
+    TEST_ASSERT_NULL(scnn_net_init(net));
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
-    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
-    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
-    softmax->set_size(softmax, 1, 2, 1, 1);
-
-    scnn_mat_copy_from_array(fc->w, (float[]){ 1, 2, 3, 4 }, fc->w->size);
-    scnn_mat_copy_from_array(fc->b, (float[]){ 0, 1 }, fc->w->size);
-
-    scnn_net_append(net, fc);
-    scnn_net_append(net, sigmoid);
-    scnn_net_append(net, softmax);
-
-    scnn_mat_fill(net->output->y, 0);
-
-    scnn_net_forward(net, NULL);
-
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, net->output->y->data, net->output->y->size);
-
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
-TEST(scnn_net, backward)
+void test_forward_1layer(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    net = scnn_net_alloc();
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
-    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
-    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
-    softmax->set_size(softmax, 1, 2, 1, 1);
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, &dummy_layer);
 
-    scnn_mat_copy_from_array(fc->w, (float[]){ 1, 2, 3, 4 }, fc->w->size);
-    scnn_mat_copy_from_array(fc->b, (float[]){ 0, 1 }, fc->w->size);
+    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_net_init(net);
 
-    scnn_net_append(net, fc);
-    scnn_net_append(net, sigmoid);
-    scnn_net_append(net, softmax);
+    scnn_dtype x;
+    scnn_dtype y;
+    scnn_layer_forward_ExpectAndReturn(&dummy_layer, &x, &y);
+    TEST_ASSERT_EQUAL_PTR(&y, scnn_net_forward(net, &x));
 
-    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
-    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
-
-    scnn_net_forward(net, x);
-
-    scnn_mat *t = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
-    scnn_mat_copy_from_array(t, (float[]){ 0, 1 }, x->size);
-
-    scnn_net_backward(net, t);
-
-    float dx_ans[] = {
-        0.00524194, 0.10959995
-    };
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx_ans, net->layers[0]->dx->data, net->layers[0]->y->size);
-
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
-TEST(scnn_net, backward_net_is_null)
+void test_forward_3layer(void)
 {
-    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 }});
-    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+    net = scnn_net_alloc();
 
-    scnn_net_backward(NULL, x);
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        scnn_layer_init_IgnoreAndReturn(&dummy_layers[i]);
+    }
+    scnn_net_init(net);
+
+    scnn_dtype x;
+    scnn_dtype y[3];
+    scnn_layer_forward_ExpectAndReturn(&dummy_layers[0], &x, &y[0]);
+    scnn_layer_forward_ExpectAndReturn(&dummy_layers[1], &y[0], &y[1]);
+    scnn_layer_forward_ExpectAndReturn(&dummy_layers[2], &y[1], &y[2]);
+
+    TEST_ASSERT_EQUAL_PTR(&y[2], scnn_net_forward(net, &x));
+
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
 }
 
-TEST(scnn_net, backward_t_is_null)
+void test_forward_fail_if_net_is_NULL(void)
 {
-    scnn_net *net = scnn_net_alloc();
+    net = scnn_net_alloc();
 
-    scnn_layer *fc = scnn_fc_layer((scnn_layer_params){ .in=2, .out=2 });
-    fc->set_size(fc, 1, 2, 1, 1);
-    scnn_layer *sigmoid = scnn_sigmoid_layer((scnn_layer_params){ .in=2 });
-    sigmoid->set_size(sigmoid, 1, 2, 1, 1);
-    scnn_layer *softmax = scnn_softmax_layer((scnn_layer_params){ .in=2 });
-    softmax->set_size(softmax, 1, 2, 1, 1);
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, &dummy_layer);
 
-    scnn_mat_copy_from_array(fc->w, (float[]){ 1, 2, 3, 4 }, fc->w->size);
-    scnn_mat_copy_from_array(fc->b, (float[]){ 0, 1 }, fc->w->size);
+    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_net_init(net);
 
-    scnn_net_append(net, fc);
-    scnn_net_append(net, sigmoid);
-    scnn_net_append(net, softmax);
+    scnn_dtype x;
+    TEST_ASSERT_NULL(scnn_net_forward(NULL, &x));
 
-    scnn_mat *x = scnn_mat_alloc((scnn_shape){ .d = { 1, 1, 1, 2 } });
-    scnn_mat_copy_from_array(x, (float[]){ 0.1, 0.2 }, x->size);
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
+}
 
-    scnn_mat_fill(net->input->dx, 0);
+void test_forward_fail_if_x_is_NULL(void)
+{
+    net = scnn_net_alloc();
 
-    scnn_net_forward(net, x);
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, &dummy_layer);
 
-    scnn_net_backward(net, NULL);
+    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_net_init(net);
 
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, net->input->dx->data, net->input->dx->size);
+    scnn_dtype x;
+    TEST_ASSERT_NULL(scnn_net_forward(net, NULL));
 
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
+}
+
+void test_backward_1layer(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, &dummy_layer);
+
+    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_net_init(net);
+
+    scnn_dtype x;
+    scnn_dtype y;
+    scnn_layer_forward_IgnoreAndReturn(&y);
+    scnn_net_forward(net, &x);
+
+    scnn_dtype dy[2];
+    scnn_layer_backward_ExpectAndReturn(&dummy_layer, &dy[1], &dy[0]);
+    TEST_ASSERT_EQUAL_PTR(&dy[0], scnn_net_backward(net, &dy[1]));
+
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
+}
+
+void test_backward_3layer(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
+    }
+
+    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
+    scnn_net_init(net);
+
+    scnn_dtype x;
+    scnn_dtype y;
+    scnn_layer_forward_IgnoreAndReturn(&y);
+    scnn_net_forward(net, &x);
+
+    scnn_dtype dy[4];
+    scnn_layer_backward_ExpectAndReturn(&dummy_layers[2], &dy[3], &dy[2]);
+    scnn_layer_backward_ExpectAndReturn(&dummy_layers[1], &dy[2], &dy[1]);
+    scnn_layer_backward_ExpectAndReturn(&dummy_layers[0], &dy[1], &dy[0]);
+    TEST_ASSERT_EQUAL_PTR(&dy[0], scnn_net_backward(net, &dy[3]));
+
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
+}
+
+void test_backward_fail_if_net_is_NULL(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
+    }
+
+    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
+    scnn_net_init(net);
+
+    scnn_dtype x;
+    scnn_dtype y;
+    scnn_layer_forward_IgnoreAndReturn(&y);
+    scnn_net_forward(net, &x);
+
+    scnn_dtype dy[4];
+    TEST_ASSERT_NULL(scnn_net_backward(NULL, &dy[3]));
+
+    scnn_layer_free_Ignore();
+    scnn_net_free(&net);
+}
+
+void test_backward_fail_if_dy_is_NULL(void)
+{
+    net = scnn_net_alloc();
+
+    scnn_layer_connect_Ignore();
+    for (int i = 0; i < 3; i++) {
+        scnn_net_append(net, &dummy_layers[i]);
+    }
+
+    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
+    scnn_net_init(net);
+
+    scnn_dtype x;
+    scnn_dtype y;
+    scnn_layer_forward_IgnoreAndReturn(&y);
+    scnn_net_forward(net, &x);
+
+    TEST_ASSERT_NULL(scnn_net_backward(net, NULL));
+
+    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }

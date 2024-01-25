@@ -8,50 +8,88 @@
 
 #include "scnn_layer.h"
 
-#define SCNN_NET_MAX_SIZE 256  //!< the max number of layers in network
+typedef struct scnn_net scnn_net;
 
 /**
- * @brief Network structure
+ * @brief Get the number of layers of a network
  * 
- */
-typedef struct scnn_net {
-    int         size;                       //!< the number of layers
-    scnn_layer  *layers[SCNN_NET_MAX_SIZE]; //!< layers
-    scnn_layer  *input;     //!< input layer
-    scnn_layer  *output;    //!< output layer
-} scnn_net;
+ * @param[in]   net Network
+ * @return          The number of layers in the network
+*/
+int scnn_net_size(const scnn_net *net);
 
 /**
- * @brief Allocate network
+ * @brief Get batch size of a network
  * 
- * @return  Pointer to network, NULL if failed
+ * @param[in]   net Network
+ * @return          Batch size of the network
+*/
+int scnn_net_batch_size(const scnn_net *net);
+
+/**
+ * @brief Get layers in the network
+ * 
+ * @param[in]   net Network
+ * @return          Pointer to layers in the network
+*/
+scnn_layer **scnn_net_layers(scnn_net *net);
+
+/**
+ * @brief Get an input layer of the network
+ *
+ * @param[in]   net Network
+ * @return          Pointer to the input layer of network
+*/
+scnn_layer *scnn_net_input(const scnn_net *net);
+ 
+/**
+ * @brief Get an output layer of the network
+ * @param[in]   net Network
+ * @return          Pointer to the output layer of network
+*/
+scnn_layer *scnn_net_output(const scnn_net *net);
+
+/**
+ * @brief Allocate a network
+ * 
+ * @return  Pointer to the network, NULL if failed
  */
 scnn_net *scnn_net_alloc(void);
 
 /**
- * @brief Append layer to network
+ * @brief Append a layer to the network
  * 
  * @param[in,out]   net     Network
- * @param[in]       layer   Layer to be appended
- * @return                  Pointer to network, NULL if failed
+ * @param[in]       layer   Layer
+ * @return                  Pointer to the network, NULL if failed
  */
 scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer);
+
+/**
+ * @brief Initialize a network
+ * 
+ * @param[in,out] net   Network
+ * @return              Pointer to the network, NULL if failed
+ */
+scnn_net *scnn_net_init(scnn_net *net);
 
 /**
  * @brief Forward propagation of network
  * 
  * @param[in,out]   net Network
  * @param[in]       x   Network input
+ * @return              Pointer to the network output, NULL if failed
  */
-void scnn_net_forward(scnn_net *net, const scnn_mat *x);
+scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x);
 
 /**
  * @brief Backward propagation of network
  * 
  * @param[in,out]   net Network
- * @param[in]       t   Training label
+ * @param[in]       dy  Differential of network output
+ * @return              Pointer to differential of an input of the network, NULL if failed
  */
-void scnn_net_backward(scnn_net *net, const scnn_mat *t);
+scnn_dtype *scnn_net_backward(scnn_net *net, const scnn_dtype *dy);
 
 /**
  * @brief Free network

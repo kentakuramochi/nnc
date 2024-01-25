@@ -6,6 +6,7 @@ file(GLOB SOURCES
     ./scnn_fc.c
     ./scnn_sigmoid.c
     ./scnn_softmax.c
+    ./scnn_net.c
 )
 
 add_library(${TARGET_LIB_NAME}

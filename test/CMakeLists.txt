@@ -21,6 +21,7 @@ file(GLOB SOURCES
     ${TEST_ROOT}/cases/test_scnn_fc.c
     ${TEST_ROOT}/cases/test_scnn_sigmoid.c
     ${TEST_ROOT}/cases/test_scnn_softmax.c
+    ${TEST_ROOT}/cases/test_scnn_net.c
     ${TEST_ROOT}/runner/all_tests.c
     ${TEST_ROOT}/runner/test_scnn_blas_runner.c
     ${TEST_ROOT}/runner/test_scnn_mat_runner.c
@@ -28,6 +29,7 @@ file(GLOB SOURCES
     ${TEST_ROOT}/runner/test_scnn_fc_runner.c
     ${TEST_ROOT}/runner/test_scnn_sigmoid_runner.c
     ${TEST_ROOT}/runner/test_scnn_softmax_runner.c
+    ${TEST_ROOT}/runner/test_scnn_net_runner.c
 )
 
 add_executable(${TARGET_TEST_RUNNER_NAME}

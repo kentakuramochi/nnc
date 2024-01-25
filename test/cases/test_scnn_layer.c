@@ -5,27 +5,31 @@
  */
 #include "scnn_layer.h"
 
-#include "unity_fixture.h"
+// Private header, include to verify private members
+#include "impl/scnn_layer_impl.h"
 
-TEST_GROUP(scnn_layer);
+#include "unity.h"
 
-scnn_layer *layer;
+#include "mock_scnn_mat.h"
 
-TEST_SETUP(scnn_layer)
+static scnn_layer *layer;
+static scnn_layer *layer2;
+
+static scnn_layer_params params = {
+    .in_shape = { 1, 3, 28, 28 }
+};
+
+void setUp(void)
 {
     layer = NULL;
+    layer2 = NULL;
 }
 
-TEST_TEAR_DOWN(scnn_layer)
-{
-    scnn_layer_free(&layer);
+void tearDown(void)
+{}
 
-    TEST_ASSERT_NULL(layer);
-}
-
-TEST(scnn_layer, allocate_layer)
+void test_allocate_and_free(void)
 {
-    scnn_layer_params params = { .in_shape = { 1, 3, 28, 28 } };
     layer = scnn_layer_alloc(params);
 
     TEST_ASSERT_NOT_NULL(layer);
@@ -46,22 +50,201 @@ TEST(scnn_layer, allocate_layer)
     TEST_ASSERT_NULL(layer->db);
 
     TEST_ASSERT_EQUAL(NULL, layer->init);
-
     TEST_ASSERT_EQUAL(NULL, layer->forward);
     TEST_ASSERT_EQUAL(NULL, layer->backward);
+
+    scnn_mat_free_Expect(&layer->x);
+    scnn_mat_free_Expect(&layer->y);
+    scnn_mat_free_Expect(&layer->w);
+    scnn_mat_free_Expect(&layer->b);
+    scnn_mat_free_Expect(&layer->dx);
+    scnn_mat_free_Expect(&layer->dw);
+    scnn_mat_free_Expect(&layer->db);
+    scnn_layer_free(&layer);
+    TEST_ASSERT_NULL(layer);
 }
 
-TEST(scnn_layer, free_NULL)
+void test_free_pointer_to_NULL(void)
+{
+    scnn_layer_free(&layer);
+}
+
+void test_free_NULL(void)
 {
     scnn_layer_free(NULL);
 }
 
-TEST(scnn_layer, free_twice)
+static scnn_layer *dummy_init(scnn_layer *layer)
 {
-    scnn_layer_params params = { .in_shape = { 1, 3, 28, 28 } };
-    scnn_layer *layer = scnn_layer_alloc(params);
+    return layer;
+}
 
+void test_init(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->init = dummy_init;
+
+    TEST_ASSERT_EQUAL_PTR(layer, scnn_layer_init(layer));
+
+    scnn_mat_free_Ignore();
     scnn_layer_free(&layer);
+}
 
-    // 2nd freeing is done in TEST_TEAR_DOWN
+void test_init_fail_if_layer_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->init = dummy_init;
+
+    TEST_ASSERT_NULL(scnn_layer_init(NULL));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_init_fail_if_init_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    TEST_ASSERT_NULL(scnn_layer_init(layer));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_connect(void)
+{
+    layer = scnn_layer_alloc(params);
+    layer->params.id = 1;
+    layer2 = scnn_layer_alloc(params);
+    layer2->params.id = 2;
+
+    scnn_layer_connect(layer, layer2);
+
+    TEST_ASSERT_EQUAL_INT(1, layer->params.id);
+    TEST_ASSERT_EQUAL_INT(0, layer->params.prev_id);
+    TEST_ASSERT_EQUAL_INT(2, layer->params.next_id);
+
+    TEST_ASSERT_EQUAL_INT(2, layer2->params.id);
+    TEST_ASSERT_EQUAL_INT(1, layer2->params.prev_id);
+    TEST_ASSERT_EQUAL_INT(0, layer2->params.next_id);
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+    scnn_layer_free(&layer2);
+}
+
+static scnn_dtype dummy_y;
+static scnn_dtype *dummy_forward_plus1(scnn_layer *layer, const scnn_dtype *x)
+{
+    dummy_y = 1 + *x;
+    return &dummy_y;
+}
+
+void test_forward(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->forward = dummy_forward_plus1;
+
+    scnn_dtype x = 1;
+    TEST_ASSERT_EQUAL_PTR(&dummy_y, scnn_layer_forward(layer, &x));
+    TEST_ASSERT_EQUAL_FLOAT(2, dummy_y);
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_forward_fail_if_layer_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->forward = dummy_forward_plus1;
+
+    scnn_dtype x = 1;
+    TEST_ASSERT_NULL(scnn_layer_forward(NULL, &x));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_forward_fail_if_x_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->forward = dummy_forward_plus1;
+
+    TEST_ASSERT_NULL(scnn_layer_forward(layer, NULL));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_forward_fail_if_forward_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    scnn_dtype x = 1;
+    TEST_ASSERT_NULL(scnn_layer_forward(layer, &x));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+static scnn_dtype dummy_dx;
+static scnn_dtype *dummy_backward_minus2(scnn_layer *layer, const scnn_dtype *dy)
+{
+    dummy_dx = *dy - 2;
+    return &dummy_dx;
+}
+
+void test_backward(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->backward = dummy_backward_minus2;
+
+    scnn_dtype dy = 1;
+    TEST_ASSERT_EQUAL_PTR(&dummy_dx, scnn_layer_backward(layer, &dy));
+    TEST_ASSERT_EQUAL_FLOAT(-1, dummy_dx);
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_backward_fail_if_layer_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->backward = dummy_backward_minus2;
+
+    scnn_dtype dy = 1;
+    TEST_ASSERT_NULL(scnn_layer_backward(NULL, &dy));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_backward_fail_if_dy_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    layer->backward = dummy_backward_minus2;
+
+    TEST_ASSERT_NULL(scnn_layer_backward(layer, NULL));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
+}
+
+void test_backward_fail_if_backward_is_NULL(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    scnn_dtype dy = 1;
+    TEST_ASSERT_NULL(scnn_layer_backward(layer, &dy));
+
+    scnn_mat_free_Ignore();
+    scnn_layer_free(&layer);
 }

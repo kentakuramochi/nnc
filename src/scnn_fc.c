@@ -24,7 +24,7 @@ static struct scnn_layer* init(scnn_layer *self)
     if (self->x == NULL) {
         return NULL;
     }
-    self->y = scnn_mat_alloc(scnn_shape(self->params.in_shape[0], self->params.out, 1, 1));
+    self->y = scnn_mat_alloc(scnn_shape(self->x->shape[0], self->params.out, 1, 1));
     if (self->y == NULL) {
         goto FREE_X;
     }

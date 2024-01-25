@@ -3,10 +3,18 @@
  * @brief Layer structure
  * 
  */
+#include "scnn_layer.h"
+
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "scnn_layer.h"
+#include "impl/scnn_layer_impl.h"
+
+scnn_dtype *scnn_layer_y(const scnn_layer *layer)
+{
+    // TODO: Implement
+    return NULL;
+}
 
 scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
 {
@@ -36,6 +44,39 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
     layer->backward = NULL;
 
     return layer;
+}
+
+scnn_layer *scnn_layer_init(scnn_layer* layer)
+{
+    if ((layer == NULL) || (layer->init == NULL)) {
+        return NULL;
+    }
+    return layer->init(layer);
+}
+
+void scnn_layer_connect(scnn_layer* prev, scnn_layer* next)
+{
+    prev->params.next_id = next->params.id;
+
+    next->params.prev_id = prev->params.id;
+
+    return;
+}
+
+scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)
+{
+    if ((layer == NULL) || (x == NULL) || (layer->forward == NULL)) {
+        return NULL;
+    }
+    return layer->forward(layer, x);
+}
+
+scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
+{
+    if ((layer == NULL) || (dy == NULL) || (layer->backward == NULL)) {
+        return NULL;
+    }
+    return layer->backward(layer, dy);
 }
 
 void scnn_layer_free(scnn_layer **layer)

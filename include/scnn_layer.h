@@ -32,34 +32,57 @@ typedef struct scnn_layer_params {
     int next_id;                //!< ID of the next layer
 } scnn_layer_params;
 
-/**
- * @brief Layer structure
- * 
- */
-typedef struct scnn_layer {
-    scnn_layer_params params;   //!< Layer parameters
-
-    scnn_mat* x;     //!< Input matrix
-    scnn_mat* y;     //!< Output matrix
-    scnn_mat* w;     //!< Weight matrix
-    scnn_mat* b;     //!< Bias matrix
-
-    scnn_mat* dx;    //!< Difference of input matrix
-    scnn_mat* dw;    //!< Difference of weight matrix
-    scnn_mat* db;    //!< Difference of bias matrix
-
-    struct scnn_layer* (*init)(struct scnn_layer *self);  //!< Initialize layer
-
-    void (*forward)(struct scnn_layer *self, scnn_dtype* x);     //!< Forward propagation
-    void (*backward)(struct scnn_layer *self, scnn_dtype* dy);   //!< Backward propagation
-} scnn_layer;
+typedef struct scnn_layer scnn_layer;
 
 /**
- * @brief Allocate layer
+ * @brief Get an output of a layer
  * 
- * @return Pointer to layer, NULL if failed
+ * @param[in]   layer   Layer
+ * @return              Pointer to an output of the layer
+*/
+scnn_dtype *scnn_layer_y(const scnn_layer *layer);
+
+/**
+ * @brief Allocate a layer
+ * 
+ * @param[in]   params  Parameters for a layer
+ * @return              Pointer to layer, NULL if failed
  */
 scnn_layer *scnn_layer_alloc(const scnn_layer_params params);
+
+/**
+ * @brief Initialze a layer
+ * 
+ * @param[in,out]   layer   Layer
+ * @return                  Pointer the the layer, NULL if failed
+ */
+scnn_layer *scnn_layer_init(scnn_layer* layer);
+
+/**
+ * @brief Connect 2 layers
+ * 
+ * @param[in,out]   prev    Previous layer, being connected from the next
+ * @param[in,out]   next    Next layer, connect to the previous
+ */
+void scnn_layer_connect(scnn_layer* prev, scnn_layer* next);
+
+/**
+ * @brief Forward propagation of a layer
+ * 
+ * @param[in,out]   layer   Layer
+ * @param[in]       x       An input of the layer
+ * @return                  Pointer to the layer output
+*/
+scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x);
+
+/**
+ * @brief Backward propagation of a layer
+ * 
+ * @param[in,out]   layer   Layer
+ * @param[in]       dy      A differential of previous layer
+ * @return                  Pointer to differential of an input of the layer
+*/
+scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy);
 
 /**
  * @brief Free layer

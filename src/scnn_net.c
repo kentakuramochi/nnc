@@ -3,11 +3,50 @@
  * @brief Network structure
  * 
  */
+#include "scnn_net.h"
+
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "scnn_net.h"
-#include "scnn_blas.h"
+#define INIT_LAYER_SIZE 128 //!< The number of layers in network when initialization
+
+/**
+ * @brief Network structure
+ * 
+ */
+struct scnn_net {
+    int         size;       //!< The number of layers
+    int         alloc_size; //!< Allocated size
+    int         batch_size; //!< Batch size
+    scnn_layer  **layers;    //!< Layers
+    scnn_layer  *input;     //!< Input layer off the network
+    scnn_layer  *output;    //!< Output layer off the network
+};
+
+int scnn_net_size(const scnn_net *net)
+{
+    return net->size;
+}
+
+int scnn_net_batch_size(const scnn_net *net)
+{
+    return net->batch_size;
+}
+
+scnn_layer **scnn_net_layers(scnn_net *net)
+{
+    return net->layers;
+}
+
+scnn_layer* scnn_net_input(const scnn_net *net)
+{
+    return net->input;
+}
+
+scnn_layer* scnn_net_output(const scnn_net *net)
+{
+    return net->output;
+}
 
 scnn_net *scnn_net_alloc(void)
 {
@@ -16,10 +55,17 @@ scnn_net *scnn_net_alloc(void)
         return NULL;
     }
 
-    // initialize member
-    net->size = 0;
+    net->layers = malloc(sizeof(scnn_net*) * INIT_LAYER_SIZE);
+    if (net->layers == NULL) {
+        return NULL;
+    }
 
-    for (int i = 0; i < SCNN_NET_MAX_SIZE; i++) {
+    net->size = 0;
+    net->alloc_size = INIT_LAYER_SIZE;
+
+    net->batch_size = 1;
+
+    for (int i = 0; i < INIT_LAYER_SIZE; i++) {
         net->layers[i] = NULL;
     }
 
@@ -35,40 +81,29 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer)
         return NULL;
     }
 
-    if (net->size >= SCNN_NET_MAX_SIZE) {
-        return NULL;
-    }
+    // Realloc layers when the number of layers exceed current allocated size
+    if (net->size == net->alloc_size) {
+        int realloc_size = net->size + INIT_LAYER_SIZE;
 
-    // check the matrix size
-    if (net->output) {
-        if ((net->output->y->shape.d[0] != layer->y->shape.d[0]) ||
-            (net->output->y->shape.d[1] != layer->y->shape.d[1]) ||
-            (net->output->y->shape.d[2] != layer->y->shape.d[2]) ||
-            (net->output->y->shape.d[3] != layer->y->shape.d[3])) {
+        scnn_layer **realloc_layers = realloc(net->layers, sizeof(scnn_layer*) * realloc_size);
+        if (realloc_layers == NULL) {
+            scnn_net_free(&net);
             return NULL;
         }
+
+        net->layers = realloc_layers;
     }
 
-    layer->id      = net->size;
-    layer->prev_id = -1;
-    layer->next_id = -1;
+    scnn_layer_connect(net->output, layer);
 
-    // attach layer id with the last layer
-    scnn_layer *last_layer = net->output;
-    if (last_layer != NULL) {
-        last_layer->next_id = layer->id;
-        layer->prev_id      = last_layer->id;
-    }
-
-    // append layer to tail of the network layers
+    // Append the current layer to tail of the network layers
     net->layers[net->size] = layer;
 
+    // Set the first layer as a network input
     if (net->size == 0) {
-        // set the first layer as input
         net->input = layer;
     }
-
-    // set the last layer as output
+    // And the last layer as a network output
     net->output = layer;
 
     net->size++;
@@ -76,57 +111,66 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer)
     return net;
 }
 
-void scnn_net_forward(scnn_net *net, const scnn_mat *x)
+scnn_net *scnn_net_init(scnn_net *net)
 {
-    if ((net == NULL) || (x == NULL)) {
-        return;
+    if ((net == NULL) || (net->size == 0)) {
+        return NULL;
     }
 
-    scnn_mat    *in = (scnn_mat*)x;
-    scnn_layer  *layer;
     for (int i = 0; i < net->size; i++) {
-        layer = net->layers[i];
-        layer->forward(layer, in);
-        in = layer->y;
+        if (scnn_layer_init(net->layers[i]) == NULL) {
+            return NULL;
+        }
     }
+
+    return net;
 }
 
-void scnn_net_backward(scnn_net *net, const scnn_mat *t)
+scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x)
 {
-    if ((net == NULL) || (t == NULL)) {
-        return;
+    if ((net == NULL) || (x == NULL)) {
+        return NULL;
     }
 
-    scnn_mat *dy = scnn_mat_alloc(t->shape);
+    scnn_dtype *in = (scnn_dtype*)x;
+    scnn_dtype *out;
+    for (int i = 0; i < net->size; i++) {
+        out = scnn_layer_forward(net->layers[i], in);
+        in = out;
+    }
 
-    scnn_scopy(net->output->y->size, net->output->y->data, 1, dy->data, 1);
-    scnn_saxpy(t->size, -1, t->data, 1, dy->data, 1);
+    return out;
+}
 
-    scnn_mat    *out = dy;
-    scnn_layer  *layer;
+scnn_dtype *scnn_net_backward(scnn_net *net, const scnn_dtype *dy)
+{
+    if ((net == NULL) || (dy == NULL)) {
+        return NULL;
+    }
+
+    scnn_dtype *din = (scnn_dtype*)dy;
+    scnn_dtype *dout;
     for (int i = (net->size - 1); i >= 0; i--) {
-        layer = net->layers[i];
-        layer->backward(layer, out);
-        out = layer->dx;
+        dout = scnn_layer_backward(net->layers[i], din);
+        din = dout;
     }
+
+    return dout;
 }
 
 void scnn_net_free(scnn_net **net)
 {
-    if (*net == NULL) {
+    if ((net == NULL) || (*net == NULL)) {
         return;
-    }
-
-    scnn_layer *layer = (*net)->layers[0];
-    if (layer == NULL) {
-        goto NET_FREE;
     }
 
     for (int i = 0; i < (*net)->size; i++) {
         scnn_layer_free(&((*net)->layers[i]));
     }
 
-NET_FREE:
+    free((*net)->layers);
+    (*net)->layers = NULL;
+
     free(*net);
     *net = NULL;
 }
