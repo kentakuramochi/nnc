@@ -10,19 +10,6 @@
 
 #define INIT_LAYER_SIZE 128 //!< The number of layers in network when initialization
 
-/**
- * @brief Network structure
- * 
- */
-struct scnn_net {
-    int         size;       //!< The number of layers
-    int         alloc_size; //!< Allocated size
-    int         batch_size; //!< Batch size
-    scnn_layer  **layers;    //!< Layers
-    scnn_layer  *input;     //!< Input layer off the network
-    scnn_layer  *output;    //!< Output layer off the network
-};
-
 int scnn_net_size(const scnn_net *net)
 {
     return net->size;

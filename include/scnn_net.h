@@ -8,7 +8,18 @@
 
 #include "scnn_layer.h"
 
-typedef struct scnn_net scnn_net;
+/**
+ * @brief Network structure
+ * 
+ */
+typedef struct scnn_net {
+    int         size;       //!< The number of layers
+    int         alloc_size; //!< Allocated size
+    int         batch_size; //!< Batch size
+    scnn_layer  **layers;   //!< Layers
+    scnn_layer  *input;     //!< Input layer off the network
+    scnn_layer  *output;    //!< Output layer off the network
+} scnn_net;
 
 /**
  * @brief Get the number of layers of a network
