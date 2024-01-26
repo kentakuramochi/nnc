@@ -8,7 +8,6 @@
 #include "unity.h"
 
 #include "mock_scnn_layer.h"
-#include "scnn_layer_impl.h"
 
 #define INIT_LAYER_SIZE 128
 

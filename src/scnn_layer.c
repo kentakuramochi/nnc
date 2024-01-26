@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "impl/scnn_layer_impl.h"
-
 scnn_dtype *scnn_layer_y(const scnn_layer *layer)
 {
     // TODO: Implement

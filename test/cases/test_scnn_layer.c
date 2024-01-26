@@ -5,9 +5,6 @@
  */
 #include "scnn_layer.h"
 
-// Private header, include to verify private members
-#include "impl/scnn_layer_impl.h"
-
 #include "unity.h"
 
 #include "mock_scnn_mat.h"
