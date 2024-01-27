@@ -69,6 +69,7 @@
   :plugins:
     - :ignore
     - :callback
+    - :expect_any_args
   :treat_as:
     uint8:    HEX8
     uint16:   HEX16
@@ -97,6 +98,7 @@
       - --leak-check=yes
       - --show-leak-kinds=all
       - --errors-for-leak-kinds=all
+      - --track-origins=yes
       - ${1}
 
 # LIBRARIES

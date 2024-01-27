@@ -40,13 +40,10 @@ scnn_net *scnn_net_alloc(void)
         return NULL;
     }
 
-    net->layers = NULL;
-
     net->size = 0;
-
     net->batch_size = 1;
-
-    net->input  = NULL;
+    net->layers = NULL;
+    net->input = NULL;
     net->output = NULL;
 
     return net;
@@ -58,7 +55,7 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
         return NULL;
     }
 
-    // Realloc layers when the number of layers exceed current allocated size
+    // Reallocate and extend layers in the network
     scnn_layer *realloc_layers = realloc(net->layers, sizeof(scnn_layer) * (net->size + 1));
     if (realloc_layers == NULL) {
         return NULL;
@@ -67,15 +64,27 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
     net->layers = realloc_layers;
     realloc_layers = NULL;
 
+    // Initialize new layer
+    scnn_layer *layer = &net->layers[net->size];
+    layer->params = params;
+    layer->x = NULL;
+    layer->y = NULL;
+    layer->w = NULL;
+    layer->b = NULL;
+    layer->dx = NULL;
+    layer->dw = NULL;
+    layer->db = NULL;
+    layer->init = NULL;
+    layer->forward = NULL;
+    layer->backward = NULL;
+
+    // Connect the layer
     scnn_layer_connect(net->output, &net->layers[net->size]);
 
     // Set the first layer as a network input
     net->input = &net->layers[0];
     // And the last layer as a network output
-    net->output = &net->layers[net->size];
-
-    // Copy the layer parameters
-    net->layers[net->size].params = params;
+    net->output = layer;
 
     net->size++;
 
