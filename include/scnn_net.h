@@ -14,9 +14,8 @@
  */
 typedef struct scnn_net {
     int         size;       //!< The number of layers
-    int         alloc_size; //!< Allocated size
     int         batch_size; //!< Batch size
-    scnn_layer  **layers;   //!< Layers
+    scnn_layer  *layers;    //!< Layers
     scnn_layer  *input;     //!< Input layer off the network
     scnn_layer  *output;    //!< Output layer off the network
 } scnn_net;
@@ -43,7 +42,7 @@ int scnn_net_batch_size(const scnn_net *net);
  * @param[in]   net Network
  * @return          Pointer to layers in the network
 */
-scnn_layer **scnn_net_layers(scnn_net *net);
+scnn_layer *scnn_net_layers(scnn_net *net);
 
 /**
  * @brief Get an input layer of the network
@@ -71,10 +70,10 @@ scnn_net *scnn_net_alloc(void);
  * @brief Append a layer to the network
  * 
  * @param[in,out]   net     Network
- * @param[in]       layer   Layer
+ * @param[in]       params  Layer parameter
  * @return                  Pointer to the network, NULL if failed
  */
-scnn_net *scnn_net_append(scnn_net *net, scnn_layer *layer);
+scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params);
 
 /**
  * @brief Initialize a network
