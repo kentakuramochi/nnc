@@ -106,7 +106,6 @@ scnn_net *scnn_net_init(scnn_net *net)
     return net;
 }
 
-#ifdef DEACTIVATE_TEMPORALLY
 scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x)
 {
     if ((net == NULL) || (x == NULL)) {
@@ -116,7 +115,7 @@ scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x)
     scnn_dtype *in = (scnn_dtype*)x;
     scnn_dtype *out;
     for (int i = 0; i < net->size; i++) {
-        out = scnn_layer_forward(net->layers[i], in);
+        out = scnn_layer_forward(&net->layers[i], in);
         in = out;
     }
 
@@ -132,13 +131,12 @@ scnn_dtype *scnn_net_backward(scnn_net *net, const scnn_dtype *dy)
     scnn_dtype *din = (scnn_dtype*)dy;
     scnn_dtype *dout;
     for (int i = (net->size - 1); i >= 0; i--) {
-        dout = scnn_layer_backward(net->layers[i], din);
+        dout = scnn_layer_backward(&net->layers[i], din);
         din = dout;
     }
 
     return dout;
 }
-#endif
 
 void scnn_net_free(scnn_net **net)
 {

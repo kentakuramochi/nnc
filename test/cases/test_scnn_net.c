@@ -197,21 +197,20 @@ void test_init_fail_if_layer_init_fail(void)
     scnn_net_free(&net);
 }
 
-#ifdef DEACTIVATE_TEMPORALLY
 void test_forward_1layer(void)
 {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
-    scnn_net_append(net, &dummy_layer);
+    scnn_net_append(net, param);
 
-    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_layer_init_IgnoreAndReturn(&scnn_net_layers(net)[0]);
     scnn_net_init(net);
 
-    scnn_dtype x;
-    scnn_dtype y;
-    scnn_layer_forward_ExpectAndReturn(&dummy_layer, &x, &y);
-    TEST_ASSERT_EQUAL_PTR(&y, scnn_net_forward(net, &x));
+    scnn_dtype x[3 * 28 * 28];
+    scnn_dtype y[100];
+    scnn_layer_forward_ExpectAndReturn(&scnn_net_layers(net)[0], x, y);
+    TEST_ASSERT_EQUAL_PTR(y, scnn_net_forward(net, x));
 
     scnn_layer_free_Ignore();
     scnn_net_free(&net);
@@ -223,21 +222,22 @@ void test_forward_3layer(void)
 
     scnn_layer_connect_Ignore();
     for (int i = 0; i < 3; i++) {
-        scnn_net_append(net, &dummy_layers[i]);
+        scnn_net_append(net, params3[i]);
     }
 
     for (int i = 0; i < 3; i++) {
-        scnn_layer_init_IgnoreAndReturn(&dummy_layers[i]);
+        scnn_layer_init_IgnoreAndReturn(&scnn_net_layers(net)[i]);
     }
     scnn_net_init(net);
 
-    scnn_dtype x;
-    scnn_dtype y[3];
-    scnn_layer_forward_ExpectAndReturn(&dummy_layers[0], &x, &y[0]);
-    scnn_layer_forward_ExpectAndReturn(&dummy_layers[1], &y[0], &y[1]);
-    scnn_layer_forward_ExpectAndReturn(&dummy_layers[2], &y[1], &y[2]);
-
-    TEST_ASSERT_EQUAL_PTR(&y[2], scnn_net_forward(net, &x));
+    scnn_dtype x[3 * 28 * 28];
+    scnn_dtype y0[100];
+    scnn_dtype y1[10];
+    scnn_dtype y2[10];
+    scnn_layer_forward_ExpectAndReturn(&scnn_net_layers(net)[0], x, y0);
+    scnn_layer_forward_ExpectAndReturn(&scnn_net_layers(net)[1], y0, y1);
+    scnn_layer_forward_ExpectAndReturn(&scnn_net_layers(net)[2], y1, y2);
+    TEST_ASSERT_EQUAL_PTR(y2, scnn_net_forward(net, x));
 
     scnn_layer_free_Ignore();
     scnn_net_free(&net);
@@ -245,19 +245,8 @@ void test_forward_3layer(void)
 
 void test_forward_fail_if_net_is_NULL(void)
 {
-    net = scnn_net_alloc();
-
-    scnn_layer_connect_Ignore();
-    scnn_net_append(net, &dummy_layer);
-
-    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
-    scnn_net_init(net);
-
-    scnn_dtype x;
-    TEST_ASSERT_NULL(scnn_net_forward(NULL, &x));
-
-    scnn_layer_free_Ignore();
-    scnn_net_free(&net);
+    scnn_dtype x[3 * 28 * 28];
+    TEST_ASSERT_NULL(scnn_net_forward(NULL, x));
 }
 
 void test_forward_fail_if_x_is_NULL(void)
@@ -265,15 +254,13 @@ void test_forward_fail_if_x_is_NULL(void)
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
-    scnn_net_append(net, &dummy_layer);
+    scnn_net_append(net, param);
 
-    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
+    scnn_layer_init_IgnoreAndReturn(&scnn_net_layers(net)[0]);
     scnn_net_init(net);
 
-    scnn_dtype x;
     TEST_ASSERT_NULL(scnn_net_forward(net, NULL));
 
-    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
@@ -282,21 +269,13 @@ void test_backward_1layer(void)
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
-    scnn_net_append(net, &dummy_layer);
+    scnn_net_append(net, param);
 
-    scnn_layer_init_IgnoreAndReturn(&dummy_layer);
-    scnn_net_init(net);
+    scnn_dtype dx[3 * 28 * 28];
+    scnn_dtype dy[100];
+    scnn_layer_backward_ExpectAndReturn(&scnn_net_layers(net)[0], dy, dx);
+    TEST_ASSERT_EQUAL_PTR(dx, scnn_net_backward(net, dy));
 
-    scnn_dtype x;
-    scnn_dtype y;
-    scnn_layer_forward_IgnoreAndReturn(&y);
-    scnn_net_forward(net, &x);
-
-    scnn_dtype dy[2];
-    scnn_layer_backward_ExpectAndReturn(&dummy_layer, &dy[1], &dy[0]);
-    TEST_ASSERT_EQUAL_PTR(&dy[0], scnn_net_backward(net, &dy[1]));
-
-    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
@@ -306,24 +285,18 @@ void test_backward_3layer(void)
 
     scnn_layer_connect_Ignore();
     for (int i = 0; i < 3; i++) {
-        scnn_net_append(net, &dummy_layers[i]);
+        scnn_net_append(net, params3[i]);
     }
 
-    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
-    scnn_net_init(net);
+    scnn_dtype dx0[3 * 28 * 28];
+    scnn_dtype dx1[100];
+    scnn_dtype dx2[10];
+    scnn_dtype dy[10];
+    scnn_layer_backward_ExpectAndReturn(&scnn_net_layers(net)[2], dy, dx2);
+    scnn_layer_backward_ExpectAndReturn(&scnn_net_layers(net)[1], dx2, dx1);
+    scnn_layer_backward_ExpectAndReturn(&scnn_net_layers(net)[0], dx1, dx0);
+    TEST_ASSERT_EQUAL_PTR(dx0, scnn_net_backward(net, dy));
 
-    scnn_dtype x;
-    scnn_dtype y;
-    scnn_layer_forward_IgnoreAndReturn(&y);
-    scnn_net_forward(net, &x);
-
-    scnn_dtype dy[4];
-    scnn_layer_backward_ExpectAndReturn(&dummy_layers[2], &dy[3], &dy[2]);
-    scnn_layer_backward_ExpectAndReturn(&dummy_layers[1], &dy[2], &dy[1]);
-    scnn_layer_backward_ExpectAndReturn(&dummy_layers[0], &dy[1], &dy[0]);
-    TEST_ASSERT_EQUAL_PTR(&dy[0], scnn_net_backward(net, &dy[3]));
-
-    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
@@ -332,22 +305,11 @@ void test_backward_fail_if_net_is_NULL(void)
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
-    for (int i = 0; i < 3; i++) {
-        scnn_net_append(net, &dummy_layers[i]);
-    }
+    scnn_net_append(net, param);
 
-    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
-    scnn_net_init(net);
+    scnn_dtype dy[100];
+    TEST_ASSERT_NULL(scnn_net_backward(NULL, dy));
 
-    scnn_dtype x;
-    scnn_dtype y;
-    scnn_layer_forward_IgnoreAndReturn(&y);
-    scnn_net_forward(net, &x);
-
-    scnn_dtype dy[4];
-    TEST_ASSERT_NULL(scnn_net_backward(NULL, &dy[3]));
-
-    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
 
@@ -356,21 +318,9 @@ void test_backward_fail_if_dy_is_NULL(void)
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
-    for (int i = 0; i < 3; i++) {
-        scnn_net_append(net, &dummy_layers[i]);
-    }
-
-    scnn_layer_init_IgnoreAndReturn(&dummy_layers[0]);
-    scnn_net_init(net);
-
-    scnn_dtype x;
-    scnn_dtype y;
-    scnn_layer_forward_IgnoreAndReturn(&y);
-    scnn_net_forward(net, &x);
+    scnn_net_append(net, param);
 
     TEST_ASSERT_NULL(scnn_net_backward(net, NULL));
 
-    scnn_layer_free_Ignore();
     scnn_net_free(&net);
 }
-#endif
