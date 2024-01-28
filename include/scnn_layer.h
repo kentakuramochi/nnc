@@ -27,22 +27,19 @@ typedef struct scnn_layer_params {
     scnn_layer_type type;       //!< Layer type
     int in_shape[SCNN_MAT_DIM]; //!< Input shape
     int out;                    //!< Output channels
-    int id;                     //!< ID of a layer
-    int prev_id;                //!< ID of the previous layer
-    int next_id;                //!< ID of the next layer
 } scnn_layer_params;
 
 typedef struct scnn_layer {
     scnn_layer_params params;   //!< Layer parameters
 
-    scnn_mat* x;     //!< Input matrix
-    scnn_mat* y;     //!< Output matrix
-    scnn_mat* w;     //!< Weight matrix
-    scnn_mat* b;     //!< Bias matrix
+    scnn_dtype* x;  //!< Input matrix
+    scnn_dtype* y;  //!< Output matrix
+    scnn_dtype* w;  //!< Weight matrix
+    scnn_dtype* b;  //!< Bias matrix
 
-    scnn_mat* dx;    //!< Difference of input matrix
-    scnn_mat* dw;    //!< Difference of weight matrix
-    scnn_mat* db;    //!< Difference of bias matrix
+    scnn_dtype* dx; //!< Difference of input matrix
+    scnn_dtype* dw; //!< Difference of weight matrix
+    scnn_dtype* db; //!< Difference of bias matrix
 
     struct scnn_layer* (*init)(struct scnn_layer *self);  //!< Initialize layer
 
