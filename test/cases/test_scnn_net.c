@@ -12,7 +12,7 @@
 scnn_net *net;
 
 scnn_layer_params dummy_layer_params[] = {
-    { SCNN_LAYER_FC, .in_shape = { 1, 3, 28, 28 }, .out = 100 },
+    { SCNN_LAYER_FC, .in = 3 * 28 * 28, .out = 100 },
     { SCNN_LAYER_FC, .out = 10 },
     { SCNN_LAYER_SIGMOID }
 };
@@ -76,7 +76,7 @@ void test_append_layer(void)
     TEST_ASSERT_NOT_NULL(scnn_net_layers(net));
 
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].type, scnn_net_layers(net)[0].params.type);
-    TEST_ASSERT_EQUAL_INT_ARRAY(dummy_layer_params[0].in_shape, scnn_net_layers(net)[0].params.in_shape, 4);
+    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, scnn_net_layers(net)[0].params.in);
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, scnn_net_layers(net)[0].params.out);
 
     TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_input(net));
@@ -99,7 +99,7 @@ void test_append_3layers(void)
 
     for (int i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].type, scnn_net_layers(net)[i].params.type);
-        TEST_ASSERT_EQUAL_INT_ARRAY(dummy_layer_params[i].in_shape, scnn_net_layers(net)[i].params.in_shape, 4);
+        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].in, scnn_net_layers(net)[i].params.in);
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, scnn_net_layers(net)[i].params.out);
      }
 

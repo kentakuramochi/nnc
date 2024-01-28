@@ -24,9 +24,9 @@ typedef enum scnn_layer_type {
  * 
  */
 typedef struct scnn_layer_params {
-    scnn_layer_type type;       //!< Layer type
-    int in_shape[SCNN_MAT_DIM]; //!< Input shape
-    int out;                    //!< Output channels
+    scnn_layer_type type;   //!< Layer type
+    int in;                 //!< Input elements
+    int out;                //!< Output elements
 } scnn_layer_params;
 
 typedef struct scnn_layer {
@@ -40,11 +40,6 @@ typedef struct scnn_layer {
     scnn_dtype* dx; //!< Difference of input matrix
     scnn_dtype* dw; //!< Difference of weight matrix
     scnn_dtype* db; //!< Difference of bias matrix
-
-    struct scnn_layer* (*init)(struct scnn_layer *self);  //!< Initialize layer
-
-    scnn_dtype* (*forward)(struct scnn_layer *self, const scnn_dtype* x);     //!< Forward propagation
-    scnn_dtype* (*backward)(struct scnn_layer *self, const scnn_dtype* dy);   //!< Backward propagation
 } scnn_layer;
 
 /**

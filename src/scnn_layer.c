@@ -34,11 +34,6 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
     layer->dw = NULL;
     layer->db = NULL;
 
-    layer->init = NULL;
-
-    layer->forward  = NULL;
-    layer->backward = NULL;
-
     return layer;
 }
 
@@ -48,12 +43,7 @@ scnn_layer *scnn_layer_init(scnn_layer* layer)
         return NULL;
     }
 
-    size_t x_size = sizeof(scnn_dtype)
-        * layer->params.in_shape[0]
-        * layer->params.in_shape[1]
-        * layer->params.in_shape[2]
-        * layer->params.in_shape[3];
-
+    size_t x_size = sizeof(scnn_dtype) * layer->params.in;
     layer->x = malloc(x_size);
     if (layer->x == NULL) {
         return NULL;
@@ -114,12 +104,7 @@ FREE_MATRICES:
 
 void scnn_layer_connect(scnn_layer* prev, scnn_layer* next)
 {
-    next->params.in_shape[0] = 1;
-    next->params.in_shape[1] = prev->params.out;
-    next->params.in_shape[2] = 1;
-    next->params.in_shape[3] = 1;
-
-    return;
+    next->params.in = prev->params.out;
 }
 
 scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)

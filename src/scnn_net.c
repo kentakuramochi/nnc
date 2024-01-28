@@ -74,9 +74,6 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
     layer->dx = NULL;
     layer->dw = NULL;
     layer->db = NULL;
-    layer->init = NULL;
-    layer->forward = NULL;
-    layer->backward = NULL;
 
     // Connect the layer
     scnn_layer_connect(net->output, &net->layers[net->size]);
