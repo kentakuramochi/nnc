@@ -669,7 +669,8 @@ void test_sgemv(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -703,7 +704,8 @@ void test_sgemv_trans(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_TRANS,
         2, 3,
         1.0, a, 2,
         x, 1,
@@ -736,7 +738,8 @@ void test_sgemv_alpha_2(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         2.0, a, 3,
         x, 1,
@@ -769,7 +772,8 @@ void test_sgemv_beta_2(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -805,7 +809,8 @@ void test_sgemv_incx_2(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 2,
@@ -838,7 +843,8 @@ void test_sgemv_incx_rev(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, -1,
@@ -874,7 +880,8 @@ void test_sgemv_incx_rev_2(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, -2,
@@ -909,7 +916,8 @@ void test_sgemv_incy_2(void)
         0
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -944,7 +952,8 @@ void test_sgemv_incy_rev(void)
         -1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -979,7 +988,8 @@ void test_sgemv_incy_rev_2(void)
         -1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -1009,7 +1019,8 @@ void test_sgemv_fail_a_null(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, NULL, 3,
         x, 1,
@@ -1036,7 +1047,8 @@ void test_sgemv_fail_x_null(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         NULL, 1,
@@ -1064,7 +1076,8 @@ void test_sgemv_fail_c_null(void)
         3
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -1090,7 +1103,8 @@ void test_sgemv_fail_invalid_m(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         0, 3,
         1.0, a, 3,
         x, 1,
@@ -1123,7 +1137,8 @@ void test_sgemv_fail_invalid_n(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 0,
         1.0, a, 3,
         x, 1,
@@ -1156,7 +1171,8 @@ void test_sgemv_fail_invalid_lda(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 0,
         x, 1,
@@ -1189,7 +1205,8 @@ void test_sgemv_fail_invalid_incx(void)
         1 
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 0,
@@ -1222,7 +1239,8 @@ void test_sgemv_fail_invalid_incy(void)
         1
     };
 
-    scnn_sgemv(SCNN_BLAS_NO_TRANS,
+    scnn_sgemv(
+        SCNN_BLAS_NO_TRANS,
         2, 3,
         1.0, a, 3,
         x, 1,
@@ -1255,7 +1273,8 @@ void test_sgemm_no_trans(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1288,7 +1307,8 @@ void test_sgemm_trans_b(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1323,7 +1343,8 @@ void test_sgemm_trans_a(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 2,
@@ -1357,7 +1378,8 @@ void test_sgemm_trans_ab(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_TRANS,
         SCNN_BLAS_TRANS,
         2, 2, 3,
         1.0, a, 2,
@@ -1391,7 +1413,8 @@ void test_sgemm_alpha_2(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         2.0, a, 3,
@@ -1425,7 +1448,8 @@ void test_sgemm_beta_2(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1454,7 +1478,8 @@ void test_sgemm_fail_a_null(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, NULL, 3,
@@ -1482,7 +1507,8 @@ void test_sgemm_fail_b_null(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1511,7 +1537,8 @@ void test_sgemm_fail_c_null(void)
         1031, 1032
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1538,7 +1565,8 @@ void test_sgemm_fail_invalid_m(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         0, 2, 3,
         1.0, a, 3,
@@ -1572,7 +1600,8 @@ void test_sgemm_fail_invalid_n(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 0, 3,
         1.0, a, 3,
@@ -1606,7 +1635,8 @@ void test_sgemm_fail_invalid_k(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 0,
         1.0, a, 3,
@@ -1640,7 +1670,8 @@ void test_sgemm_fail_invalid_lda(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 0,
@@ -1674,7 +1705,8 @@ void test_sgemm_fail_invalid_ldb(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 3,
@@ -1708,7 +1740,8 @@ void test_sgemm_fail_invalid_ldc(void)
         3, 4
     };
 
-    scnn_sgemm(SCNN_BLAS_NO_TRANS,
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS,
         SCNN_BLAS_NO_TRANS,
         2, 2, 3,
         1.0, a, 2,

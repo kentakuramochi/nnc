@@ -43,7 +43,6 @@
 
 :files:
   :test:
-    - -:test/cases/test_scnn_blas.c
     - -:test/cases/test_scnn_fc.c
     - -:test/cases/test_scnn_loss.c
     - -:test/cases/test_scnn_mat.c
@@ -109,7 +108,7 @@
   :placement: :end
   :flag: "-l${1}"
   :path_flag: "-L ${1}"
-  :system: []    # for example, you might list 'm' to grab the math library
+  :system: ["m"]
   :test: []
   :release: []
 
