@@ -5,17 +5,15 @@
  */
 #include "scnn_blas.h"
 
-#include "unity_fixture.h"
+#include "unity.h"
 
-TEST_GROUP(scnn_blas);
-
-TEST_SETUP(scnn_blas)
+void setUp(void)
 {}
 
-TEST_TEAR_DOWN(scnn_blas)
+void tearDown(void)
 {}
 
-TEST(scnn_blas, scopy)
+void test_scopy(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -32,7 +30,7 @@ TEST(scnn_blas, scopy)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, scopy_incx_2)
+void test_scopy_incx_2(void)
 {
     float x[] = {
         0, 0, 1, 0, 2, 0, 3, 0, 4, 0,
@@ -50,7 +48,7 @@ TEST(scnn_blas, scopy_incx_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, scopy_rev_x)
+void test_scopy_rev_x(void)
 {
     float x[] = {
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
@@ -67,7 +65,7 @@ TEST(scnn_blas, scopy_rev_x)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, scopy_rev_x_2)
+void test_scopy_rev_x_2(void)
 {
     float x[] = {
         0, 9, 0, 8, 0, 7, 0, 6, 0, 5,
@@ -85,7 +83,7 @@ TEST(scnn_blas, scopy_rev_x_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, scopy_incy_2)
+void test_scopy_incy_2(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -103,7 +101,7 @@ TEST(scnn_blas, scopy_incy_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 20);
 }
 
-TEST(scnn_blas, scopy_rev_y)
+void scopy_rev_y(void)
 {
     float x[] = {
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
@@ -120,7 +118,7 @@ TEST(scnn_blas, scopy_rev_y)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, scopy_rev_y_2)
+void test_scopy_rev_y_2(void)
 {
     float x[] = {
         9, 8, 7, 6, 5, 4, 3, 2, 1, 0
@@ -138,7 +136,7 @@ TEST(scnn_blas, scopy_rev_y_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 20);
 }
 
-TEST(scnn_blas, scopy_fail_x_null)
+void test_scopy_fail_x_NULL(void)
 {
     float y[10] = { 0 };
     
@@ -147,7 +145,7 @@ TEST(scnn_blas, scopy_fail_x_null)
     TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
 }
 
-TEST(scnn_blas, scopy_fail_y_null)
+void test_scopy_fail_y_NULL(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -156,7 +154,7 @@ TEST(scnn_blas, scopy_fail_y_null)
     scnn_scopy(10, x, 1, NULL, 1);
 }
 
-TEST(scnn_blas, scopy_fail_invalid_n)
+void test_scopy_fail_invalid_n(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -169,7 +167,7 @@ TEST(scnn_blas, scopy_fail_invalid_n)
     TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
 }
 
-TEST(scnn_blas, scopy_fail_invalid_incx)
+void test_scopy_fail_invalid_incx(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -182,7 +180,7 @@ TEST(scnn_blas, scopy_fail_invalid_incx)
     TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
 }
 
-TEST(scnn_blas, scopy_fail_invalid_incy)
+void test_scopy_fail_invalid_incy(void)
 {
     float x[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -195,7 +193,7 @@ TEST(scnn_blas, scopy_fail_invalid_incy)
     TEST_ASSERT_EACH_EQUAL_FLOAT(0, y, 10);
 }
 
-TEST(scnn_blas, sdot)
+void test_sdot(void)
 {
     int n = 10;
     float x[] = {
@@ -208,7 +206,7 @@ TEST(scnn_blas, sdot)
     TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, 1, y, 1));
 }
 
-TEST(scnn_blas, sdot_incx_2)
+void test_sdot_incx_2(void)
 {
     int n = 10;
     float x[] = {
@@ -222,7 +220,7 @@ TEST(scnn_blas, sdot_incx_2)
     TEST_ASSERT_EQUAL_FLOAT(660, scnn_sdot(n, x, 2, y, 1));
 }
 
-TEST(scnn_blas, sdot_incy_2)
+void test_sdot_incy_2(void)
 {
     int n = 10;
     float x[] = {
@@ -236,7 +234,7 @@ TEST(scnn_blas, sdot_incy_2)
     TEST_ASSERT_EQUAL_FLOAT(615, scnn_sdot(n, x, 1, y, 2));
 }
 
-TEST(scnn_blas, sdot_rev_x)
+void test_sdot_rev_x(void)
 {
     int n = 10;
     float x[] = {
@@ -249,7 +247,7 @@ TEST(scnn_blas, sdot_rev_x)
     TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, -1, y, 1));
 }
 
-TEST(scnn_blas, sdot_rev_y)
+void test_sdot_rev_y(void)
 {
     int n = 10;
     float x[] = {
@@ -262,7 +260,7 @@ TEST(scnn_blas, sdot_rev_y)
     TEST_ASSERT_EQUAL_FLOAT(330, scnn_sdot(n, x, 1, y, -1));
 }
 
-TEST(scnn_blas, sdot_rev_x_2)
+void test_sdot_rev_x_2(void)
 {
     int n = 10;
     float x[] = {
@@ -276,7 +274,7 @@ TEST(scnn_blas, sdot_rev_x_2)
     TEST_ASSERT_EQUAL_FLOAT(660, scnn_sdot(n, x, -2, y, 1));
 }
 
-TEST(scnn_blas, sdot_rev_y_2)
+void test_sdot_rev_y_2(void)
 {
     int n = 10;
     float x[] = {
@@ -290,7 +288,7 @@ TEST(scnn_blas, sdot_rev_y_2)
     TEST_ASSERT_EQUAL_FLOAT(615, scnn_sdot(n, x, 1, y, -2));
 }
 
-TEST(scnn_blas, sdot_fail_invalid_n)
+void test_sdot_fail_invalid_n(void)
 {
     int n = 0;
     float x[] = {
@@ -303,7 +301,7 @@ TEST(scnn_blas, sdot_fail_invalid_n)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, y, 1));
 }
 
-TEST(scnn_blas, sdot_fail_x_null)
+void test_sdot_fail_x_null(void)
 {
     int n = 10;
     float y[] = {
@@ -313,7 +311,7 @@ TEST(scnn_blas, sdot_fail_x_null)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, NULL, 1, y, 1));
 }
 
-TEST(scnn_blas, sdot_fail_y_null)
+void test_sdot_fail_y_null(void)
 {
     int n = 10;
     float x[] = {
@@ -323,7 +321,7 @@ TEST(scnn_blas, sdot_fail_y_null)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, NULL, 1));
 }
 
-TEST(scnn_blas, sdot_fail_invalid_incx)
+void test_sdot_fail_invalid_incx(void)
 {
     int n = 10;
     float x[] = {
@@ -336,7 +334,7 @@ TEST(scnn_blas, sdot_fail_invalid_incx)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 0, y, 1));
 }
 
-TEST(scnn_blas, sdot_fail_invalid_incy)
+void test_sdot_fail_invalid_incy(void)
 {
     int n = 10;
     float x[] = {
@@ -349,7 +347,7 @@ TEST(scnn_blas, sdot_fail_invalid_incy)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_sdot(n, x, 1, y, 0));
 }
 
-TEST(scnn_blas, snrm2)
+void test_snrm2(void)
 {
     int n = 10;
     float x[] = {
@@ -359,7 +357,7 @@ TEST(scnn_blas, snrm2)
     TEST_ASSERT_EQUAL_FLOAT(16.8819, scnn_snrm2(n, x, 1));
 }
 
-TEST(scnn_blas, snrm2_incx_2)
+void test_snrm2_incx_2(void)
 {
     int n = 10;
     float x[] = {
@@ -370,7 +368,7 @@ TEST(scnn_blas, snrm2_incx_2)
     TEST_ASSERT_EQUAL_FLOAT(33.7639, scnn_snrm2(n, x, 2));
 }
 
-TEST(scnn_blas, snrm2_rev)
+void test_snrm2_rev(void)
 {
     int n = 10;
     float x[] = {
@@ -380,7 +378,7 @@ TEST(scnn_blas, snrm2_rev)
     TEST_ASSERT_EQUAL_FLOAT(16.8819, scnn_snrm2(n, x, -1));
 }
 
-TEST(scnn_blas, snrm2_rev_2)
+void test_snrm2_rev_2(void)
 {
     int n = 10;
     float x[] = {
@@ -391,7 +389,7 @@ TEST(scnn_blas, snrm2_rev_2)
     TEST_ASSERT_EQUAL_FLOAT(36.4692, scnn_snrm2(n, x, -2));
 }
 
-TEST(scnn_blas, snrm2_fail_invalid_n)
+void test_snrm2_fail_invalid_n(void)
 {
     int n = 0;
     float x[] = {
@@ -401,14 +399,14 @@ TEST(scnn_blas, snrm2_fail_invalid_n)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, x, 1));
 }
 
-TEST(scnn_blas, snrm2_fail_x_null)
+void test_snrm2_fail_x_null(void)
 {
     int n = 10;
 
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, NULL, 1));
 }
 
-TEST(scnn_blas, snrm2_fail_invalid_incx)
+void test_snrm2_fail_invalid_incx(void)
 {
     int n = 10;
     float x[] = {
@@ -418,7 +416,7 @@ TEST(scnn_blas, snrm2_fail_invalid_incx)
     TEST_ASSERT_EQUAL_FLOAT(0, scnn_snrm2(n, x, 0));
 }
 
-TEST(scnn_blas, saxpy)
+void test_saxpy(void)
 {
     int n = 10;
     float x[] = {
@@ -437,7 +435,7 @@ TEST(scnn_blas, saxpy)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_alpha_2)
+void test_saxpy_alpha_2(void)
 {
     int n = 10;
     float x[] = {
@@ -456,7 +454,7 @@ TEST(scnn_blas, saxpy_alpha_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_incx_2)
+void test_saxpy_incx_2(void)
 {
     int n = 10;
     float x[] = {
@@ -475,7 +473,7 @@ TEST(scnn_blas, saxpy_incx_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_incy_2)
+void test_saxpy_incy_2(void)
 {
     int n = 10;
     float x[] = {
@@ -494,7 +492,7 @@ TEST(scnn_blas, saxpy_incy_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (n * 2));
 }
 
-TEST(scnn_blas, saxpy_rev_x)
+void test_saxpy_rev_x(void)
 {
     int n = 10;
     float x[] = {
@@ -513,7 +511,7 @@ TEST(scnn_blas, saxpy_rev_x)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_rev_y)
+void test_saxpy_rev_y(void)
 {
     int n = 10;
     float x[] = {
@@ -532,7 +530,7 @@ TEST(scnn_blas, saxpy_rev_y)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_rev_x_2)
+void test_saxpy_rev_x_2(void)
 {
     int n = 10;
     float x[] = {
@@ -551,7 +549,7 @@ TEST(scnn_blas, saxpy_rev_x_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_rev_y_2)
+void test_saxpy_rev_y_2(void)
 {
     int n = 10;
     float x[] = {
@@ -570,7 +568,7 @@ TEST(scnn_blas, saxpy_rev_y_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (n * 2));
 }
 
-TEST(scnn_blas, saxpy_fail_x_null)
+void test_saxpy_fail_x_null(void)
 {
     int n = 10;
     float y[] = {
@@ -586,7 +584,7 @@ TEST(scnn_blas, saxpy_fail_x_null)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_fail_y_null)
+void test_saxpy_fail_y_null(void)
 {
     int n = 10;
     float x[] = {
@@ -596,7 +594,7 @@ TEST(scnn_blas, saxpy_fail_y_null)
     scnn_saxpy(n, 1.0, x, 1, NULL, 1);
 }
 
-TEST(scnn_blas, saxpy_fail_invalid_n)
+void test_saxpy_fail_invalid_n(void)
 {
     int n = 0;
     float x[] = {
@@ -615,7 +613,7 @@ TEST(scnn_blas, saxpy_fail_invalid_n)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 10);
 }
 
-TEST(scnn_blas, saxpy_fail_invalid_incx)
+void test_saxpy_fail_invalid_incx(void)
 {
     int n = 10;
     float x[] = {
@@ -634,7 +632,7 @@ TEST(scnn_blas, saxpy_fail_invalid_incx)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, saxpy_fail_invalid_incy)
+void test_saxpy_fail_invalid_incy(void)
 {
     int n = 10;
     float x[] = {
@@ -653,7 +651,7 @@ TEST(scnn_blas, saxpy_fail_invalid_incy)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, n);
 }
 
-TEST(scnn_blas, sgemv)
+void test_sgemv(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -686,7 +684,7 @@ TEST(scnn_blas, sgemv)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_trans)
+void test_sgemv_trans(void)
 {
     float a[3 * 2] = {
         0.11, 0.21,
@@ -720,7 +718,7 @@ TEST(scnn_blas, sgemv_trans)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_alpha_2)
+void test_sgemv_alpha_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -753,7 +751,7 @@ TEST(scnn_blas, sgemv_alpha_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_beta_2)
+void test_sgemv_beta_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -786,7 +784,7 @@ TEST(scnn_blas, sgemv_beta_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_incx_2)
+void test_sgemv_incx_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -822,7 +820,7 @@ TEST(scnn_blas, sgemv_incx_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_incx_rev)
+void test_sgemv_incx_rev(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -855,7 +853,7 @@ TEST(scnn_blas, sgemv_incx_rev)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_incx_rev_2)
+void test_sgemv_incx_rev_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -891,7 +889,7 @@ TEST(scnn_blas, sgemv_incx_rev_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_incy_2)
+void test_sgemv_incy_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -928,7 +926,7 @@ TEST(scnn_blas, sgemv_incy_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (2 * 2));
 }
 
-TEST(scnn_blas, sgemv_incy_rev)
+void test_sgemv_incy_rev(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -961,7 +959,7 @@ TEST(scnn_blas, sgemv_incy_rev)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_incy_rev_2)
+void test_sgemv_incy_rev_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -998,7 +996,7 @@ TEST(scnn_blas, sgemv_incy_rev_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, (2 * 2));
 }
 
-TEST(scnn_blas, sgemv_fail_a_null)
+void test_sgemv_fail_a_null(void)
 {
     float x[3] = {
         1,
@@ -1026,7 +1024,7 @@ TEST(scnn_blas, sgemv_fail_a_null)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_x_null)
+void test_sgemv_fail_x_null(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1053,7 +1051,7 @@ TEST(scnn_blas, sgemv_fail_x_null)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_c_null)
+void test_sgemv_fail_c_null(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1074,7 +1072,7 @@ TEST(scnn_blas, sgemv_fail_c_null)
     );
 }
 
-TEST(scnn_blas, sgemv_fail_invalid_m)
+void test_sgemv_fail_invalid_m(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1107,7 +1105,7 @@ TEST(scnn_blas, sgemv_fail_invalid_m)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_invalid_n)
+void test_sgemv_fail_invalid_n(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1140,7 +1138,7 @@ TEST(scnn_blas, sgemv_fail_invalid_n)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_invalid_lda)
+void test_sgemv_fail_invalid_lda(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1173,7 +1171,7 @@ TEST(scnn_blas, sgemv_fail_invalid_lda)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_invalid_incx)
+void test_sgemv_fail_invalid_incx(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1206,7 +1204,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incx)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemv_fail_invalid_incy)
+void test_sgemv_fail_invalid_incy(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1239,7 +1237,7 @@ TEST(scnn_blas, sgemv_fail_invalid_incy)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 2);
 }
 
-TEST(scnn_blas, sgemm_no_trans)
+void test_sgemm_no_trans(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1273,7 +1271,7 @@ TEST(scnn_blas, sgemm_no_trans)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_trans_b)
+void test_sgemm_trans_b(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1306,7 +1304,7 @@ TEST(scnn_blas, sgemm_trans_b)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_trans_a)
+void test_sgemm_trans_a(void)
 {
     float a[3 * 2] = {
         0.11, 0.21,
@@ -1341,7 +1339,7 @@ TEST(scnn_blas, sgemm_trans_a)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_trans_ab)
+void test_sgemm_trans_ab(void)
 {
     float a[3 * 2] = {
         0.11, 0.21,
@@ -1375,7 +1373,7 @@ TEST(scnn_blas, sgemm_trans_ab)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_alpha_2)
+void test_sgemm_alpha_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1409,7 +1407,7 @@ TEST(scnn_blas, sgemm_alpha_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_beta_2)
+void test_sgemm_beta_2(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1443,7 +1441,7 @@ TEST(scnn_blas, sgemm_beta_2)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_a_null)
+void test_sgemm_fail_a_null(void)
 {
     float b[3 * 2] = {
         1011, 1012,
@@ -1472,7 +1470,7 @@ TEST(scnn_blas, sgemm_fail_a_null)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_b_null)
+void test_sgemm_fail_b_null(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1500,7 +1498,7 @@ TEST(scnn_blas, sgemm_fail_b_null)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_c_null)
+void test_sgemm_fail_c_null(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1522,7 +1520,7 @@ TEST(scnn_blas, sgemm_fail_c_null)
     );
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_m)
+void test_sgemm_fail_invalid_m(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1556,7 +1554,7 @@ TEST(scnn_blas, sgemm_fail_invalid_m)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_n)
+void test_sgemm_fail_invalid_n(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1590,7 +1588,7 @@ TEST(scnn_blas, sgemm_fail_invalid_n)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_k)
+void test_sgemm_fail_invalid_k(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1624,7 +1622,7 @@ TEST(scnn_blas, sgemm_fail_invalid_k)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_lda)
+void test_sgemm_fail_invalid_lda(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1658,7 +1656,7 @@ TEST(scnn_blas, sgemm_fail_invalid_lda)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_ldb)
+void test_sgemm_fail_invalid_ldb(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
@@ -1692,7 +1690,7 @@ TEST(scnn_blas, sgemm_fail_invalid_ldb)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, c, (2 * 2));
 }
 
-TEST(scnn_blas, sgemm_fail_invalid_ldc)
+void test_sgemm_fail_invalid_ldc(void)
 {
     float a[2 * 3] = {
         0.11, 0.12, 0.13,
