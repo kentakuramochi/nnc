@@ -5,10 +5,11 @@
  */
 #include "scnn_layer.h"
 
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "scnn_fc.h"
+#include "scnn_blas.h"
 
 scnn_dtype *scnn_layer_y(const scnn_layer *layer)
 {
@@ -113,7 +114,29 @@ scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)
         return NULL;
     }
 
-    return scnn_fc(x, layer->w, layer->b, layer->y);
+    scnn_scopy(layer->params.in, x, 1, layer->x, 1);
+
+    const int m = 1; // Batch dimension
+    const int n = layer->params.out;
+    const int k = layer->params.in;
+
+    // y = b: Broadcast for batch dimension
+    for (int i = 0; i < m; i++) {
+        scnn_scopy(
+            layer->params.out, layer->b, 1, &layer->y[i * layer->params.out], 1
+        );
+    }
+
+    // y = x * W + b
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS, SCNN_BLAS_NO_TRANS,
+        m, n, k,
+        1.0, layer->x, k,
+        layer->w, n,
+        1.0, layer->y, n
+    );
+
+    return layer->y;
 }
 
 scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
@@ -122,7 +145,54 @@ scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
         return NULL;
     }
 
-    return scnn_fc_diff(dy, layer->w, layer->b, layer->dx, layer->dw, layer->db);
+    // dx = 0
+    for (int i = 0; i < layer->params.in; i++) {
+        layer->dx[i] = 0;
+    }
+
+    int m = 1; // Batch dimension
+    int n = layer->params.in;
+    int k = layer->params.out;
+
+    // dx = dy * WT
+    scnn_sgemm(
+        SCNN_BLAS_NO_TRANS, SCNN_BLAS_TRANS,
+        m, n, k,
+        1.0, dy, k,
+        layer->w, k,
+        1.0, layer->dx, n
+    );
+
+    // dw = 0
+    for (int i = 0; i < layer->params.in * layer->params.out; i++) {
+        layer->dw[i] = 0;
+    }
+
+    m = layer->params.in;
+    n = layer->params.out;
+    k = 1;
+
+    // dW = xT * dy
+    scnn_sgemm(
+        SCNN_BLAS_TRANS, SCNN_BLAS_NO_TRANS,
+        m, n, k,
+        1.0, layer->x, m,
+        dy, n,
+        1.0, layer->dw, n
+    );
+
+    // db = 0
+    for (int i = 0; i < layer->params.out; i++) {
+        layer->db[i] = 0;
+    }
+
+    // db = dy / (batch size):
+    // Broadcast for batch dimension
+    for (int i = 0; i < 1; i++) {
+        scnn_saxpy(layer->params.out, 1, &dy[i * layer->params.out], 1, layer->db, 1);
+    }
+
+    return layer->dx;
 }
 
 void scnn_layer_free(scnn_layer **layer)
