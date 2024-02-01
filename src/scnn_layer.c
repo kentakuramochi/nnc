@@ -8,14 +8,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "scnn_fc.h"
 #include "scnn_blas.h"
-
-scnn_dtype *scnn_layer_y(const scnn_layer *layer)
-{
-    // TODO: Implement
-    return NULL;
-}
 
 scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
 {

@@ -51,7 +51,7 @@ scnn_net *scnn_net_alloc(void)
 
 scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
 {
-    if ((net == NULL) || (params.type == SCNN_LAYER_NONE)) {
+    if (net == NULL) {
         return NULL;
     }
 

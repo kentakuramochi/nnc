@@ -9,22 +9,10 @@
 #include "scnn_mat.h"
 
 /**
- * @brief Layer type
- * 
- */
-typedef enum scnn_layer_type {
-    SCNN_LAYER_NONE,    //!< None type
-    SCNN_LAYER_FC,      //!< FullyConnected layer
-    SCNN_LAYER_SIGMOID, //!< Sigmoid layer
-    SCNN_LAYER_SOFTMAX  //!< Softmax layer
-} scnn_layer_type;
-
-/**
  * @brief Layer parameters
  * 
  */
 typedef struct scnn_layer_params {
-    scnn_layer_type type;   //!< Layer type
     int in;                 //!< Input elements
     int out;                //!< Output elements
 } scnn_layer_params;
@@ -41,14 +29,6 @@ typedef struct scnn_layer {
     scnn_dtype* dw; //!< Difference of weight matrix
     scnn_dtype* db; //!< Difference of bias matrix
 } scnn_layer;
-
-/**
- * @brief Get an output of a layer
- * 
- * @param[in]   layer   Layer
- * @return              Pointer to an output of the layer
-*/
-scnn_dtype *scnn_layer_y(const scnn_layer *layer);
 
 /**
  * @brief Allocate a layer

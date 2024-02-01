@@ -12,20 +12,20 @@
 scnn_net *net;
 
 scnn_layer_params dummy_layer_params[] = {
-    { SCNN_LAYER_FC, .in = 3 * 28 * 28, .out = 100 },
-    { SCNN_LAYER_FC, .out = 10 },
-    { SCNN_LAYER_SIGMOID }
+    { .in = 3 * 28 * 28, .out = 100 },
+    { .out = 10 },
+    { .out = 2 }
 };
 
 scnn_dtype dummy_x[3 * 28 * 28];
 scnn_dtype dummy_y0[100];
 scnn_dtype dummy_y1[10];
-scnn_dtype dummy_y2[10];
+scnn_dtype dummy_y2[2];
 
 scnn_dtype dummy_dx0[3 * 28 * 28];
 scnn_dtype dummy_dx1[100];
 scnn_dtype dummy_dx2[10];
-scnn_dtype dummy_dy[10];
+scnn_dtype dummy_dy[2];
 
 void setUp(void)
 {
@@ -75,7 +75,6 @@ void test_append_layer(void)
 
     TEST_ASSERT_NOT_NULL(scnn_net_layers(net));
 
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].type, scnn_net_layers(net)[0].params.type);
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, scnn_net_layers(net)[0].params.in);
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, scnn_net_layers(net)[0].params.out);
 
@@ -98,7 +97,6 @@ void test_append_3layers(void)
     TEST_ASSERT_EQUAL_INT(3, scnn_net_size(net));
 
     for (int i = 0; i < 3; i++) {
-        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].type, scnn_net_layers(net)[i].params.type);
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].in, scnn_net_layers(net)[i].params.in);
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, scnn_net_layers(net)[i].params.out);
      }
@@ -113,27 +111,6 @@ void test_append_3layers(void)
 void test_append_fail_if_net_is_NULL(void)
 {
     TEST_ASSERT_NULL(scnn_net_append(NULL, dummy_layer_params[0]));
-}
-
-void test_append_fail_if_layer_is_NONE(void)
-{
-    net = scnn_net_alloc();
-
-    scnn_layer_connect_ExpectAnyArgs();
-    TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, dummy_layer_params[0]));
-
-    scnn_layer *prev_layer = scnn_net_layers(net);
-
-    TEST_ASSERT_NULL(scnn_net_append(net, (scnn_layer_params){}));
-
-    TEST_ASSERT_EQUAL_INT(1, scnn_net_size(net));
-
-    TEST_ASSERT_EQUAL_PTR(prev_layer, scnn_net_layers(net));
-
-    TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_input(net));
-    TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_output(net));
-
-    scnn_net_free(&net);
 }
 
 void test_init(void)

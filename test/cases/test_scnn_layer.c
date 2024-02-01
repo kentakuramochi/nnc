@@ -13,7 +13,7 @@
 #include "mock_scnn_fc.h"
 
 static scnn_layer_params params = {
-    SCNN_LAYER_FC, .in = 3 * 28 * 28, .out = 100,
+    .in = 3 * 28 * 28, .out = 100,
 };
 
 static scnn_layer *layer;
@@ -39,7 +39,6 @@ void test_allocate_and_free(void)
 
     TEST_ASSERT_NOT_NULL(layer);
 
-    TEST_ASSERT_EQUAL(params.type, layer->params.type);
     TEST_ASSERT_EQUAL_INT(params.in, layer->params.in);
     TEST_ASSERT_EQUAL(params.out, layer->params.out);
 
@@ -90,12 +89,12 @@ void test_connect(void)
 {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
-            SCNN_LAYER_FC, .in =  3 * 28 * 28, .out = 100,
+            .in =  3 * 28 * 28, .out = 100,
         }
     );
     layer_next = scnn_layer_alloc(
         (scnn_layer_params){
-            SCNN_LAYER_FC, .out = 10,
+            .out = 10,
         }
     );
 
@@ -111,7 +110,7 @@ void test_forward(void)
 {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
-            SCNN_LAYER_FC, .in=2, .out=3,
+            .in=2, .out=3,
         }
     );
 
@@ -159,7 +158,7 @@ void test_backward(void)
 {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
-            SCNN_LAYER_FC, .in = 2, .out = 3
+            .in = 2, .out = 3
         }
     );
 
