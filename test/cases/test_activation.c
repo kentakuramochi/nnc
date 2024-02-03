@@ -32,3 +32,20 @@ void test_sigmoid(void)
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 3);
 }
+
+void test_softmax(void)
+{
+    float x[] = {
+        -1, 1, 4
+    };
+
+    float y[3];
+
+    float answer[] = {
+        0.00637746f, 0.04712342f, 0.94649912f
+    };
+
+    TEST_ASSERT_EQUAL_PTR(y, softmax(x, y, 3));
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 3);
+}
