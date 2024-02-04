@@ -9,8 +9,8 @@
 
 #include "unity.h"
 
+#include "activation.h"
 #include "scnn_blas.h"
-#include "mock_scnn_fc.h"
 
 static scnn_layer_params params = {
     .in = 3 * 28 * 28, .out = 100,
@@ -44,9 +44,11 @@ void test_allocate_and_free(void)
 
     TEST_ASSERT_NULL(layer->x);
     TEST_ASSERT_NULL(layer->y);
+    TEST_ASSERT_NULL(layer->z);
     TEST_ASSERT_NULL(layer->w);
     TEST_ASSERT_NULL(layer->b);
     TEST_ASSERT_NULL(layer->dx);
+    TEST_ASSERT_NULL(layer->dz);
     TEST_ASSERT_NULL(layer->dw);
     TEST_ASSERT_NULL(layer->db);
 
@@ -71,9 +73,11 @@ void test_init(void)
     TEST_ASSERT_EQUAL_PTR(layer, scnn_layer_init(layer));
     TEST_ASSERT_NOT_NULL(layer->x);
     TEST_ASSERT_NOT_NULL(layer->y);
+    TEST_ASSERT_NOT_NULL(layer->z);
     TEST_ASSERT_NOT_NULL(layer->w);
     TEST_ASSERT_NOT_NULL(layer->b);
     TEST_ASSERT_NOT_NULL(layer->dx);
+    TEST_ASSERT_NOT_NULL(layer->dz);
     TEST_ASSERT_NOT_NULL(layer->dw);
     TEST_ASSERT_NOT_NULL(layer->db);
 
@@ -135,7 +139,12 @@ void test_forward(void)
         4, 6, 8
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, scnn_layer_forward(layer, _x), 3);
+    scnn_dtype z[] = {
+        0.982014f, 0.997527f, 0.999665f
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(z, scnn_layer_forward(layer, _x), 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, layer->y, 3);
 
     scnn_layer_free(&layer);
 }
@@ -176,31 +185,37 @@ void test_backward(void)
     memcpy(layer->b, b, sizeof(b));
 
     scnn_dtype _x[] = {
-        1, 2
-    };
-
-    scnn_dtype _dy[] = {
-        8, 12, 16
+        1, 1
     };
 
     scnn_layer_forward(layer, _x);
 
     scnn_dtype _dx[] = {
-        44, 152
+        0.003130589f, 0.01056396f
     };
 
+    scnn_dtype dt[] = {
+        -0.01798624f, 0.99752736f, 0.99966466f
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dx, scnn_layer_backward(layer, dt), 2);
+
     scnn_dtype _dw[] = {
-        8,  12, 16,
-        16, 24, 32
+        -0.0003176862f, 0.002460367f, 0.0003351109f,
+        -0.0003176862f, 0.002460367f, 0.0003351109f
     };
 
     scnn_dtype _db[] = {
-        8, 12, 16
+        -0.0003176862f, 0.002460367f, 0.0003351109f
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dx, scnn_layer_backward(layer, _dy), 2);
+    scnn_dtype dz[] = {
+        -0.0003176862f, 0.002460367f, 0.0003351109f
+    };
+
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dw, layer->dw, 2 * 3);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_db, layer->db, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dz, layer->dz, 3);
 
     scnn_layer_free(&layer);
 }

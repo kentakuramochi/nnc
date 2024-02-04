@@ -22,10 +22,12 @@ typedef struct scnn_layer {
 
     scnn_dtype* x;  //!< Input matrix
     scnn_dtype* y;  //!< Output matrix
+    scnn_dtype* z;  //!< Activation output matrix
     scnn_dtype* w;  //!< Weight matrix
     scnn_dtype* b;  //!< Bias matrix
 
     scnn_dtype* dx; //!< Difference of input matrix
+    scnn_dtype* dz; //!< Difference of activation
     scnn_dtype* dw; //!< Difference of weight matrix
     scnn_dtype* db; //!< Difference of bias matrix
 } scnn_layer;

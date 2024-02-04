@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "activation.h"
 #include "scnn_blas.h"
 
 scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
@@ -21,10 +22,12 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
 
     layer->x = NULL;
     layer->y = NULL;
+    layer->z = NULL;
     layer->w = NULL;
     layer->b = NULL;
 
     layer->dx = NULL;
+    layer->dz = NULL;
     layer->dw = NULL;
     layer->db = NULL;
 
@@ -49,6 +52,11 @@ scnn_layer *scnn_layer_init(scnn_layer* layer)
         goto FREE_MATRICES;
     }
 
+    layer->z = malloc(y_size);
+    if (layer->z == NULL) {
+        goto FREE_MATRICES;
+    }
+
     size_t w_size = x_size * y_size;
     layer->w = malloc(w_size);
     if (layer->w == NULL) {
@@ -62,6 +70,11 @@ scnn_layer *scnn_layer_init(scnn_layer* layer)
 
     layer->dx = malloc(x_size);
     if (layer->dx == NULL) {
+        goto FREE_MATRICES;
+    }
+
+    layer->dz = malloc(y_size);
+    if (layer->dz == NULL) {
         goto FREE_MATRICES;
     }
 
@@ -82,12 +95,16 @@ FREE_MATRICES:
     layer->db = NULL;
     free(layer->dw);
     layer->dw = NULL;
+    free(layer->dz);
+    layer->dz = NULL;
     free(layer->dx);
     layer->dx = NULL;
     free(layer->b);
     layer->b = NULL;
     free(layer->w);
     layer->w = NULL;
+    free(layer->z);
+    layer->z = NULL;
     free(layer->y);
     layer->y = NULL;
     free(layer->x);
@@ -129,13 +146,21 @@ scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)
         1.0, layer->y, n
     );
 
-    return layer->y;
+    // Activation
+    sigmoid(layer->y, layer->z, layer->params.out);
+
+    return layer->z;
 }
 
 scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
 {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
+    }
+
+    // dz = dy * z * (1 - z)
+    for (int i = 0; i < layer->params.out; i++) {
+        layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
     }
 
     // dx = 0
@@ -151,7 +176,7 @@ scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
     scnn_sgemm(
         SCNN_BLAS_NO_TRANS, SCNN_BLAS_TRANS,
         m, n, k,
-        1.0, dy, k,
+        1.0, layer->dz, k,
         layer->w, k,
         1.0, layer->dx, n
     );
@@ -170,7 +195,7 @@ scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
         SCNN_BLAS_TRANS, SCNN_BLAS_NO_TRANS,
         m, n, k,
         1.0, layer->x, m,
-        dy, n,
+        layer->dz, n,
         1.0, layer->dw, n
     );
 
@@ -182,7 +207,7 @@ scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
     // db = dy / (batch size):
     // Broadcast for batch dimension
     for (int i = 0; i < 1; i++) {
-        scnn_saxpy(layer->params.out, 1, &dy[i * layer->params.out], 1, layer->db, 1);
+        scnn_saxpy(layer->params.out, 1, &layer->dz[i * layer->params.out], 1, layer->db, 1);
     }
 
     return layer->dx;
@@ -198,6 +223,8 @@ void scnn_layer_free(scnn_layer **layer)
     (*layer)->x = NULL;
     free((*layer)->y);
     (*layer)->y = NULL;
+    free((*layer)->z);
+    (*layer)->z = NULL;
     free((*layer)->w);
     (*layer)->w = NULL;
     free((*layer)->b);
@@ -205,6 +232,8 @@ void scnn_layer_free(scnn_layer **layer)
 
     free((*layer)->dx);
     (*layer)->dx = NULL;
+    free((*layer)->dz);
+    (*layer)->dz = NULL;
     free((*layer)->dw);
     (*layer)->dw = NULL;
     free((*layer)->db);
