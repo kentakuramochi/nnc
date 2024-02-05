@@ -6,8 +6,6 @@
 #ifndef SCNN_LAYER_H
 #define SCNN_LAYER_H
 
-#include "scnn_mat.h"
-
 /**
  * @brief Layer parameters
  * 
@@ -20,16 +18,16 @@ typedef struct scnn_layer_params {
 typedef struct scnn_layer {
     scnn_layer_params params;   //!< Layer parameters
 
-    scnn_dtype* x;  //!< Input matrix
-    scnn_dtype* y;  //!< Output matrix
-    scnn_dtype* z;  //!< Activation output matrix
-    scnn_dtype* w;  //!< Weight matrix
-    scnn_dtype* b;  //!< Bias matrix
+    float* x;  //!< Input matrix
+    float* y;  //!< Output matrix
+    float* z;  //!< Activation output matrix
+    float* w;  //!< Weight matrix
+    float* b;  //!< Bias matrix
 
-    scnn_dtype* dx; //!< Difference of input matrix
-    scnn_dtype* dz; //!< Difference of activation
-    scnn_dtype* dw; //!< Difference of weight matrix
-    scnn_dtype* db; //!< Difference of bias matrix
+    float* dx; //!< Difference of input matrix
+    float* dz; //!< Difference of activation
+    float* dw; //!< Difference of weight matrix
+    float* db; //!< Difference of bias matrix
 } scnn_layer;
 
 /**
@@ -63,7 +61,7 @@ void scnn_layer_connect(scnn_layer* prev, scnn_layer* next);
  * @param[in]       x       An input of the layer
  * @return                  Pointer to the layer output
 */
-scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x);
+float *scnn_layer_forward(scnn_layer *layer, const float *x);
 
 /**
  * @brief Backward propagation of a layer
@@ -72,7 +70,7 @@ scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x);
  * @param[in]       dy      A differential of previous layer
  * @return                  Pointer to differential of an input of the layer
 */
-scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy);
+float *scnn_layer_backward(scnn_layer *layer, const float *dy);
 
 /**
  * @brief Free layer

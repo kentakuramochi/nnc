@@ -43,11 +43,6 @@
 
 :files:
   :test:
-    - -:test/cases/test_scnn_fc.c
-    - -:test/cases/test_scnn_loss.c
-    - -:test/cases/test_scnn_mat.c
-    - -:test/cases/test_scnn_sigmoid.c
-    - -:test/cases/test_scnn_softmax.c
 
 :defines:
   # in order to add common defines:

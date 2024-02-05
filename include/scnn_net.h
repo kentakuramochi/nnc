@@ -90,7 +90,7 @@ scnn_net *scnn_net_init(scnn_net *net);
  * @param[in]       x   Network input
  * @return              Pointer to the network output, NULL if failed
  */
-scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x);
+float *scnn_net_forward(scnn_net *net, const float *x);
 
 /**
  * @brief Backward propagation of network
@@ -99,7 +99,7 @@ scnn_dtype *scnn_net_forward(scnn_net *net, const scnn_dtype *x);
  * @param[in]       dy  Differential of network output
  * @return              Pointer to differential of an input of the network, NULL if failed
  */
-scnn_dtype *scnn_net_backward(scnn_net *net, const scnn_dtype *dy);
+float *scnn_net_backward(scnn_net *net, const float *dy);
 
 /**
  * @brief Free network

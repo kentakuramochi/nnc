@@ -17,15 +17,15 @@ scnn_layer_params dummy_layer_params[] = {
     { .out = 2 }
 };
 
-scnn_dtype dummy_x[3 * 28 * 28];
-scnn_dtype dummy_y0[100];
-scnn_dtype dummy_y1[10];
-scnn_dtype dummy_y2[2];
+float dummy_x[3 * 28 * 28];
+float dummy_y0[100];
+float dummy_y1[10];
+float dummy_y2[2];
 
-scnn_dtype dummy_dx0[3 * 28 * 28];
-scnn_dtype dummy_dx1[100];
-scnn_dtype dummy_dx2[10];
-scnn_dtype dummy_dy[2];
+float dummy_dx0[3 * 28 * 28];
+float dummy_dx1[100];
+float dummy_dx2[10];
+float dummy_dy[2];
 
 void setUp(void)
 {

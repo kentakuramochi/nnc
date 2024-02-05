@@ -19,8 +19,8 @@ static scnn_layer_params params = {
 static scnn_layer *layer;
 static scnn_layer *layer_next;
 
-static scnn_dtype x[3 * 28 * 28];
-static scnn_dtype dy[100];
+static float x[3 * 28 * 28];
+static float dy[100];
 
 void setUp(void)
 {
@@ -120,26 +120,26 @@ void test_forward(void)
 
     scnn_layer_init(layer);
 
-    scnn_dtype w[] = {
+    float w[] = {
         0, 1, 2,
         3, 4, 5
     };
     memcpy(layer->w, w, sizeof(w));
 
-    scnn_dtype b[] = {
+    float b[] = {
         1, 1, 1
     };
     memcpy(layer->b, b, sizeof(b));
 
-    scnn_dtype _x[] = {
+    float _x[] = {
         1, 1
     };
 
-    scnn_dtype answer[] = {
+    float answer[] = {
         4, 6, 8
     };
 
-    scnn_dtype z[] = {
+    float z[] = {
         0.982014f, 0.997527f, 0.999665f
     };
 
@@ -173,43 +173,43 @@ void test_backward(void)
 
     scnn_layer_init(layer);
 
-    scnn_dtype w[] = {
+    float w[] = {
         0, 1, 2,
         3, 4, 5
     };
     memcpy(layer->w, w, sizeof(w));
 
-    scnn_dtype b[] = {
+    float b[] = {
         1, 1, 1
     };
     memcpy(layer->b, b, sizeof(b));
 
-    scnn_dtype _x[] = {
+    float _x[] = {
         1, 1
     };
 
     scnn_layer_forward(layer, _x);
 
-    scnn_dtype _dx[] = {
+    float _dx[] = {
         0.003130589f, 0.01056396f
     };
 
-    scnn_dtype dt[] = {
+    float dt[] = {
         -0.01798624f, 0.99752736f, 0.99966466f
     };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dx, scnn_layer_backward(layer, dt), 2);
 
-    scnn_dtype _dw[] = {
+    float _dw[] = {
         -0.0003176862f, 0.002460367f, 0.0003351109f,
         -0.0003176862f, 0.002460367f, 0.0003351109f
     };
 
-    scnn_dtype _db[] = {
+    float _db[] = {
         -0.0003176862f, 0.002460367f, 0.0003351109f
     };
 
-    scnn_dtype dz[] = {
+    float dz[] = {
         -0.0003176862f, 0.002460367f, 0.0003351109f
     };
 

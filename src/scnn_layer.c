@@ -40,13 +40,13 @@ scnn_layer *scnn_layer_init(scnn_layer* layer)
         return NULL;
     }
 
-    size_t x_size = sizeof(scnn_dtype) * layer->params.in;
+    size_t x_size = sizeof(float) * layer->params.in;
     layer->x = malloc(x_size);
     if (layer->x == NULL) {
         return NULL;
     }
 
-    size_t y_size = sizeof(scnn_dtype) * layer->params.out;
+    size_t y_size = sizeof(float) * layer->params.out;
     layer->y = malloc(y_size);
     if (layer->y == NULL) {
         goto FREE_MATRICES;
@@ -118,7 +118,7 @@ void scnn_layer_connect(scnn_layer* prev, scnn_layer* next)
     next->params.in = prev->params.out;
 }
 
-scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)
+float *scnn_layer_forward(scnn_layer *layer, const float *x)
 {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
@@ -152,7 +152,7 @@ scnn_dtype *scnn_layer_forward(scnn_layer *layer, const scnn_dtype *x)
     return layer->z;
 }
 
-scnn_dtype *scnn_layer_backward(scnn_layer *layer, const scnn_dtype *dy)
+float *scnn_layer_backward(scnn_layer *layer, const float *dy)
 {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
