@@ -213,6 +213,15 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
     return layer->dx;
 }
 
+void layer_update(scnn_layer *layer, const float learning_rate)
+{
+    const int w_size = layer->params.in * layer->params.out;
+
+    scnn_saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
+
+    scnn_saxpy(layer->params.out, -learning_rate, layer->db, 1, layer->b, 1);
+}
+
 void scnn_layer_free(scnn_layer **layer)
 {
     if ((layer == NULL) || (*layer == NULL)) {

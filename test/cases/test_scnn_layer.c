@@ -233,3 +233,48 @@ void test_backward_fail_if_dy_is_NULL(void)
 
     scnn_layer_free(&layer);
 }
+
+void test_update(void)
+{
+    layer = scnn_layer_alloc(params);
+
+    scnn_layer_init(layer);
+
+    float w[] = {
+        1, 1, 1,
+        1, 1, 1
+    };
+    memcpy(layer->w, w, sizeof(w));
+
+    float dw[] = {
+        1, 2, 3,
+        4, 5, 6
+    };
+    memcpy(layer->dw, dw, sizeof(dw));
+
+    float b[] = {
+        1, 1, 1
+    };
+    memcpy(layer->b, b, sizeof(b));
+
+    float db[] = {
+        1, 2, 3
+    };
+    memcpy(layer->db, db, sizeof(db));
+
+    layer_update(layer, 0.01);
+
+    float _w[] = {
+        0.99, 0.98, 0.97,
+        0.96, 0.95, 0.94
+    };
+
+    float _b[] = {
+        0.99, 0.98, 0.97
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_w, layer->w, 2 * 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_b, layer->b, 3);
+
+    scnn_layer_free(&layer);
+}

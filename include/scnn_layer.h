@@ -72,6 +72,15 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x);
 */
 float *scnn_layer_backward(scnn_layer *layer, const float *dy);
 
+
+/**
+ * @brief Update layer parameter
+ *
+ * @param[in,out] layer Pointer to the layer
+ * @param[in] learning_rate Learning rate
+ */
+void layer_update(scnn_layer *layer, const float learning_rate);
+
 /**
  * @brief Free layer
  * 
