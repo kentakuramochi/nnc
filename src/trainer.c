@@ -29,9 +29,7 @@ float train_step(scnn_net *net, const float *x, const float *t, const float lear
 
     scnn_net_backward(net, dy);
 
-    for (int i = net->size - 1; i >= 0; i--) {
-        layer_update(&net->layers[i], learning_rate);
-    }
+    net_update(net, learning_rate);
 
     free(dy);
     dy = NULL;

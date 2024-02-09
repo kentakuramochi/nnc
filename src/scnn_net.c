@@ -135,6 +135,13 @@ float *scnn_net_backward(scnn_net *net, const float *dy)
     return dout;
 }
 
+void net_update(scnn_net *net, const float learning_rate)
+{
+    for (int i = 0; i < net->size; i++) {
+        layer_update(&net->layers[i], learning_rate);
+    }
+}
+
 void scnn_net_free(scnn_net **net)
 {
     if ((net == NULL) || (*net == NULL)) {

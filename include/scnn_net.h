@@ -102,6 +102,14 @@ float *scnn_net_forward(scnn_net *net, const float *x);
 float *scnn_net_backward(scnn_net *net, const float *dy);
 
 /**
+ * @brief Update each layer parameter
+ *
+ * @param[in,out] net Pointer to the network
+ * @param[in] learning_rate Learning rate
+ */
+void net_update(scnn_net *net, const float learning_rate);
+
+/**
  * @brief Free network
  * 
  * @param[in,out] net   Pointer to poiner of network

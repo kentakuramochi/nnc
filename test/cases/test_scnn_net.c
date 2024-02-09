@@ -284,3 +284,22 @@ void test_backward_fail_if_dy_is_NULL(void)
 
     scnn_net_free(&net);
 }
+
+void test_update(void)
+{
+    net = scnn_net_alloc();
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, dummy_layer_params[0]);
+    scnn_layer_connect_Ignore();
+    scnn_net_append(net, dummy_layer_params[1]);
+
+    scnn_layer_init_IgnoreAndReturn(&scnn_net_layers(net)[0]);
+    scnn_layer_init_IgnoreAndReturn(&scnn_net_layers(net)[1]);
+    scnn_net_init(net);
+
+    layer_update_Expect(&net->layers[0], 0.01);
+    layer_update_Expect(&net->layers[1], 0.01);
+    net_update(net, 0.01);
+
+    scnn_net_free(&net);
+}
