@@ -39,8 +39,8 @@ void test_allocate_and_free(void)
 
     TEST_ASSERT_NOT_NULL(layer);
 
-    TEST_ASSERT_EQUAL_INT(params.in, layer->params.in);
-    TEST_ASSERT_EQUAL(params.out, layer->params.out);
+    TEST_ASSERT_EQUAL_INT(params.in, layer->in);
+    TEST_ASSERT_EQUAL(params.out, layer->out);
 
     TEST_ASSERT_NULL(layer->x);
     TEST_ASSERT_NULL(layer->y);
@@ -104,7 +104,7 @@ void test_connect(void)
 
     scnn_layer_connect(layer, layer_next);
 
-    TEST_ASSERT_EQUAL_INT(100, layer_next->params.in);
+    TEST_ASSERT_EQUAL_INT(100, layer_next->in);
 
     scnn_layer_free(&layer);
     scnn_layer_free(&layer_next);

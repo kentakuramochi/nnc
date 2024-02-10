@@ -11,12 +11,13 @@
  * 
  */
 typedef struct scnn_layer_params {
-    int in;                 //!< Input elements
-    int out;                //!< Output elements
+    int in;     //!< Number of input elements
+    int out;    //!< Number of output elements
 } scnn_layer_params;
 
 typedef struct scnn_layer {
-    scnn_layer_params params;   //!< Layer parameters
+    int in;     //!< Number of input elements
+    int out;    //!< Number of output elements
 
     float* x;  //!< Input matrix
     float* y;  //!< Output matrix

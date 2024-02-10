@@ -40,7 +40,8 @@ void test_train_step(void)
         .batch_size = 1,
         .layers = (scnn_layer[]){
             {
-                { .in = 2, .out = 3 },
+                .in = 2,
+                .out = 3,
                 .x = (float[2]){ 0 },
                 .y = (float[3]){ 0 },
                 .z = (float[3]){ 0 },
@@ -52,7 +53,8 @@ void test_train_step(void)
                 .db = (float[3]){ 0 },
             },
             {
-                { .in = 3, .out = 1 },
+                .in = 3,
+                .out = 1,
                 .x = (float[3]){ 0 },
                 .y = (float[1]){ 0 },
                 .z = (float[1]){ 0 },

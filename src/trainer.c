@@ -16,7 +16,7 @@ float train_step(scnn_net *net, const float *x, const float *t, const float lear
 {
     const float *y = scnn_net_forward(net, x);
 
-    const int osize = scnn_net_layers(net)[net->size - 1].params.out;
+    const int osize = scnn_net_layers(net)[net->size - 1].out;
 
     float *dy = malloc(sizeof(float) * osize);
 

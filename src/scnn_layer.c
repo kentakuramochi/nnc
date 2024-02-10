@@ -18,7 +18,8 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
         return NULL;
     }
 
-    layer->params = params;
+    layer->in = params.in;
+    layer->out = params.out;
 
     layer->x = NULL;
     layer->y = NULL;
@@ -40,13 +41,13 @@ scnn_layer *scnn_layer_init(scnn_layer* layer)
         return NULL;
     }
 
-    size_t x_size = sizeof(float) * layer->params.in;
+    size_t x_size = sizeof(float) * layer->in;
     layer->x = malloc(x_size);
     if (layer->x == NULL) {
         return NULL;
     }
 
-    size_t y_size = sizeof(float) * layer->params.out;
+    size_t y_size = sizeof(float) * layer->out;
     layer->y = malloc(y_size);
     if (layer->y == NULL) {
         goto FREE_MATRICES;
@@ -115,7 +116,7 @@ FREE_MATRICES:
 
 void scnn_layer_connect(scnn_layer* prev, scnn_layer* next)
 {
-    next->params.in = prev->params.out;
+    next->in = prev->out;
 }
 
 float *scnn_layer_forward(scnn_layer *layer, const float *x)
@@ -124,16 +125,16 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x)
         return NULL;
     }
 
-    scnn_scopy(layer->params.in, x, 1, layer->x, 1);
+    scnn_scopy(layer->in, x, 1, layer->x, 1);
 
     const int m = 1; // Batch dimension
-    const int n = layer->params.out;
-    const int k = layer->params.in;
+    const int n = layer->out;
+    const int k = layer->in;
 
     // y = b: Broadcast for batch dimension
     for (int i = 0; i < m; i++) {
         scnn_scopy(
-            layer->params.out, layer->b, 1, &layer->y[i * layer->params.out], 1
+            layer->out, layer->b, 1, &layer->y[i * layer->out], 1
         );
     }
 
@@ -147,7 +148,7 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x)
     );
 
     // Activation
-    sigmoid(layer->y, layer->z, layer->params.out);
+    sigmoid(layer->y, layer->z, layer->out);
 
     return layer->z;
 }
@@ -159,18 +160,18 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
     }
 
     // dz = dy * z * (1 - z)
-    for (int i = 0; i < layer->params.out; i++) {
+    for (int i = 0; i < layer->out; i++) {
         layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
     }
 
     // dx = 0
-    for (int i = 0; i < layer->params.in; i++) {
+    for (int i = 0; i < layer->in; i++) {
         layer->dx[i] = 0;
     }
 
     int m = 1; // Batch dimension
-    int n = layer->params.in;
-    int k = layer->params.out;
+    int n = layer->in;
+    int k = layer->out;
 
     // dx = dy * WT
     scnn_sgemm(
@@ -182,12 +183,12 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
     );
 
     // dw = 0
-    for (int i = 0; i < layer->params.in * layer->params.out; i++) {
+    for (int i = 0; i < layer->in * layer->out; i++) {
         layer->dw[i] = 0;
     }
 
-    m = layer->params.in;
-    n = layer->params.out;
+    m = layer->in;
+    n = layer->out;
     k = 1;
 
     // dW = xT * dy
@@ -200,14 +201,14 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
     );
 
     // db = 0
-    for (int i = 0; i < layer->params.out; i++) {
+    for (int i = 0; i < layer->out; i++) {
         layer->db[i] = 0;
     }
 
     // db = dy / (batch size):
     // Broadcast for batch dimension
     for (int i = 0; i < 1; i++) {
-        scnn_saxpy(layer->params.out, 1, &layer->dz[i * layer->params.out], 1, layer->db, 1);
+        scnn_saxpy(layer->out, 1, &layer->dz[i * layer->out], 1, layer->db, 1);
     }
 
     return layer->dx;
@@ -215,11 +216,11 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
 
 void layer_update(scnn_layer *layer, const float learning_rate)
 {
-    const int w_size = layer->params.in * layer->params.out;
+    const int w_size = layer->in * layer->out;
 
     scnn_saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
 
-    scnn_saxpy(layer->params.out, -learning_rate, layer->db, 1, layer->b, 1);
+    scnn_saxpy(layer->out, -learning_rate, layer->db, 1, layer->b, 1);
 }
 
 void scnn_layer_free(scnn_layer **layer)
