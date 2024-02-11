@@ -66,7 +66,8 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
 
     // Initialize new layer
     scnn_layer *layer = &net->layers[net->size];
-    layer->params = params;
+    layer->in = params.in;
+    layer->out = params.out;
     layer->x = NULL;
     layer->y = NULL;
     layer->w = NULL;
@@ -75,15 +76,17 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
     layer->dw = NULL;
     layer->db = NULL;
 
+    net->size++;
+
     // Connect the layer
-    scnn_layer_connect(net->output, &net->layers[net->size]);
+    for (int i = 1; i < net->size; i++) {
+        scnn_layer_connect(&net->layers[i - 1], &net->layers[i]);
+    }
 
     // Set the first layer as a network input
     net->input = &net->layers[0];
     // And the last layer as a network output
     net->output = layer;
-
-    net->size++;
 
     return net;
 }

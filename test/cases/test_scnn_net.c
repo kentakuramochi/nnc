@@ -68,15 +68,14 @@ void test_append_layer(void)
 {
     net = scnn_net_alloc();
 
-    scnn_layer_connect_ExpectAnyArgs();
     TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, dummy_layer_params[0]));
 
     TEST_ASSERT_EQUAL_INT(1, scnn_net_size(net));
 
     TEST_ASSERT_NOT_NULL(scnn_net_layers(net));
 
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, scnn_net_layers(net)[0].params.in);
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, scnn_net_layers(net)[0].params.out);
+    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, scnn_net_layers(net)[0].in);
+    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, scnn_net_layers(net)[0].out);
 
     TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_input(net));
     TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_output(net));
@@ -97,8 +96,8 @@ void test_append_3layers(void)
     TEST_ASSERT_EQUAL_INT(3, scnn_net_size(net));
 
     for (int i = 0; i < 3; i++) {
-        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].in, scnn_net_layers(net)[i].params.in);
-        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, scnn_net_layers(net)[i].params.out);
+        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].in, scnn_net_layers(net)[i].in);
+        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, scnn_net_layers(net)[i].out);
      }
 
     TEST_ASSERT_EQUAL_PTR(&scnn_net_layers(net)[0], scnn_net_input(net));
