@@ -16,14 +16,23 @@
 #include "nn_net.h"
 
 #include "unity.h"
+#include "test_utils.h"
 
 void setUp(void) {}
 
 void tearDown(void) {}
 
-void init_random(float *x, const size_t size) {
+static void init_random(float *array, const size_t size) {
     for (size_t i = 0; i < size; i++) {
-        x[i] = (float)rand() / RAND_MAX - 0.5f;
+        array[i] = (float)rand() / RAND_MAX - 0.5f;
+    }
+}
+
+static void net_init_random(NnNet *net) {
+    for (size_t i = 0; i < net->size; i++) {
+        NnLayer *layer = &nn_net_layers(net)[i];
+        init_random(layer->w, (layer->in * layer->out));
+        init_random(layer->b, layer->out);
     }
 }
 
@@ -35,36 +44,33 @@ void test_train_step(void) {
             {
                 .in = 2,
                 .out = 3,
-                .x = (float[2]){ 0 },
-                .y = (float[3]){ 0 },
-                .z = (float[3]){ 0 },
-                .w = (float[3 * 2]){ 0 },
-                .b = (float[3]){ 0 },
-                .dx = (float[2]){ 0 },
-                .dz = (float[3]){ 0 },
-                .dw = (float[3 * 2]){ 0 },
-                .db = (float[3]){ 0 },
+                .x = FLOAT_ZEROS(2),
+                .y = FLOAT_ZEROS(3),
+                .z = FLOAT_ZEROS(3),
+                .w = FLOAT_ZEROS(3 * 2),
+                .b = FLOAT_ZEROS(3),
+                .dx = FLOAT_ZEROS(2),
+                .dz = FLOAT_ZEROS(3),
+                .dw = FLOAT_ZEROS(3 * 2),
+                .db = FLOAT_ZEROS(3)
             },
             {
                 .in = 3,
                 .out = 1,
-                .x = (float[3]){ 0 },
-                .y = (float[1]){ 0 },
-                .z = (float[1]){ 0 },
-                .w = (float[1 * 3]){ 0 },
-                .b = (float[1]){ 0 },
-                .dx = (float[3]){ 0 },
-                .dz = (float[1]){ 0 },
-                .dw = (float[1 * 3]){ 0 },
-                .db = (float[1]){ 0 },
+                .x = FLOAT_ZEROS(3),
+                .y = FLOAT_ZEROS(1),
+                .z = FLOAT_ZEROS(1),
+                .w = FLOAT_ZEROS(1 * 3),
+                .b = FLOAT_ZEROS(1),
+                .dx = FLOAT_ZEROS(3),
+                .dz = FLOAT_ZEROS(1),
+                .dw = FLOAT_ZEROS(1 * 3),
+                .db = FLOAT_ZEROS(1)
             }
         }
     };
 
-    init_random(net.layers[0].w, (3 * 2));
-    init_random(net.layers[0].b, 3);
-    init_random(net.layers[1].w, (1 * 3));
-    init_random(net.layers[1].b, 1);
+    net_init_random(&net);
 
     float x[] = {
         0.1, 0.1
