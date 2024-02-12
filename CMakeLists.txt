@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(TARGET_LIB_NAME scnn)
+set(TARGET_LIB_NAME nn)
 
 project(${TARGET_LIB_NAME} C)
 

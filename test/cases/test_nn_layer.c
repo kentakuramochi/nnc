@@ -1,23 +1,23 @@
 /**
- * @file test_scnn_layer.c
- * @brief Unit tests of scnn_layer.c
+ * @file test_nn_layer.c
+ * @brief Unit tests of nn_layer.c
  *
  */
-#include "scnn_layer.h"
+#include "nn_layer.h"
 
 #include <string.h>
 
 #include "unity.h"
 
 #include "activation.h"
-#include "scnn_blas.h"
+#include "blas.h"
 
-static scnn_layer_params params = {
+static NnLayerParams params = {
     .in = 3 * 28 * 28, .out = 100,
 };
 
-static scnn_layer *layer;
-static scnn_layer *layer_next;
+static NnLayer *layer;
+static NnLayer *layer_next;
 
 static float x[3 * 28 * 28];
 static float dy[100];
@@ -28,11 +28,11 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_allocate_and_free(void) {
-    layer = scnn_layer_alloc(params);
+    layer = nn_layer_alloc(params);
 
     TEST_ASSERT_NOT_NULL(layer);
 
@@ -49,22 +49,22 @@ void test_allocate_and_free(void) {
     TEST_ASSERT_NULL(layer->dw);
     TEST_ASSERT_NULL(layer->db);
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
     TEST_ASSERT_NULL(layer);
 }
 
 void test_free_pointer_to_NULL(void) {
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_free_NULL(void) {
-    scnn_layer_free(NULL);
+    nn_layer_free(NULL);
 }
 
 void test_init(void) {
-    layer = scnn_layer_alloc(params);
+    layer = nn_layer_alloc(params);
 
-    TEST_ASSERT_EQUAL_PTR(layer, scnn_layer_init(layer));
+    TEST_ASSERT_EQUAL_PTR(layer, nn_layer_init(layer));
     TEST_ASSERT_NOT_NULL(layer->x);
     TEST_ASSERT_NOT_NULL(layer->y);
     TEST_ASSERT_NOT_NULL(layer->z);
@@ -75,41 +75,41 @@ void test_init(void) {
     TEST_ASSERT_NOT_NULL(layer->dw);
     TEST_ASSERT_NOT_NULL(layer->db);
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_init_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(scnn_layer_init(NULL));
+    TEST_ASSERT_NULL(nn_layer_init(NULL));
 }
 
 void test_connect(void) {
-    layer = scnn_layer_alloc(
-        (scnn_layer_params){
+    layer = nn_layer_alloc(
+        (NnLayerParams){
             .in =  3 * 28 * 28, .out = 100,
         }
     );
-    layer_next = scnn_layer_alloc(
-        (scnn_layer_params){
+    layer_next = nn_layer_alloc(
+        (NnLayerParams){
             .out = 10,
         }
     );
 
-    scnn_layer_connect(layer, layer_next);
+    nn_layer_connect(layer, layer_next);
 
     TEST_ASSERT_EQUAL_INT(100, layer_next->in);
 
-    scnn_layer_free(&layer);
-    scnn_layer_free(&layer_next);
+    nn_layer_free(&layer);
+    nn_layer_free(&layer_next);
 }
 
 void test_forward(void) {
-    layer = scnn_layer_alloc(
-        (scnn_layer_params){
+    layer = nn_layer_alloc(
+        (NnLayerParams){
             .in=2, .out=3,
         }
     );
 
-    scnn_layer_init(layer);
+    nn_layer_init(layer);
 
     float w[] = {
         0, 1, 2,
@@ -134,32 +134,32 @@ void test_forward(void) {
         0.982014f, 0.997527f, 0.999665f
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(z, scnn_layer_forward(layer, _x), 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(z, nn_layer_forward(layer, _x), 3);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, layer->y, 3);
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_forward_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(scnn_layer_forward(NULL, x));
+    TEST_ASSERT_NULL(nn_layer_forward(NULL, x));
 }
 
 void test_forward_fail_if_x_is_NULL(void) {
-    layer = scnn_layer_alloc(params);
+    layer = nn_layer_alloc(params);
 
-    TEST_ASSERT_NULL(scnn_layer_forward(layer, NULL));
+    TEST_ASSERT_NULL(nn_layer_forward(layer, NULL));
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_backward(void) {
-    layer = scnn_layer_alloc(
-        (scnn_layer_params){
+    layer = nn_layer_alloc(
+        (NnLayerParams){
             .in = 2, .out = 3
         }
     );
 
-    scnn_layer_init(layer);
+    nn_layer_init(layer);
 
     float w[] = {
         0, 1, 2,
@@ -176,7 +176,7 @@ void test_backward(void) {
         1, 1
     };
 
-    scnn_layer_forward(layer, _x);
+    nn_layer_forward(layer, _x);
 
     float _dx[] = {
         0.003130589f, 0.01056396f
@@ -186,7 +186,7 @@ void test_backward(void) {
         -0.01798624f, 0.99752736f, 0.99966466f
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dx, scnn_layer_backward(layer, dt), 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(_dx, nn_layer_backward(layer, dt), 2);
 
     float _dw[] = {
         -0.0003176862f, 0.002460367f, 0.0003351109f,
@@ -205,25 +205,25 @@ void test_backward(void) {
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_db, layer->db, 3);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(dz, layer->dz, 3);
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_backward_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(scnn_layer_backward(NULL, dy));
+    TEST_ASSERT_NULL(nn_layer_backward(NULL, dy));
 }
 
 void test_backward_fail_if_dy_is_NULL(void) {
-    layer = scnn_layer_alloc(params);
+    layer = nn_layer_alloc(params);
 
-    TEST_ASSERT_NULL(scnn_layer_backward(layer, NULL));
+    TEST_ASSERT_NULL(nn_layer_backward(layer, NULL));
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }
 
 void test_update(void) {
-    layer = scnn_layer_alloc(params);
+    layer = nn_layer_alloc(params);
 
-    scnn_layer_init(layer);
+    nn_layer_init(layer);
 
     float w[] = {
         1, 1, 1,
@@ -247,7 +247,7 @@ void test_update(void) {
     };
     memcpy(layer->db, db, sizeof(db));
 
-    layer_update(layer, 0.01);
+    nn_layer_update(layer, 0.01);
 
     float _w[] = {
         0.99, 0.98, 0.97,
@@ -261,5 +261,5 @@ void test_update(void) {
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_w, layer->w, 2 * 3);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(_b, layer->b, 3);
 
-    scnn_layer_free(&layer);
+    nn_layer_free(&layer);
 }

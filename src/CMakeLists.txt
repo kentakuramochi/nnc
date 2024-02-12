@@ -1,12 +1,10 @@
-#file(GLOB SOURCES ./*.c)
 file(GLOB SOURCES
-    ./scnn_blas.c
-    ./scnn_mat.c
-    ./scnn_layer.c
-    ./scnn_fc.c
-    ./scnn_sigmoid.c
-    ./scnn_softmax.c
-    ./scnn_net.c
+    ./activation.c
+    ./blas.c
+    ./loss.c
+    ./nn_layer.c
+    ./nn_net.c
+    ./nn_trainer.c
 )
 
 add_library(${TARGET_LIB_NAME}

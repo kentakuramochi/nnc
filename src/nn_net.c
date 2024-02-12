@@ -1,35 +1,38 @@
 /**
- * @file scnn_net.c
+ * @file nn_net.c
  * @brief Network structure
  *
  */
-#include "scnn_net.h"
+#include "nn_net.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 
-int scnn_net_size(const scnn_net *net) {
+int nn_net_size(const NnNet *net) {
     return net->size;
 }
 
-int scnn_net_batch_size(const scnn_net *net) {
+int nn_net_batch_size(const NnNet *net) {
     return net->batch_size;
 }
 
-scnn_layer *scnn_net_layers(scnn_net *net) {
+NnLayer *nn_net_layers(NnNet *net) {
     return net->layers;
 }
 
-scnn_layer* scnn_net_input(const scnn_net *net) {
-    return net->input;
+NnLayer *nn_net_input(const NnNet *net) {
+    return &net->layers[0];
+}
+ 
+NnLayer *nn_net_output(const NnNet *net) {
+    if (net->size == 0) {
+        return NULL;
+    }
+    return &net->layers[net->size - 1];
 }
 
-scnn_layer* scnn_net_output(const scnn_net *net) {
-    return net->output;
-}
-
-scnn_net *scnn_net_alloc(void) {
-    scnn_net *net = malloc(sizeof(scnn_net));
+NnNet *nn_net_alloc(void) {
+    NnNet *net = malloc(sizeof(NnNet));
     if (net == NULL) {
         return NULL;
     }
@@ -37,19 +40,19 @@ scnn_net *scnn_net_alloc(void) {
     net->size = 0;
     net->batch_size = 1;
     net->layers = NULL;
-    net->input = NULL;
-    net->output = NULL;
+    // net->input = NULL;
+    // net->output = NULL;
 
     return net;
 }
 
-scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params) {
+NnNet *nn_net_append(NnNet *net, NnLayerParams params) {
     if (net == NULL) {
         return NULL;
     }
 
     // Reallocate and extend layers in the network
-    scnn_layer *realloc_layers = realloc(net->layers, sizeof(scnn_layer) * (net->size + 1));
+    NnLayer *realloc_layers = realloc(net->layers, sizeof(NnLayer) * (net->size + 1));
     if (realloc_layers == NULL) {
         return NULL;
     }
@@ -58,7 +61,7 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params) {
     realloc_layers = NULL;
 
     // Initialize new layer
-    scnn_layer *layer = &net->layers[net->size];
+    NnLayer *layer = &net->layers[net->size];
     layer->in = params.in;
     layer->out = params.out;
     layer->x = NULL;
@@ -73,24 +76,19 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params) {
 
     // Connect the layer
     for (int i = 1; i < net->size; i++) {
-        scnn_layer_connect(&net->layers[i - 1], &net->layers[i]);
+        nn_layer_connect(&net->layers[i - 1], &net->layers[i]);
     }
-
-    // Set the first layer as a network input
-    net->input = &net->layers[0];
-    // And the last layer as a network output
-    net->output = layer;
 
     return net;
 }
 
-scnn_net *scnn_net_init(scnn_net *net) {
+NnNet *nn_net_init(NnNet *net) {
     if ((net == NULL) || (net->size == 0)) {
         return NULL;
     }
 
     for (int i = 0; i < net->size; i++) {
-        if (scnn_layer_init(&net->layers[i]) == NULL) {
+        if (nn_layer_init(&net->layers[i]) == NULL) {
             return NULL;
         }
     }
@@ -98,7 +96,7 @@ scnn_net *scnn_net_init(scnn_net *net) {
     return net;
 }
 
-float *scnn_net_forward(scnn_net *net, const float *x) {
+float *nn_net_forward(NnNet *net, const float *x) {
     if ((net == NULL) || (x == NULL)) {
         return NULL;
     }
@@ -106,14 +104,14 @@ float *scnn_net_forward(scnn_net *net, const float *x) {
     float *in = (float*)x;
     float *out;
     for (int i = 0; i < net->size; i++) {
-        out = scnn_layer_forward(&net->layers[i], in);
+        out = nn_layer_forward(&net->layers[i], in);
         in = out;
     }
 
     return out;
 }
 
-float *scnn_net_backward(scnn_net *net, const float *dy) {
+float *nn_net_backward(NnNet *net, const float *dy) {
     if ((net == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -121,25 +119,25 @@ float *scnn_net_backward(scnn_net *net, const float *dy) {
     float *din = (float*)dy;
     float *dout;
     for (int i = (net->size - 1); i >= 0; i--) {
-        dout = scnn_layer_backward(&net->layers[i], din);
+        dout = nn_layer_backward(&net->layers[i], din);
         din = dout;
     }
 
     return dout;
 }
 
-void net_update(scnn_net *net, const float learning_rate) {
+void nn_net_update(NnNet *net, const float learning_rate) {
     for (int i = 0; i < net->size; i++) {
-        layer_update(&net->layers[i], learning_rate);
+        nn_layer_update(&net->layers[i], learning_rate);
     }
 }
 
-void scnn_net_free(scnn_net **net) {
+void nn_net_free(NnNet **net) {
     if ((net == NULL) || (*net == NULL)) {
         return;
     }
 
-    scnn_net *instance = *net;
+    NnNet *instance = *net;
 
     for (int i = 0; i < instance->size; i++) {
         free(instance->layers[i].x);

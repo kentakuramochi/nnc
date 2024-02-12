@@ -1,21 +1,21 @@
 /**
- * @file scnn_layer.h
+ * @file nn_layer.h
  * @brief Layer structure
  *
  */
-#ifndef SCNN_LAYER_H
-#define SCNN_LAYER_H
+#ifndef NN_LAYER_H
+#define NN_LAYER_H
 
 /**
  * @brief Layer parameters
  *
  */
-typedef struct scnn_layer_params {
+typedef struct NnLayerParams {
     int in; //!< Number of input elements
     int out; //!< Number of output elements
-} scnn_layer_params;
+} NnLayerParams;
 
-typedef struct scnn_layer {
+typedef struct NnLayer {
     int in; //!< Number of input elements
     int out; //!< Number of output elements
     float *x; //!< Input matrix
@@ -27,7 +27,7 @@ typedef struct scnn_layer {
     float *dz; //!< Difference of activation
     float *dw; //!< Difference of weight matrix
     float *db; //!< Difference of bias matrix
-} scnn_layer;
+} NnLayer;
 
 /**
  * @brief Allocate a layer
@@ -35,7 +35,7 @@ typedef struct scnn_layer {
  * @param[in] params Parameters for a layer
  * @return Pointer to layer, NULL if failed
  */
-scnn_layer *scnn_layer_alloc(const scnn_layer_params params);
+NnLayer *nn_layer_alloc(const NnLayerParams params);
 
 /**
  * @brief Initialze a layer
@@ -43,7 +43,7 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params);
  * @param[in,out] layer Layer
  * @return Pointer the the layer, NULL if failed
  */
-scnn_layer *scnn_layer_init(scnn_layer *layer);
+NnLayer *nn_layer_init(NnLayer *layer);
 
 /**
  * @brief Connect 2 layers
@@ -51,7 +51,7 @@ scnn_layer *scnn_layer_init(scnn_layer *layer);
  * @param[in,out] prev Previous layer, being connected from the next
  * @param[in,out] next Next layer, connect to the previous
  */
-void scnn_layer_connect(scnn_layer *prev, scnn_layer *next);
+void nn_layer_connect(NnLayer *prev, NnLayer *next);
 
 /**
  * @brief Forward propagation of a layer
@@ -60,7 +60,7 @@ void scnn_layer_connect(scnn_layer *prev, scnn_layer *next);
  * @param[in] x An input of the layer
  * @return Pointer to the layer output
  */
-float *scnn_layer_forward(scnn_layer *layer, const float *x);
+float *nn_layer_forward(NnLayer *layer, const float *x);
 
 /**
  * @brief Backward propagation of a layer
@@ -69,7 +69,7 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x);
  * @param[in] dy A differential of previous layer
  * @return Pointer to differential of an input of the layer
  */
-float *scnn_layer_backward(scnn_layer *layer, const float *dy);
+float *nn_layer_backward(NnLayer *layer, const float *dy);
 
 
 /**
@@ -78,13 +78,13 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy);
  * @param[in,out] layer Pointer to the layer
  * @param[in] learning_rate Learning rate
  */
-void layer_update(scnn_layer *layer, const float learning_rate);
+void nn_layer_update(NnLayer *layer, const float learning_rate);
 
 /**
  * @brief Free layer
  *
  * @param[in,out] layer Pointer to pointer of layer
  */
-void scnn_layer_free(scnn_layer **layer);
+void nn_layer_free(NnLayer **layer);
 
-#endif // SCNN_LAYER_H
+#endif // NN_LAYER_H

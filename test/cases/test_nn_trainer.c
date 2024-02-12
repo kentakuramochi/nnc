@@ -1,19 +1,19 @@
 /**
- * @file test_trainer.c
+ * @file test_nn_trainer.c
  * @brief Unit tests of trainer.c
  *
  */
-#include "trainer.h"
+#include "nn_trainer.h"
 
 #include <float.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "activation.h"
+#include "blas.h"
 #include "loss.h"
-#include "scnn_blas.h"
-#include "scnn_layer.h"
-#include "scnn_net.h"
+#include "nn_layer.h"
+#include "nn_net.h"
 
 #include "unity.h"
 
@@ -28,10 +28,10 @@ void init_random(float *x, const size_t size) {
 }
 
 void test_train_step(void) {
-    scnn_net net = {
+    NnNet net = {
         .size = 2,
         .batch_size = 1,
-        .layers = (scnn_layer[]){
+        .layers = (NnLayer[]){
             {
                 .in = 2,
                 .out = 3,
@@ -77,7 +77,7 @@ void test_train_step(void) {
     float loss = 0;
     float prev_loss = FLT_MAX;
     for (int i = 0; i < 10; i++) {
-        loss = train_step(&net, x, t, 0.1);
+        loss = nn_train_step(&net, x, t, 0.1);
 
         TEST_ASSERT_TRUE(prev_loss > loss);
 

@@ -1,20 +1,20 @@
 /**
- * @file scnn_blas.h
+ * @file blas.h
  * @brief Matrix operations for data array
  * @note Row-major order
  *
  */
-#ifndef SCNN_BLAS_H
-#define SCNN_BLAS_H
+#ifndef BLAS_H
+#define BLAS_H
 
 /**
  * @brief Flag for transpose of matrix
  *
  */
-typedef enum scnn_blas_transpose {
-    SCNN_BLAS_NO_TRANS, //!< No tranpose
-    SCNN_BLAS_TRANS //!< Transpose
-} scnn_blas_transpose;
+typedef enum BlasTranspose {
+    BLAS_NO_TRANS, //!< No tranpose
+    BLAS_TRANS //!< Transpose
+} BlasTranspose;
 
 /**
  * @brief Copy elements of vector x to vector y
@@ -25,7 +25,7 @@ typedef enum scnn_blas_transpose {
  * @param[in] y Pointer to vector x
  * @param[in] incy Stride between elements of y (!= 0, reversal order if negative)
  */
-void scnn_scopy(const int n, const float *x, const int incx, float *y, const int incy);
+void scopy(const int n, const float *x, const int incx, float *y, const int incy);
 
 /**
  * @brief Calculate dot product of 2 vectors (transpose of x) * y
@@ -38,7 +38,7 @@ void scnn_scopy(const int n, const float *x, const int incx, float *y, const int
  * @return Dot product (transpose x) * y
  * @retval 0, if failed
  */
-float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy);
+float sdot(const int n, const float *x, const int incx, const float *y, const int incy);
 
 /**
  * @brief Calculate the Euclidean (L2) norm of a vector ||x||
@@ -49,7 +49,7 @@ float scnn_sdot(const int n, const float *x, const int incx, const float *y, con
  * @return Euclidean (L2) norm ||x||
  * @retval 0, if failed
  */
-float scnn_snrm2(const int n, const float *x, const int incx);
+float snrm2(const int n, const float *x, const int incx);
 
 /**
  * @brief Add 2 vectors y = alpha * x + y
@@ -61,7 +61,7 @@ float scnn_snrm2(const int n, const float *x, const int incx);
  * @param[in,out] y Pointer to vector y
  * @param[in] incy Stride between elements of y (!= 0, reversal order if negative)
  */
-void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy);
+void saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy);
 
 /**
  * @brief Calculate matrix and vector multiplication y = alpha * Ax + beta * y
@@ -78,8 +78,8 @@ void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, 
  * @param[in,out] y Pointer to vector y
  * @param[in] incy Stride between elements of y (!= 0, reversal order if negative)
  */
-void scnn_sgemv(
-    const scnn_blas_transpose trans,
+void sgemv(
+    const BlasTranspose trans,
     const int M, const int N,
     const float alpha, const float *A, const int lda,
     const float *x, const int incx, const float beta, float *y, const int incy
@@ -102,12 +102,12 @@ void scnn_sgemv(
  * @param[in,out] C Pointer to MxN matrix C
  * @param[in] ldc Leading dimension of C (>= M)
  */
-void scnn_sgemm(
-    const scnn_blas_transpose transa, const scnn_blas_transpose transb,
+void sgemm(
+    const BlasTranspose transa, const BlasTranspose transb,
     const int M, const int N, const int K,
     const float alpha, const float *A, const int lda,
     const float *B, const int ldb,
     const float beta, float *C, const int ldc
 );
 
-#endif // SCNN_BLAS_H
+#endif // BLAS_H

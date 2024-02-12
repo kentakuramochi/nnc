@@ -1,18 +1,18 @@
 /**
- * @file scnn_layer.c
+ * @file nn_layer.c
  * @brief Layer structure
  *
  */
-#include "scnn_layer.h"
+#include "nn_layer.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 
 #include "activation.h"
-#include "scnn_blas.h"
+#include "blas.h"
 
-scnn_layer *scnn_layer_alloc(const scnn_layer_params params) {
-    scnn_layer *layer = malloc(sizeof(scnn_layer));
+NnLayer *nn_layer_alloc(const NnLayerParams params) {
+    NnLayer *layer = malloc(sizeof(NnLayer));
     if (layer == NULL) {
         return NULL;
     }
@@ -34,7 +34,7 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params) {
     return layer;
 }
 
-scnn_layer *scnn_layer_init(scnn_layer *layer) {
+NnLayer *nn_layer_init(NnLayer *layer) {
     if (layer == NULL) {
         return NULL;
     }
@@ -112,16 +112,16 @@ FREE_MATRICES:
     return NULL;
 }
 
-void scnn_layer_connect(scnn_layer *prev, scnn_layer *next) {
+void nn_layer_connect(NnLayer *prev, NnLayer *next) {
     next->in = prev->out;
 }
 
-float *scnn_layer_forward(scnn_layer *layer, const float *x) {
+float *nn_layer_forward(NnLayer *layer, const float *x) {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
     }
 
-    scnn_scopy(layer->in, x, 1, layer->x, 1);
+    scopy(layer->in, x, 1, layer->x, 1);
 
     const int m = 1; // Batch dimension
     const int n = layer->out;
@@ -129,14 +129,14 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x) {
 
     // y = b: Broadcast for batch dimension
     for (int i = 0; i < m; i++) {
-        scnn_scopy(
+        scopy(
             layer->out, layer->b, 1, &layer->y[i * layer->out], 1
         );
     }
 
     // y = x * W + b
-    scnn_sgemm(
-        SCNN_BLAS_NO_TRANS, SCNN_BLAS_NO_TRANS,
+    sgemm(
+        BLAS_NO_TRANS, BLAS_NO_TRANS,
         m, n, k,
         1.0, layer->x, k,
         layer->w, n,
@@ -149,7 +149,7 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x) {
     return layer->z;
 }
 
-float *scnn_layer_backward(scnn_layer *layer, const float *dy) {
+float *nn_layer_backward(NnLayer *layer, const float *dy) {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -169,8 +169,8 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy) {
     int k = layer->out;
 
     // dx = dy * WT
-    scnn_sgemm(
-        SCNN_BLAS_NO_TRANS, SCNN_BLAS_TRANS,
+    sgemm(
+        BLAS_NO_TRANS, BLAS_TRANS,
         m, n, k,
         1.0, layer->dz, k,
         layer->w, k,
@@ -187,8 +187,8 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy) {
     k = 1;
 
     // dW = xT * dy
-    scnn_sgemm(
-        SCNN_BLAS_TRANS, SCNN_BLAS_NO_TRANS,
+    sgemm(
+        BLAS_TRANS, BLAS_NO_TRANS,
         m, n, k,
         1.0, layer->x, m,
         layer->dz, n,
@@ -203,21 +203,21 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy) {
     // db = dy / (batch size):
     // Broadcast for batch dimension
     for (int i = 0; i < 1; i++) {
-        scnn_saxpy(layer->out, 1, &layer->dz[i * layer->out], 1, layer->db, 1);
+        saxpy(layer->out, 1, &layer->dz[i * layer->out], 1, layer->db, 1);
     }
 
     return layer->dx;
 }
 
-void layer_update(scnn_layer *layer, const float learning_rate) {
+void nn_layer_update(NnLayer *layer, const float learning_rate) {
     const int w_size = layer->in * layer->out;
 
-    scnn_saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
+    saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
 
-    scnn_saxpy(layer->out, -learning_rate, layer->db, 1, layer->b, 1);
+    saxpy(layer->out, -learning_rate, layer->db, 1, layer->b, 1);
 }
 
-void scnn_layer_free(scnn_layer **layer) {
+void nn_layer_free(NnLayer **layer) {
     if ((layer == NULL) || (*layer == NULL)) {
         return;
     }
