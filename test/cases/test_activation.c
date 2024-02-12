@@ -3,21 +3,15 @@
  * @brief Unite tests of activation.c
  *
  */
-
 #include "activation.h"
 
 #include "unity.h"
 
-void setUp(void)
-{
-}
+void setUp(void) {}
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
-void test_sigmoid(void)
-{
+void test_sigmoid(void) {
     float x[] = {
         -1, 0, 1
     };
@@ -33,8 +27,7 @@ void test_sigmoid(void)
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, y, 3);
 }
 
-void test_softmax(void)
-{
+void test_softmax(void) {
     float x[] = {
         -1, 1, 4
     };

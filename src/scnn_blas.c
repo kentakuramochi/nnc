@@ -1,15 +1,14 @@
 /**
  * @file scnn_blas.c
  * @brief Matrix operations for data array
- * 
+ *
  */
 #include <stddef.h>
 #include <math.h>
 
 #include "scnn_blas.h"
 
-void scnn_scopy(const int n, const float *x, const int incx, float *y, const int incy)
-{
+void scnn_scopy(const int n, const float *x, const int incx, float *y, const int incy) {
     if ((x == NULL) || (y == NULL)) {
         return;
     }
@@ -27,8 +26,7 @@ void scnn_scopy(const int n, const float *x, const int incx, float *y, const int
     }
 }
 
-float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy)
-{
+float scnn_sdot(const int n, const float *x, const int incx, const float *y, const int incy) {
     if ((x == NULL) || (y == NULL)) {
         return 0;
     }
@@ -55,8 +53,7 @@ float scnn_sdot(const int n, const float *x, const int incx, const float *y, con
     return dot;
 }
 
-float scnn_snrm2(const int n, const float *x, const int incx)
-{
+float scnn_snrm2(const int n, const float *x, const int incx) {
     if (x == NULL) {
         return 0;
     }
@@ -81,8 +78,7 @@ float scnn_snrm2(const int n, const float *x, const int incx)
     return sqrtf(nrm2);
 }
 
-void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy)
-{
+void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, float *y, const int incy) {
     if ((x == NULL) || (y == NULL)) {
         return;
     }
@@ -106,12 +102,12 @@ void scnn_saxpy(const int n, const float alpha, const float *x, const int incx, 
     }
 }
 
-void scnn_sgemv(const scnn_blas_transpose trans,
+void scnn_sgemv(
+    const scnn_blas_transpose trans,
     const int M, const int N,
     const float alpha, const float *A, const int lda,
     const float *x, const int incx,
-    const float beta, float *y, const int incy)
-{
+    const float beta, float *y, const int incy) {
     if ((A == NULL) || (x == NULL) || (y == NULL)) {
         return;
     }
@@ -154,12 +150,12 @@ void scnn_sgemv(const scnn_blas_transpose trans,
     }
 }
 
-void scnn_sgemm(const scnn_blas_transpose transa, const scnn_blas_transpose transb,
+void scnn_sgemm(
+    const scnn_blas_transpose transa, const scnn_blas_transpose transb,
     const int M, const int N, const int K,
     const float alpha, const float *A, const int lda,
     const float *B, const int ldb,
-    const float beta, float *C, const int ldc)
-{
+    const float beta, float *C, const int ldc) {
     if ((A == NULL) || (B == NULL) || (C == NULL)) {
         return;
     }

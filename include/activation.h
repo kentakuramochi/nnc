@@ -10,21 +10,21 @@
 
 /**
  * @brief Sigmoid function
- * 
- * @param x[in]     Input array
- * @param y[out]    Output array
- * @param size[in]  Number of input elements
- * @return float*   Sigmoid
+ *
+ * @param[in] x Input array
+ * @param[out] y Output array
+ * @param[in] size Number of input elements
+ * @return float* Sigmoid
  */
 float *sigmoid(const float *x, float *y, const size_t size);
 
 /**
  * @brief Softmax function
- * 
- * @param x[in]     Input array
- * @param y[out]    Output array
- * @param size[in]  Number of input elements
- * @return float*   Softmax
+ *
+ * @param[in] x Input array
+ * @param[out] y Output array
+ * @param[in] size Number of input elements
+ * @return float* Softmax
  */
 float *softmax(const float *x, float *y, const size_t size);
 

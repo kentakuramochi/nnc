@@ -1,7 +1,7 @@
 /**
  * @file test_scnn_layer.c
  * @brief Unit tests of scnn_layer.c
- * 
+ *
  */
 #include "scnn_layer.h"
 
@@ -22,19 +22,16 @@ static scnn_layer *layer_next;
 static float x[3 * 28 * 28];
 static float dy[100];
 
-void setUp(void)
-{
+void setUp(void) {
     layer = NULL;
     layer_next = NULL;
 }
 
-void tearDown(void)
-{
+void tearDown(void) {
     scnn_layer_free(&layer);
 }
 
-void test_allocate_and_free(void)
-{
+void test_allocate_and_free(void) {
     layer = scnn_layer_alloc(params);
 
     TEST_ASSERT_NOT_NULL(layer);
@@ -56,18 +53,15 @@ void test_allocate_and_free(void)
     TEST_ASSERT_NULL(layer);
 }
 
-void test_free_pointer_to_NULL(void)
-{
+void test_free_pointer_to_NULL(void) {
     scnn_layer_free(&layer);
 }
 
-void test_free_NULL(void)
-{
+void test_free_NULL(void) {
     scnn_layer_free(NULL);
 }
 
-void test_init(void)
-{
+void test_init(void) {
     layer = scnn_layer_alloc(params);
 
     TEST_ASSERT_EQUAL_PTR(layer, scnn_layer_init(layer));
@@ -84,13 +78,11 @@ void test_init(void)
     scnn_layer_free(&layer);
 }
 
-void test_init_fail_if_layer_is_NULL(void)
-{
+void test_init_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_layer_init(NULL));
 }
 
-void test_connect(void)
-{
+void test_connect(void) {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
             .in =  3 * 28 * 28, .out = 100,
@@ -110,8 +102,7 @@ void test_connect(void)
     scnn_layer_free(&layer_next);
 }
 
-void test_forward(void)
-{
+void test_forward(void) {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
             .in=2, .out=3,
@@ -149,13 +140,11 @@ void test_forward(void)
     scnn_layer_free(&layer);
 }
 
-void test_forward_fail_if_layer_is_NULL(void)
-{
+void test_forward_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_layer_forward(NULL, x));
 }
 
-void test_forward_fail_if_x_is_NULL(void)
-{
+void test_forward_fail_if_x_is_NULL(void) {
     layer = scnn_layer_alloc(params);
 
     TEST_ASSERT_NULL(scnn_layer_forward(layer, NULL));
@@ -163,8 +152,7 @@ void test_forward_fail_if_x_is_NULL(void)
     scnn_layer_free(&layer);
 }
 
-void test_backward(void)
-{
+void test_backward(void) {
     layer = scnn_layer_alloc(
         (scnn_layer_params){
             .in = 2, .out = 3
@@ -220,13 +208,11 @@ void test_backward(void)
     scnn_layer_free(&layer);
 }
 
-void test_backward_fail_if_layer_is_NULL(void)
-{
+void test_backward_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_layer_backward(NULL, dy));
 }
 
-void test_backward_fail_if_dy_is_NULL(void)
-{
+void test_backward_fail_if_dy_is_NULL(void) {
     layer = scnn_layer_alloc(params);
 
     TEST_ASSERT_NULL(scnn_layer_backward(layer, NULL));
@@ -234,8 +220,7 @@ void test_backward_fail_if_dy_is_NULL(void)
     scnn_layer_free(&layer);
 }
 
-void test_update(void)
-{
+void test_update(void) {
     layer = scnn_layer_alloc(params);
 
     scnn_layer_init(layer);

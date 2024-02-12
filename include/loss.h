@@ -3,7 +3,6 @@
  * @brief Loss function
  *
  */
-
 #ifndef LOSS_H
 #define LOSS_H
 
@@ -14,7 +13,7 @@
  *
  * @param[in] y Predicted data
  * @param[in] t Expected data
- * @param size Size of data
+ * @param[in] size Size of data
  * @return float MSE loss
  */
 float mse_loss(const float *y, const float *t, const size_t size);

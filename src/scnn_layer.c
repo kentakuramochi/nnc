@@ -1,7 +1,7 @@
 /**
  * @file scnn_layer.c
  * @brief Layer structure
- * 
+ *
  */
 #include "scnn_layer.h"
 
@@ -11,8 +11,7 @@
 #include "activation.h"
 #include "scnn_blas.h"
 
-scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
-{
+scnn_layer *scnn_layer_alloc(const scnn_layer_params params) {
     scnn_layer *layer = malloc(sizeof(scnn_layer));
     if (layer == NULL) {
         return NULL;
@@ -35,8 +34,7 @@ scnn_layer *scnn_layer_alloc(const scnn_layer_params params)
     return layer;
 }
 
-scnn_layer *scnn_layer_init(scnn_layer* layer)
-{
+scnn_layer *scnn_layer_init(scnn_layer *layer) {
     if (layer == NULL) {
         return NULL;
     }
@@ -114,13 +112,11 @@ FREE_MATRICES:
     return NULL;
 }
 
-void scnn_layer_connect(scnn_layer* prev, scnn_layer* next)
-{
+void scnn_layer_connect(scnn_layer *prev, scnn_layer *next) {
     next->in = prev->out;
 }
 
-float *scnn_layer_forward(scnn_layer *layer, const float *x)
-{
+float *scnn_layer_forward(scnn_layer *layer, const float *x) {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
     }
@@ -153,8 +149,7 @@ float *scnn_layer_forward(scnn_layer *layer, const float *x)
     return layer->z;
 }
 
-float *scnn_layer_backward(scnn_layer *layer, const float *dy)
-{
+float *scnn_layer_backward(scnn_layer *layer, const float *dy) {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -214,8 +209,7 @@ float *scnn_layer_backward(scnn_layer *layer, const float *dy)
     return layer->dx;
 }
 
-void layer_update(scnn_layer *layer, const float learning_rate)
-{
+void layer_update(scnn_layer *layer, const float learning_rate) {
     const int w_size = layer->in * layer->out;
 
     scnn_saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
@@ -223,8 +217,7 @@ void layer_update(scnn_layer *layer, const float learning_rate)
     scnn_saxpy(layer->out, -learning_rate, layer->db, 1, layer->b, 1);
 }
 
-void scnn_layer_free(scnn_layer **layer)
-{
+void scnn_layer_free(scnn_layer **layer) {
     if ((layer == NULL) || (*layer == NULL)) {
         return;
     }

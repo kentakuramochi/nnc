@@ -3,7 +3,6 @@
  * @brief Unit tests of trainer.c
  *
  */
-
 #include "trainer.h"
 
 #include <float.h>
@@ -18,23 +17,17 @@
 
 #include "unity.h"
 
-void setUp(void)
-{
-}
+void setUp(void) {}
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
-void init_random(float *x, const size_t size)
-{
+void init_random(float *x, const size_t size) {
     for (size_t i = 0; i < size; i++) {
         x[i] = (float)rand() / RAND_MAX - 0.5f;
     }
 }
 
-void test_train_step(void)
-{
+void test_train_step(void) {
     scnn_net net = {
         .size = 2,
         .batch_size = 1,

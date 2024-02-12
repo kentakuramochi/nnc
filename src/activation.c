@@ -3,14 +3,12 @@
  * @brief Activation function
  *
  */
-
 #include "activation.h"
 
 #include <float.h>
 #include <math.h>
 
-float *sigmoid(const float *x, float *y, const size_t size)
-{
+float *sigmoid(const float *x, float *y, const size_t size) {
     for (int i = 0; i < size; i++) {
         y[i] = 1.0 / (1 + expf(-x[i]));
     }
@@ -18,8 +16,7 @@ float *sigmoid(const float *x, float *y, const size_t size)
     return y;
 }
 
-float *softmax(const float *x, float *y, const size_t size)
-{
+float *softmax(const float *x, float *y, const size_t size) {
     float max = -FLT_MAX;
     for (int i = 0; i < size; i++) {
         if (x[i] > max) {

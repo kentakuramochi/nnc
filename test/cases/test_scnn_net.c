@@ -1,7 +1,7 @@
 /**
  * @file test_scnn_net.c
  * @brief Unit tests of scnn_net.c
- * 
+ *
  */
 #include "scnn_net.h"
 
@@ -27,16 +27,13 @@ float dummy_dx1[100];
 float dummy_dx2[10];
 float dummy_dy[2];
 
-void setUp(void)
-{
+void setUp(void) {
     net = NULL;
 }
 
-void tearDown(void)
-{}
+void tearDown(void) {}
 
-void test_allocate_and_free(void)
-{
+void test_allocate_and_free(void) {
     net = scnn_net_alloc();
 
     TEST_ASSERT_NOT_NULL(net);
@@ -54,18 +51,15 @@ void test_allocate_and_free(void)
     TEST_ASSERT_NULL(net);
 }
 
-void test_free_pointer_to_NULL(void)
-{
+void test_free_pointer_to_NULL(void) {
     scnn_net_free(&net);
 }
 
-void test_free_NULL(void)
-{
+void test_free_NULL(void) {
     scnn_net_free(NULL);
 }
 
-void test_append_layer(void)
-{
+void test_append_layer(void) {
     net = scnn_net_alloc();
 
     TEST_ASSERT_EQUAL_PTR(net, scnn_net_append(net, dummy_layer_params[0]));
@@ -84,8 +78,7 @@ void test_append_layer(void)
     TEST_ASSERT_NULL(net);
 }
 
-void test_append_3layers(void)
-{
+void test_append_3layers(void) {
     net = scnn_net_alloc();
 
     for (int i = 0; i < 3; i++) {
@@ -107,13 +100,11 @@ void test_append_3layers(void)
     TEST_ASSERT_NULL(net);
 }
 
-void test_append_fail_if_net_is_NULL(void)
-{
+void test_append_fail_if_net_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_net_append(NULL, dummy_layer_params[0]));
 }
 
-void test_init(void)
-{
+void test_init(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -125,8 +116,7 @@ void test_init(void)
     scnn_net_free(&net);
 }
 
-void test_init_3layers(void)
-{
+void test_init_3layers(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -142,13 +132,11 @@ void test_init_3layers(void)
     scnn_net_free(&net);
 }
 
-void test_init_fail_if_net_is_NULL(void)
-{
+void test_init_fail_if_net_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_net_init(NULL));
 }
 
-void test_init_fail_if_net_size_is_0(void)
-{
+void test_init_fail_if_net_size_is_0(void) {
     net = scnn_net_alloc();
 
     TEST_ASSERT_NULL(scnn_net_init(net));
@@ -156,8 +144,7 @@ void test_init_fail_if_net_size_is_0(void)
     scnn_net_free(&net);
 }
 
-void test_init_fail_if_layer_init_fail(void)
-{
+void test_init_fail_if_layer_init_fail(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -172,8 +159,7 @@ void test_init_fail_if_layer_init_fail(void)
     scnn_net_free(&net);
 }
 
-void test_forward_1layer(void)
-{
+void test_forward_1layer(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -188,8 +174,7 @@ void test_forward_1layer(void)
     scnn_net_free(&net);
 }
 
-void test_forward_3layer(void)
-{
+void test_forward_3layer(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -210,13 +195,11 @@ void test_forward_3layer(void)
     scnn_net_free(&net);
 }
 
-void test_forward_fail_if_net_is_NULL(void)
-{
+void test_forward_fail_if_net_is_NULL(void) {
     TEST_ASSERT_NULL(scnn_net_forward(NULL, dummy_x));
 }
 
-void test_forward_fail_if_x_is_NULL(void)
-{
+void test_forward_fail_if_x_is_NULL(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -230,8 +213,7 @@ void test_forward_fail_if_x_is_NULL(void)
     scnn_net_free(&net);
 }
 
-void test_backward_1layer(void)
-{
+void test_backward_1layer(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -243,8 +225,7 @@ void test_backward_1layer(void)
     scnn_net_free(&net);
 }
 
-void test_backward_3layer(void)
-{
+void test_backward_3layer(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -260,8 +241,7 @@ void test_backward_3layer(void)
     scnn_net_free(&net);
 }
 
-void test_backward_fail_if_net_is_NULL(void)
-{
+void test_backward_fail_if_net_is_NULL(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -272,8 +252,7 @@ void test_backward_fail_if_net_is_NULL(void)
     scnn_net_free(&net);
 }
 
-void test_backward_fail_if_dy_is_NULL(void)
-{
+void test_backward_fail_if_dy_is_NULL(void) {
     net = scnn_net_alloc();
 
     scnn_layer_connect_Ignore();
@@ -284,8 +263,7 @@ void test_backward_fail_if_dy_is_NULL(void)
     scnn_net_free(&net);
 }
 
-void test_update(void)
-{
+void test_update(void) {
     net = scnn_net_alloc();
     scnn_layer_connect_Ignore();
     scnn_net_append(net, dummy_layer_params[0]);

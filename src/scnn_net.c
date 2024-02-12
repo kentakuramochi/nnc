@@ -1,40 +1,34 @@
 /**
  * @file scnn_net.c
  * @brief Network structure
- * 
+ *
  */
 #include "scnn_net.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 
-int scnn_net_size(const scnn_net *net)
-{
+int scnn_net_size(const scnn_net *net) {
     return net->size;
 }
 
-int scnn_net_batch_size(const scnn_net *net)
-{
+int scnn_net_batch_size(const scnn_net *net) {
     return net->batch_size;
 }
 
-scnn_layer *scnn_net_layers(scnn_net *net)
-{
+scnn_layer *scnn_net_layers(scnn_net *net) {
     return net->layers;
 }
 
-scnn_layer* scnn_net_input(const scnn_net *net)
-{
+scnn_layer* scnn_net_input(const scnn_net *net) {
     return net->input;
 }
 
-scnn_layer* scnn_net_output(const scnn_net *net)
-{
+scnn_layer* scnn_net_output(const scnn_net *net) {
     return net->output;
 }
 
-scnn_net *scnn_net_alloc(void)
-{
+scnn_net *scnn_net_alloc(void) {
     scnn_net *net = malloc(sizeof(scnn_net));
     if (net == NULL) {
         return NULL;
@@ -49,8 +43,7 @@ scnn_net *scnn_net_alloc(void)
     return net;
 }
 
-scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
-{
+scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params) {
     if (net == NULL) {
         return NULL;
     }
@@ -91,8 +84,7 @@ scnn_net *scnn_net_append(scnn_net *net, scnn_layer_params params)
     return net;
 }
 
-scnn_net *scnn_net_init(scnn_net *net)
-{
+scnn_net *scnn_net_init(scnn_net *net) {
     if ((net == NULL) || (net->size == 0)) {
         return NULL;
     }
@@ -106,8 +98,7 @@ scnn_net *scnn_net_init(scnn_net *net)
     return net;
 }
 
-float *scnn_net_forward(scnn_net *net, const float *x)
-{
+float *scnn_net_forward(scnn_net *net, const float *x) {
     if ((net == NULL) || (x == NULL)) {
         return NULL;
     }
@@ -122,8 +113,7 @@ float *scnn_net_forward(scnn_net *net, const float *x)
     return out;
 }
 
-float *scnn_net_backward(scnn_net *net, const float *dy)
-{
+float *scnn_net_backward(scnn_net *net, const float *dy) {
     if ((net == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -138,15 +128,13 @@ float *scnn_net_backward(scnn_net *net, const float *dy)
     return dout;
 }
 
-void net_update(scnn_net *net, const float learning_rate)
-{
+void net_update(scnn_net *net, const float learning_rate) {
     for (int i = 0; i < net->size; i++) {
         layer_update(&net->layers[i], learning_rate);
     }
 }
 
-void scnn_net_free(scnn_net **net)
-{
+void scnn_net_free(scnn_net **net) {
     if ((net == NULL) || (*net == NULL)) {
         return;
     }
