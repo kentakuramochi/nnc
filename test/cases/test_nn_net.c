@@ -12,7 +12,7 @@
 NnNet *net;
 
 NnLayerParams dummy_layer_params[] = {
-    { .in = 3 * 28 * 28, .out = 100 },
+    { .batch_size = 1, .in = 3 * 28 * 28, .out = 100 },
     { .out = 10 },
     { .out = 2 }
 };

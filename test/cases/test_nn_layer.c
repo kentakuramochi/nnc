@@ -17,13 +17,14 @@ void tearDown(void) {}
 
 void test_allocate_and_free(void) {
     NnLayerParams params = {
-        .in = 3 * 28 * 28, .out = 100,
+        .batch_size = 2, .in = 3 * 28 * 28, .out = 100,
     };
 
     NnLayer *layer = nn_layer_alloc(params);
 
     TEST_ASSERT_NOT_NULL(layer);
 
+    TEST_ASSERT_EQUAL_INT(params.batch_size, layer->batch_size);
     TEST_ASSERT_EQUAL_INT(params.in, layer->in);
     TEST_ASSERT_EQUAL(params.out, layer->out);
 
@@ -52,7 +53,7 @@ void test_free_NULL(void) {
 
 void test_init(void) {
     NnLayerParams params = {
-        .in = 2, .out = 3
+        .batch_size = 1, .in = 2, .out = 3
     };
 
     NnLayer *layer = nn_layer_alloc(params);
@@ -77,8 +78,7 @@ void test_init_fail_if_layer_is_NULL(void) {
 
 void test_connect(void) {
     NnLayer layer = {
-        .in = 2,
-        .out = 10,
+        .batch_size = 2, .in = 2, .out = 10,
     };
 
     NnLayer next_layer = {
@@ -87,11 +87,13 @@ void test_connect(void) {
 
     nn_layer_connect(&layer, &next_layer);
 
+    TEST_ASSERT_EQUAL_INT(2, next_layer.batch_size);
     TEST_ASSERT_EQUAL_INT(10, next_layer.in);
 }
 
 void test_forward(void) {
     NnLayer layer = {
+        .batch_size = 1,
         .in = 2,
         .out = 3,
         .x = FLOAT_ZEROS(2),
@@ -132,12 +134,68 @@ void test_forward(void) {
     );
 }
 
+void test_forward_batch(void) {
+    NnLayer layer = {
+        .batch_size = 2,
+        .in = 2,
+        .out = 3,
+        .x = FLOAT_ZEROS(2 * 2),
+        .y = FLOAT_ZEROS(2 * 3),
+        .z = FLOAT_ZEROS(2 * 3),
+        .w = FLOAT_ZEROS(3 * 2),
+        .b = FLOAT_ZEROS(3),
+        .dx = FLOAT_ZEROS(2 * 2),
+        .dz = FLOAT_ZEROS(2 * 3),
+        .dw = FLOAT_ZEROS(3 * 2),
+        .db = FLOAT_ZEROS(3)
+    };
+
+    COPY_ARRAY(
+        layer.w,
+        FLOAT_ARRAY(
+            0, 1,
+            2, 3,
+            4, 5
+        )
+    );
+
+    COPY_ARRAY(
+        layer.b,
+        FLOAT_ARRAY(1, 1, 1)
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(
+            0.982014f, 0.997527f, 0.999665f,
+            0.982014f, 0.997527f, 0.999665f
+        ),
+        nn_layer_forward(
+            &layer,
+            FLOAT_ARRAY(
+                1, 1,
+                1, 1
+            )
+        ),
+        (2 * 3)
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(
+            4, 6, 8,
+            4, 6, 8
+        ),
+        layer.y,
+        (2 * 3)
+    );
+}
+
 void test_forward_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(nn_layer_forward(NULL, FLOAT_ZEROS(1)));
 }
 
 void test_forward_fail_if_x_is_NULL(void) {
     NnLayer layer = {
+        .batch_size = 1,
         .in = 2,
         .out = 3,
         .x = FLOAT_ZEROS(2),
@@ -156,6 +214,7 @@ void test_forward_fail_if_x_is_NULL(void) {
 
 void test_backward(void) {
     NnLayer layer = {
+        .batch_size = 1,
         .in = 2,
         .out = 3,
         .x = FLOAT_ZEROS(2),
@@ -222,6 +281,7 @@ void test_backward_fail_if_layer_is_NULL(void) {
 
 void test_backward_fail_if_dy_is_NULL(void) {
     NnLayer layer = {
+        .batch_size = 1,
         .in = 2,
         .out = 3,
         .x = FLOAT_ZEROS(2),

@@ -42,6 +42,7 @@ void test_train_step(void) {
         .batch_size = 1,
         .layers = (NnLayer[]){
             {
+                .batch_size = 1,
                 .in = 2,
                 .out = 3,
                 .x = FLOAT_ZEROS(2),
@@ -55,6 +56,7 @@ void test_train_step(void) {
                 .db = FLOAT_ZEROS(3)
             },
             {
+                .batch_size = 1,
                 .in = 3,
                 .out = 1,
                 .x = FLOAT_ZEROS(3),

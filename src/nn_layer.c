@@ -17,6 +17,7 @@ NnLayer *nn_layer_alloc(const NnLayerParams params) {
         return NULL;
     }
 
+    layer->batch_size = params.batch_size;
     layer->in = params.in;
     layer->out = params.out;
 
@@ -40,13 +41,13 @@ NnLayer *nn_layer_init(NnLayer *layer) {
     }
 
     size_t x_size = sizeof(float) * layer->in;
-    layer->x = malloc(x_size);
+    layer->x = malloc(layer->batch_size * x_size);
     if (layer->x == NULL) {
         return NULL;
     }
 
     size_t y_size = sizeof(float) * layer->out;
-    layer->y = malloc(y_size);
+    layer->y = malloc(layer->batch_size * y_size);
     if (layer->y == NULL) {
         goto FREE_MATRICES;
     }
@@ -67,12 +68,12 @@ NnLayer *nn_layer_init(NnLayer *layer) {
         goto FREE_MATRICES;
     }
 
-    layer->dx = malloc(x_size);
+    layer->dx = malloc(layer->batch_size * x_size);
     if (layer->dx == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->dz = malloc(y_size);
+    layer->dz = malloc(layer->batch_size * y_size);
     if (layer->dz == NULL) {
         goto FREE_MATRICES;
     }
@@ -113,6 +114,7 @@ FREE_MATRICES:
 }
 
 void nn_layer_connect(NnLayer *prev, NnLayer *next) {
+    next->batch_size = prev->batch_size;
     next->in = prev->out;
 }
 
@@ -121,11 +123,15 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
         return NULL;
     }
 
-    scopy(layer->in, x, 1, layer->x, 1);
-
-    const int m = 1; // Batch dimension
+    const int m = layer->batch_size; // Batch dimension
     const int n = layer->out;
     const int k = layer->in;
+
+    for (int i = 0; i < m; i++) {
+        scopy(
+            layer->in, x, 1, &layer->x[i * layer->in], 1
+        );
+    }
 
     // y = b: Broadcast for batch dimension
     for (int i = 0; i < m; i++) {
@@ -144,7 +150,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     );
 
     // Activation
-    sigmoid(layer->y, layer->z, layer->out);
+    sigmoid(layer->y, layer->z, (layer->batch_size * layer->out));
 
     return layer->z;
 }
