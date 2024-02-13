@@ -160,19 +160,19 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
         return NULL;
     }
 
+    int m = layer->batch_size; // Batch dimension
+    int n = layer->in;
+    int k = layer->out;
+
     // dz = dy * z * (1 - z)
-    for (int i = 0; i < layer->out; i++) {
+    for (int i = 0; i < (m * layer->out); i++) {
         layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
     }
 
     // dx = 0
-    for (int i = 0; i < layer->in; i++) {
+    for (int i = 0; i < (m * layer->in); i++) {
         layer->dx[i] = 0;
     }
-
-    int m = 1; // Batch dimension
-    int n = layer->in;
-    int k = layer->out;
 
     // dx = dy * WT
     sgemm(
@@ -188,17 +188,13 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
         layer->dw[i] = 0;
     }
 
-    m = layer->in;
-    n = layer->out;
-    k = 1;
-
     // dW = xT * dy
     sgemm(
         BLAS_TRANS, BLAS_NO_TRANS,
-        m, n, k,
-        1.0, layer->x, m,
-        layer->dz, n,
-        1.0, layer->dw, n
+        n, k, m,
+        1.0, layer->x, n,
+        layer->dz, k,
+        1.0, layer->dw, k
     );
 
     // db = 0
@@ -206,10 +202,12 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
         layer->db[i] = 0;
     }
 
-    // db = dy / (batch size):
-    // Broadcast for batch dimension
-    for (int i = 0; i < 1; i++) {
-        saxpy(layer->out, 1, &layer->dz[i * layer->out], 1, layer->db, 1);
+    // db = sum(dy) for batch
+    for (int i = 0; i < layer->batch_size; i++) {
+        saxpy(
+            layer->out, 1, &layer->dz[i * layer->out], 1,
+            layer->db, 1
+        );
     }
 
     return layer->dx;

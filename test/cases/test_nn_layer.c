@@ -275,6 +275,84 @@ void test_backward(void) {
     );
 }
 
+void test_backward_batch(void) {
+    NnLayer layer = {
+        .batch_size = 2,
+        .in = 2,
+        .out = 3,
+        .x = FLOAT_ZEROS(2 * 2),
+        .y = FLOAT_ZEROS(2 * 3),
+        .z = FLOAT_ZEROS(2 * 3),
+        .w = FLOAT_ZEROS(3 * 2),
+        .b = FLOAT_ZEROS(3),
+        .dx = FLOAT_ZEROS(2 * 2),
+        .dz = FLOAT_ZEROS(2 * 3),
+        .dw = FLOAT_ZEROS(3 * 2),
+        .db = FLOAT_ZEROS(3)
+    };
+
+    COPY_ARRAY(
+        layer.w,
+        FLOAT_ARRAY(
+            0, 1,
+            2, 3,
+            4, 5
+        )
+    );
+
+    COPY_ARRAY(
+        layer.b,
+        FLOAT_ARRAY(1, 1, 1)
+    );
+
+    nn_layer_forward(
+        &layer,
+        FLOAT_ARRAY(
+            1, 1,
+            1, 1
+        )
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(
+            0.003130589f, 0.01056396f,
+            0.003130589f, 0.01056396f
+        ),
+        nn_layer_backward(
+            &layer,
+            FLOAT_ARRAY(
+                -0.01798624f, 0.99752736f, 0.99966466f,
+                -0.01798624f, 0.99752736f, 0.99966466f
+            )
+        ),
+        (2 * 2)
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(
+            -0.000635372f, 0.00492073f, 0.000670222f,
+            -0.000635372f, 0.00492073f, 0.000670222f
+        ),
+        layer.dw,
+        (3 * 2)
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(-0.000635372f, 0.00492073f, 0.000670222f),
+        layer.db,
+        3
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ARRAY(
+            -0.0003176862f, 0.002460367f, 0.0003351109f,
+            -0.0003176862f, 0.002460367f, 0.0003351109f
+        ),
+        layer.dz,
+        (2 * 3)
+    );
+}
+
 void test_backward_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(nn_layer_backward(NULL, FLOAT_ZEROS(1)));
 }
