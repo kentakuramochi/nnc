@@ -18,4 +18,14 @@
  */
 float mse_loss(const float *y, const float *t, const size_t size);
 
+/**
+ * @brief Calculate the squared error (SE)
+ *
+ * @param[in] y Predicted data
+ * @param[in] t Expected data
+ * @param[in] size Size of data
+ * @return float SE loss
+ */
+float se_loss(const float *y, const float *t, const size_t size);
+
 #endif // LOSS_H
