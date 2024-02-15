@@ -35,8 +35,6 @@ NnNet *nn_net_alloc(void) {
 
     net->size = 0;
     net->layers = NULL;
-    // net->input = NULL;
-    // net->output = NULL;
 
     return net;
 }

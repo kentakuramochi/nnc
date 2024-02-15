@@ -15,8 +15,6 @@
 typedef struct NnNet {
     int size; //!< The number of layers
     NnLayer *layers; //!< Layers
-    // NnLayer *input; //!< Input layer off the network
-    // NnLayer *output; //!< Output layer off the network
 } NnNet;
 
 /**
@@ -107,4 +105,4 @@ void nn_net_update(NnNet *net, const float learning_rate);
  */
 void nn_net_free(NnNet **net);
 
-#endif // nn_net_H
+#endif // NN_NET_H
