@@ -12,10 +12,6 @@ int nn_net_size(const NnNet *net) {
     return net->size;
 }
 
-int nn_net_batch_size(const NnNet *net) {
-    return net->batch_size;
-}
-
 NnLayer *nn_net_layers(NnNet *net) {
     return net->layers;
 }
@@ -38,7 +34,6 @@ NnNet *nn_net_alloc(void) {
     }
 
     net->size = 0;
-    net->batch_size = 1;
     net->layers = NULL;
     // net->input = NULL;
     // net->output = NULL;
@@ -62,6 +57,7 @@ NnNet *nn_net_append(NnNet *net, NnLayerParams params) {
 
     // Initialize new layer
     NnLayer *layer = &net->layers[net->size];
+    layer->batch_size = params.batch_size;
     layer->in = params.in;
     layer->out = params.out;
     layer->x = NULL;

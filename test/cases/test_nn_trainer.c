@@ -39,7 +39,6 @@ static void net_init_random(NnNet *net) {
 void test_train_step(void) {
     NnNet net = {
         .size = 2,
-        .batch_size = 1,
         .layers = (NnLayer[]){
             {
                 .batch_size = 1,

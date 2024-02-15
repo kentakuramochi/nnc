@@ -14,7 +14,6 @@
  */
 typedef struct NnNet {
     int size; //!< The number of layers
-    int batch_size; //!< Batch size
     NnLayer *layers; //!< Layers
     // NnLayer *input; //!< Input layer off the network
     // NnLayer *output; //!< Output layer off the network
@@ -27,14 +26,6 @@ typedef struct NnNet {
  * @return The number of layers in the network
  */
 int nn_net_size(const NnNet *net);
-
-/**
- * @brief Get batch size of a network
- *
- * @param[in] net Network
- * @return Batch size of the network
- */
-int nn_net_batch_size(const NnNet *net);
 
 /**
  * @brief Get layers in the network

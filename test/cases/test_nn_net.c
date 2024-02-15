@@ -40,8 +40,6 @@ void test_allocate_and_free(void) {
 
     TEST_ASSERT_EQUAL_INT(0, nn_net_size(net));
 
-    TEST_ASSERT_EQUAL_INT(1, nn_net_batch_size(net));
-
     TEST_ASSERT_NULL(nn_net_layers(net));
 
     TEST_ASSERT_NULL(nn_net_input(net));
@@ -68,6 +66,7 @@ void test_append_layer(void) {
 
     TEST_ASSERT_NOT_NULL(nn_net_layers(net));
 
+    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].batch_size, nn_net_layers(net)[0].batch_size);
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, nn_net_layers(net)[0].in);
     TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, nn_net_layers(net)[0].out);
 
@@ -89,6 +88,7 @@ void test_append_3layers(void) {
     TEST_ASSERT_EQUAL_INT(3, nn_net_size(net));
 
     for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].batch_size, nn_net_layers(net)[0].batch_size);
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].in, nn_net_layers(net)[i].in);
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, nn_net_layers(net)[i].out);
      }
