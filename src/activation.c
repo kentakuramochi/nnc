@@ -9,7 +9,7 @@
 #include <math.h>
 
 float *sigmoid(const float *x, float *y, const size_t size) {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         y[i] = 1.0 / (1 + expf(-x[i]));
     }
 
@@ -18,7 +18,7 @@ float *sigmoid(const float *x, float *y, const size_t size) {
 
 float *softmax(const float *x, float *y, const size_t size) {
     float max = -FLT_MAX;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         if (x[i] > max) {
             max = x[i];
         }
@@ -26,11 +26,11 @@ float *softmax(const float *x, float *y, const size_t size) {
 
     // Subtract a max of the input to avoid overflow
     float sum = 0.0f;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         sum += expf(x[i] - max);
     }
 
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         y[i] = expf(x[i] - max) / sum;
     }
 
