@@ -40,50 +40,50 @@ NnLayer *nn_layer_init(NnLayer *layer) {
         return NULL;
     }
 
-    size_t x_size = sizeof(float) * layer->in;
-    layer->x = malloc(layer->batch_size * x_size);
+    size_t x_byte_size = sizeof(float) * layer->in;
+    layer->x = malloc(layer->batch_size * x_byte_size);
     if (layer->x == NULL) {
         return NULL;
     }
 
-    size_t y_size = sizeof(float) * layer->out;
-    layer->y = malloc(layer->batch_size * y_size);
+    size_t y_byte_size = sizeof(float) * layer->out;
+    layer->y = malloc(layer->batch_size * y_byte_size);
     if (layer->y == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->z = malloc(y_size);
+    layer->z = malloc(layer->batch_size * y_byte_size);
     if (layer->z == NULL) {
         goto FREE_MATRICES;
     }
 
-    size_t w_size = x_size * y_size;
-    layer->w = malloc(w_size);
+    size_t w_byte_size = sizeof(float) * layer->in * layer->out;
+    layer->w = malloc(w_byte_size);
     if (layer->w == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->b = malloc(y_size);
+    layer->b = malloc(y_byte_size);
     if (layer->b == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->dx = malloc(layer->batch_size * x_size);
+    layer->dx = malloc(layer->batch_size * x_byte_size);
     if (layer->dx == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->dz = malloc(layer->batch_size * y_size);
+    layer->dz = malloc(layer->batch_size * y_byte_size);
     if (layer->dz == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->dw = malloc(w_size);
+    layer->dw = malloc(w_byte_size);
     if (layer->dw == NULL) {
         goto FREE_MATRICES;
     }
 
-    layer->db = malloc(y_size);
+    layer->db = malloc(y_byte_size);
     if (layer->db == NULL) {
         goto FREE_MATRICES;
     }
