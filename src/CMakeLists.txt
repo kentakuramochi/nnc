@@ -1,11 +1,4 @@
-file(GLOB SOURCES
-    ./activation.c
-    ./blas.c
-    ./loss.c
-    ./nn_layer.c
-    ./nn_net.c
-    ./nn_trainer.c
-)
+file(GLOB SOURCES *.c)
 
 add_library(${TARGET_LIB_NAME}
     ${SOURCES}

@@ -1,7 +1,10 @@
 .PHONY: release test clean
 
 release:
-	@./docker/docker_run.sh "ceedling release"
+	@cmake -DCMAKE_BUILD_TYPE=Release -B ./build . && cmake --build ./build
+
+debug:
+	@cmake -DCMAKE_BUILD_TYPE=Debug -B ./build . && cmake --build ./build
 
 test:
 	@./docker/docker_run.sh "ceedling test"
