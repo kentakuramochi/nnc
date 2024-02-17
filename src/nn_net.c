@@ -98,7 +98,7 @@ float *nn_net_forward(NnNet *net, const float *x) {
     }
 
     float *in = (float*)x;
-    float *out;
+    float *out = NULL;
     for (int i = 0; i < net->size; i++) {
         out = nn_layer_forward(&net->layers[i], in);
         in = out;
@@ -113,7 +113,7 @@ float *nn_net_backward(NnNet *net, const float *dy) {
     }
 
     float *din = (float*)dy;
-    float *dout;
+    float *dout = NULL;
     for (int i = (net->size - 1); i >= 0; i--) {
         dout = nn_layer_backward(&net->layers[i], din);
         din = dout;
