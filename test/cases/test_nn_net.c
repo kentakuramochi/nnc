@@ -136,12 +136,27 @@ void test_init_fail_if_net_size_is_0(void) {
     nn_net_free(&net);
 }
 
+static void fill_with_val(float *array, const float value, const size_t size) {
+    for (int i = 0; i < size; i++) {
+        array[i] = 0;
+    }
+}
+
+static void net_fill_with_val(NnNet *net, const float value) {
+    for (int i = 0; i < net->size; i++) {
+        fill_with_val(net->layers[i].w, value, (net->layers[i].in * net->layers[i].out));
+        fill_with_val(net->layers[i].b, value, net->layers[i].out);
+    }
+}
+
 void test_forward_1layer(void) {
     net = nn_net_alloc();
 
     nn_net_append(net, dummy_layer_params[0]);
 
     nn_net_init(net);
+
+    net_fill_with_val(net, 0);
 
     TEST_ASSERT_EQUAL_PTR(nn_net_layers(net)[0].z, nn_net_forward(net, dummy_x));
 
@@ -156,6 +171,8 @@ void test_forward_3layer(void) {
     }
 
     nn_net_init(net);
+
+    net_fill_with_val(net, 0);
 
     TEST_ASSERT_EQUAL_PTR(nn_net_layers(net)[2].z, nn_net_forward(net, dummy_x));
 
