@@ -1,5 +1,5 @@
-add_subdirectory(mnist)
+add_subdirectory(xor)
 
 add_custom_target(example
-    DEPENDS mnist
+    DEPENDS xor
 )
