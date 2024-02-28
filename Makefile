@@ -10,4 +10,4 @@ test:
 	@./docker/docker_run.sh "ceedling test"
 
 clean:
-	@./docker/docker_run.sh "ceedling clean"
+	@cmake --build ./build --target clean
