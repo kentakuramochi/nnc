@@ -128,16 +128,12 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     const int k = layer->in;
 
     for (int i = 0; i < m; i++) {
-        scopy(
-            layer->in, x, 1, &layer->x[i * layer->in], 1
-        );
+        scopy(k, x, 1, &layer->x[i * k], 1);
     }
 
     // y = b: Broadcast for batch dimension
     for (int i = 0; i < m; i++) {
-        scopy(
-            layer->out, layer->b, 1, &layer->y[i * layer->out], 1
-        );
+        scopy(n, layer->b, 1, &layer->y[i * n], 1);
     }
 
     // y = x * W + b
@@ -150,7 +146,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     );
 
     // Activation
-    sigmoid(layer->y, layer->z, (layer->batch_size * layer->out));
+    sigmoid(layer->y, layer->z, (m * n));
 
     return layer->z;
 }
@@ -165,12 +161,12 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     int k = layer->out;
 
     // dz = dy * z * (1 - z)
-    for (int i = 0; i < (m * layer->out); i++) {
+    for (int i = 0; i < (m * k); i++) {
         layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
     }
 
     // dx = 0
-    for (int i = 0; i < (m * layer->in); i++) {
+    for (int i = 0; i < (m * n); i++) {
         layer->dx[i] = 0;
     }
 
@@ -184,7 +180,7 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     );
 
     // dw = 0
-    for (int i = 0; i < layer->in * layer->out; i++) {
+    for (int i = 0; i < (n * k); i++) {
         layer->dw[i] = 0;
     }
 
@@ -198,14 +194,14 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     );
 
     // db = 0
-    for (int i = 0; i < layer->out; i++) {
+    for (int i = 0; i < k; i++) {
         layer->db[i] = 0;
     }
 
     // db = sum(dy) for batch
-    for (int i = 0; i < layer->batch_size; i++) {
+    for (int i = 0; i < m; i++) {
         saxpy(
-            layer->out, 1, &layer->dz[i * layer->out], 1,
+            layer->out, 1, &layer->dz[i * k], 1,
             layer->db, 1
         );
     }
