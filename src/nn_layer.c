@@ -127,9 +127,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     const int n = layer->out;
     const int k = layer->in;
 
-    for (int i = 0; i < m; i++) {
-        scopy(k, x, 1, &layer->x[i * k], 1);
-    }
+    scopy((m * k), x, 1, layer->x, 1);
 
     // y = b: Broadcast for batch dimension
     for (int i = 0; i < m; i++) {
