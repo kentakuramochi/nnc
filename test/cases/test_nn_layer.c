@@ -110,9 +110,8 @@ void test_forward(void) {
     COPY_ARRAY(
         layer.w,
         FLOAT_ARRAY(
-            0, 1,
-            2, 3,
-            4, 5
+            0, 1, 2,
+            3, 4, 5
         )
     );
 
@@ -153,9 +152,8 @@ void test_forward_batch(void) {
     COPY_ARRAY(
         layer.w,
         FLOAT_ARRAY(
-            0, 1,
-            2, 3,
-            4, 5
+            0, 1, 2,
+            3, 4, 5
         )
     );
 
@@ -167,13 +165,13 @@ void test_forward_batch(void) {
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         FLOAT_ARRAY(
             0.982014f, 0.997527f, 0.999665f,
-            0.982014f, 0.997527f, 0.999665f
+            0.119203f, 0.047426f, 0.0179862f
         ),
         nn_layer_forward(
             &layer,
             FLOAT_ARRAY(
                 1, 1,
-                1, 1
+                0, -1
             )
         ),
         (2 * 3)
@@ -182,7 +180,7 @@ void test_forward_batch(void) {
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         FLOAT_ARRAY(
             4, 6, 8,
-            4, 6, 8
+            -2, -3, -4
         ),
         layer.y,
         (2 * 3)
@@ -231,9 +229,8 @@ void test_backward(void) {
     COPY_ARRAY(
         layer.w,
         FLOAT_ARRAY(
-            0, 1,
-            2, 3,
-            4, 5
+            0, 1, 2,
+            3, 4, 5
         )
     );
 
@@ -294,9 +291,8 @@ void test_backward_batch(void) {
     COPY_ARRAY(
         layer.w,
         FLOAT_ARRAY(
-            0, 1,
-            2, 3,
-            4, 5
+            0, 1, 2,
+            3, 4, 5
         )
     );
 
@@ -309,20 +305,22 @@ void test_backward_batch(void) {
         &layer,
         FLOAT_ARRAY(
             1, 1,
-            1, 1
+            0, -1
         )
     );
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         FLOAT_ARRAY(
             0.003130589f, 0.01056396f,
-            0.003130589f, 0.01056396f
+            -0.04239874f, -0.1330014f
         ),
         nn_layer_backward(
             &layer,
+            // dy = y - [1, 0, 0]
+            //          [0, 1, 0]
             FLOAT_ARRAY(
                 -0.01798624f, 0.99752736f, 0.99966466f,
-                -0.01798624f, 0.99752736f, 0.99966466f
+                 0.119203f, -0.952574f, 0.0179862f
             )
         ),
         (2 * 2)
@@ -330,15 +328,15 @@ void test_backward_batch(void) {
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         FLOAT_ARRAY(
-            -0.000635372f, 0.00492073f, 0.000670222f,
-            -0.000635372f, 0.00492073f, 0.000670222f
+            -0.0003176862f, 0.002460367f, 0.0003351109f,
+            -0.01283324f, 0.04549448f, 0.00001742589f
         ),
         layer.dw,
-        (3 * 2)
+        (2 * 3)
     );
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(-0.000635372f, 0.00492073f, 0.000670222f),
+        FLOAT_ARRAY(0.01219786f, -0.04057374f, 0.0006527959f),
         layer.db,
         3
     );
@@ -346,7 +344,7 @@ void test_backward_batch(void) {
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         FLOAT_ARRAY(
             -0.0003176862f, 0.002460367f, 0.0003351109f,
-            -0.0003176862f, 0.002460367f, 0.0003351109f
+            0.01251555f, -0.04303412f, 0.000317685f
         ),
         layer.dz,
         (2 * 3)
@@ -394,18 +392,16 @@ void test_update(void) {
     COPY_ARRAY(
         layer.w,
         FLOAT_ARRAY(
-            1, 1,
-            1, 1,
-            1, 1
+            1, 1, 1,
+            1, 1, 1
         )
     );
 
     COPY_ARRAY(
         layer.dw,
         FLOAT_ARRAY(
-            1, 2,
-            3, 4,
-            5, 6
+            1, 2, 3,
+            4, 5, 6
         )
     );
 
