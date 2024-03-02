@@ -14,7 +14,8 @@
 float nn_train_step(NnNet *net, const float *x, const float *t, const float learning_rate) {
     const float *y = nn_net_forward(net, x);
 
-    const int osize = nn_net_layers(net)[net->size - 1].out;
+    NnLayer *layer = &nn_net_layers(net)[net->size - 1];
+    const int osize = layer->batch_size * layer->out;
 
     float *dy = malloc(sizeof(float) * osize);
 
