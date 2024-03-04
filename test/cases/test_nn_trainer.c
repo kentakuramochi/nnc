@@ -84,7 +84,7 @@ void test_train_step(void) {
     float loss = 0;
     float prev_loss = FLT_MAX;
     for (int i = 0; i < 10; i++) {
-        loss = nn_train_step(&net, x, t, 0.1);
+        loss = nn_train_step(&net, x, t, 0.1, se_loss);
 
         TEST_ASSERT_TRUE(prev_loss > loss);
 

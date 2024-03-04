@@ -75,7 +75,7 @@ int main(void) {
 
     const int iter = 1000;
     for (int i = 0; i < iter; i++) {
-        float loss = nn_train_step(net, x[0], t[0], 0.5);
+        float loss = nn_train_step(net, x[0], t[0], 0.5, se_loss);
         if ((i + 1) % (iter / 10) == 0) {
             printf("[%4d] loss=%f\n", (i + 1), loss);
         }
