@@ -11,6 +11,13 @@
 #include "nn_net.h"
 
 /**
+ * @brief Initialize network parameters with random values
+ * 
+ * @param[in,out] net Target network
+*/
+void nn_net_init_random(NnNet *net);
+
+/**
  * @brief Train a network by one step
  *
  * @param[in,out] net Target network

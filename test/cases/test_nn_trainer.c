@@ -22,20 +22,6 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-static void init_random(float *array, const size_t size) {
-    for (size_t i = 0; i < size; i++) {
-        array[i] = (float)rand() / RAND_MAX - 0.5f;
-    }
-}
-
-static void net_init_random(NnNet *net) {
-    for (size_t i = 0; i < net->size; i++) {
-        NnLayer *layer = &nn_net_layers(net)[i];
-        init_random(layer->w, (layer->in * layer->out));
-        init_random(layer->b, layer->out);
-    }
-}
-
 void test_train_step(void) {
     NnNet net = {
         .size = 2,
@@ -71,7 +57,7 @@ void test_train_step(void) {
         }
     };
 
-    net_init_random(&net);
+    nn_net_init_random(&net);
 
     float x[] = {
         0.1, 0.1

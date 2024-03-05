@@ -7,22 +7,6 @@
 
 #define BATCH_SIZE 4
 
-static void init_rand(float *array, const size_t size) {
-    for (size_t i = 0; i < size; i++) {
-        array[i] = 2 * ((float)rand() / RAND_MAX) - 1;
-    }
-}
-
-static void net_randomize(NnNet *net) {
-    srand(time(NULL));
-
-    for (int i = 0; i < net->size; i++) {
-        NnLayer *layer = &nn_net_layers(net)[i];
-        init_rand(layer->w, (layer->in * layer->out));
-        init_rand(layer->b, layer->out);
-    }
-}
-
 static int get_class(const float value) {
     return (value > 0.5f ? 1 : 0);
 }
@@ -45,11 +29,9 @@ int main(void) {
     nn_net_append(net, (NnLayerParams){ .out=10 });
     nn_net_append(net, (NnLayerParams){ .out=1 });
 
-    //
-
     nn_net_init(net);
 
-    net_randomize(net);
+    nn_net_init_random(net);
 
     float x[][BATCH_SIZE * 2] = {
         {
