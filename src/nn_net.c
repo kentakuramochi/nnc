@@ -84,7 +84,7 @@ NnNet *nn_net_init(NnNet *net) {
     }
 
     for (int i = 0; i < net->size; i++) {
-        if (nn_layer_init(&net->layers[i]) == NULL) {
+        if (nn_layer_alloc_params(&net->layers[i]) == NULL) {
             return NULL;
         }
     }
@@ -134,26 +134,8 @@ void nn_net_free(NnNet **net) {
     }
 
     NnNet *instance = *net;
-
     for (int i = 0; i < instance->size; i++) {
-        free(instance->layers[i].x);
-        instance->layers[i].x = NULL;
-        free(instance->layers[i].y);
-        instance->layers[i].y = NULL;
-        free(instance->layers[i].z);
-        instance->layers[i].z = NULL;
-        free(instance->layers[i].w);
-        instance->layers[i].w = NULL;
-        free(instance->layers[i].b);
-        instance->layers[i].b = NULL;
-        free(instance->layers[i].dx);
-        instance->layers[i].dx = NULL;
-        free(instance->layers[i].dz);
-        instance->layers[i].dz = NULL;
-        free(instance->layers[i].dw);
-        instance->layers[i].dw = NULL;
-        free(instance->layers[i].db);
-        instance->layers[i].db = NULL;
+        nn_layer_free_params(&instance->layers[i]);
     }
 
     free(instance->layers);

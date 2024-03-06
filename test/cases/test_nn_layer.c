@@ -16,64 +16,60 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_allocate_and_free(void) {
-    NnLayerParams params = {
-        .batch_size = 2, .in = 3 * 28 * 28, .out = 100,
-    };
-
-    NnLayer *layer = nn_layer_alloc(params);
-
-    TEST_ASSERT_NOT_NULL(layer);
-
-    TEST_ASSERT_EQUAL_INT(params.batch_size, layer->batch_size);
-    TEST_ASSERT_EQUAL_INT(params.in, layer->in);
-    TEST_ASSERT_EQUAL(params.out, layer->out);
-
-    TEST_ASSERT_NULL(layer->x);
-    TEST_ASSERT_NULL(layer->y);
-    TEST_ASSERT_NULL(layer->z);
-    TEST_ASSERT_NULL(layer->w);
-    TEST_ASSERT_NULL(layer->b);
-    TEST_ASSERT_NULL(layer->dx);
-    TEST_ASSERT_NULL(layer->dz);
-    TEST_ASSERT_NULL(layer->dw);
-    TEST_ASSERT_NULL(layer->db);
-
-    nn_layer_free(&layer);
-    TEST_ASSERT_NULL(layer);
-}
-
-void test_free_pointer_to_NULL(void) {
-    NnLayer *layer = NULL;
-    nn_layer_free(&layer);
-}
-
-void test_free_NULL(void) {
-    nn_layer_free(NULL);
-}
-
-void test_init(void) {
-    NnLayerParams params = {
+    NnLayer layer = {
         .batch_size = 1, .in = 2, .out = 3
     };
 
-    NnLayer *layer = nn_layer_alloc(params);
+    TEST_ASSERT_EQUAL_PTR(&layer, nn_layer_alloc_params(&layer));
+    TEST_ASSERT_NOT_NULL(layer.x);
+    TEST_ASSERT_NOT_NULL(layer.y);
+    TEST_ASSERT_NOT_NULL(layer.z);
+    TEST_ASSERT_NOT_NULL(layer.w);
+    TEST_ASSERT_NOT_NULL(layer.b);
+    TEST_ASSERT_NOT_NULL(layer.dx);
+    TEST_ASSERT_NOT_NULL(layer.dz);
+    TEST_ASSERT_NOT_NULL(layer.dw);
+    TEST_ASSERT_NOT_NULL(layer.db);
 
-    TEST_ASSERT_EQUAL_PTR(layer, nn_layer_init(layer));
-    TEST_ASSERT_NOT_NULL(layer->x);
-    TEST_ASSERT_NOT_NULL(layer->y);
-    TEST_ASSERT_NOT_NULL(layer->z);
-    TEST_ASSERT_NOT_NULL(layer->w);
-    TEST_ASSERT_NOT_NULL(layer->b);
-    TEST_ASSERT_NOT_NULL(layer->dx);
-    TEST_ASSERT_NOT_NULL(layer->dz);
-    TEST_ASSERT_NOT_NULL(layer->dw);
-    TEST_ASSERT_NOT_NULL(layer->db);
-
-    nn_layer_free(&layer);
+    nn_layer_free_params(&layer);
+    TEST_ASSERT_NULL(layer.x);
+    TEST_ASSERT_NULL(layer.y);
+    TEST_ASSERT_NULL(layer.z);
+    TEST_ASSERT_NULL(layer.w);
+    TEST_ASSERT_NULL(layer.b);
+    TEST_ASSERT_NULL(layer.dx);
+    TEST_ASSERT_NULL(layer.dz);
+    TEST_ASSERT_NULL(layer.dw);
+    TEST_ASSERT_NULL(layer.db);
 }
 
-void test_init_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(nn_layer_init(NULL));
+void test_allocation_fail_if_layer_is_NULL(void) {
+    TEST_ASSERT_NULL(nn_layer_alloc_params(NULL));
+}
+
+void test_allocation_fail_if_parameters_contains_0(void) {
+    NnLayer layer[3] = {
+        {.batch_size = 0, .in = 2, .out = 3},
+        {.batch_size = 1, .in = 0, .out = 3},
+        {.batch_size = 1, .in = 2, .out = 0}
+    };
+
+    for (int i = 0; i < 3; i++) {
+        TEST_ASSERT_NULL(nn_layer_alloc_params(&layer[i]));
+        TEST_ASSERT_NULL(layer[i].x);
+        TEST_ASSERT_NULL(layer[i].y);
+        TEST_ASSERT_NULL(layer[i].z);
+        TEST_ASSERT_NULL(layer[i].w);
+        TEST_ASSERT_NULL(layer[i].b);
+        TEST_ASSERT_NULL(layer[i].dx);
+        TEST_ASSERT_NULL(layer[i].dz);
+        TEST_ASSERT_NULL(layer[i].dw);
+        TEST_ASSERT_NULL(layer[i].db);
+    }
+}
+
+void test_free_to_NULL(void) {
+    nn_layer_free_params(NULL);
 }
 
 void test_connect(void) {

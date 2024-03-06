@@ -32,20 +32,19 @@ typedef struct NnLayer {
 } NnLayer;
 
 /**
- * @brief Allocate a layer
+ * @brief Allocate layer parameters
  *
- * @param[in] params Parameters for a layer
- * @return Pointer to layer, NULL if failed
+ * @param[in,out] layer Pointer to a layer
+ * @return Pointer to the layer, NULL if failed
  */
-NnLayer *nn_layer_alloc(const NnLayerParams params);
+NnLayer *nn_layer_alloc_params(NnLayer *layer);
 
 /**
- * @brief Initialze a layer
+ * @brief Free layer parameters
  *
- * @param[in,out] layer Layer
- * @return Pointer the the layer, NULL if failed
+ * @param[in,out] layer Pointer to a layer
  */
-NnLayer *nn_layer_init(NnLayer *layer);
+void nn_layer_free_params(NnLayer *layer);
 
 /**
  * @brief Connect 2 layers
@@ -81,12 +80,5 @@ float *nn_layer_backward(NnLayer *layer, const float *dy);
  * @param[in] learning_rate Learning rate
  */
 void nn_layer_update(NnLayer *layer, const float learning_rate);
-
-/**
- * @brief Free layer
- *
- * @param[in,out] layer Pointer to pointer of layer
- */
-void nn_layer_free(NnLayer **layer);
 
 #endif // NN_LAYER_H
