@@ -64,6 +64,12 @@ NnNet *nn_net_alloc(void);
  */
 NnNet *nn_net_append(NnNet *net, NnLayerParams params);
 
+NnNet *nn_net_alloc_layers(
+    NnNet *net, const int num_layers, NnLayerParams *paramList
+);
+
+void nn_net_free_layers(NnNet *net);
+
 /**
  * @brief Initialize a network
  *
