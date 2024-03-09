@@ -39,45 +39,6 @@ NnNet *nn_net_alloc(void) {
     return net;
 }
 
-NnNet *nn_net_append(NnNet *net, NnLayerParams params) {
-    if (net == NULL) {
-        return NULL;
-    }
-
-    // Reallocate and extend layers in the network
-    NnLayer *realloc_layers = realloc(net->layers, sizeof(NnLayer) * (net->size + 1));
-    if (realloc_layers == NULL) {
-        return NULL;
-    }
-
-    net->layers = realloc_layers;
-    realloc_layers = NULL;
-
-    // Initialize new layer
-    NnLayer *layer = &net->layers[net->size];
-    layer->batch_size = params.batch_size;
-    layer->in = params.in;
-    layer->out = params.out;
-    layer->x = NULL;
-    layer->y = NULL;
-    layer->z = NULL;
-    layer->w = NULL;
-    layer->b = NULL;
-    layer->dx = NULL;
-    layer->dz = NULL;
-    layer->dw = NULL;
-    layer->db = NULL;
-
-    net->size++;
-
-    // Connect the layer
-    for (int i = 1; i < net->size; i++) {
-        nn_layer_connect(&net->layers[i - 1], &net->layers[i]);
-    }
-
-    return net;
-}
-
 NnNet *nn_net_alloc_layers(
     NnNet *net, const int num_layers, NnLayerParams *paramList
 ) {

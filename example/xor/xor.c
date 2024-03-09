@@ -24,14 +24,19 @@ static float get_accuracy(const float *y, const float *t, const size_t size) {
 }
 
 int main(void) {
-    NnNet *net = nn_net_alloc();
-    nn_net_append(net, (NnLayerParams){ .batch_size=BATCH_SIZE, .in=2, .out=100 });
-    nn_net_append(net, (NnLayerParams){ .out=10 });
-    nn_net_append(net, (NnLayerParams){ .out=1 });
+    NnNet net;
+    nn_net_alloc_layers(
+        &net, 3,
+        (NnLayerParams[]){
+            { .batch_size=BATCH_SIZE, .in=2, .out=100 },
+            { .out=10 },
+            { .out=1 }
+        }
+    );
 
-    nn_net_init(net);
+    nn_net_init(&net);
 
-    nn_net_init_random(net);
+    nn_net_init_random(&net);
 
     float x[][BATCH_SIZE * 2] = {
         {
@@ -57,7 +62,7 @@ int main(void) {
 
     const int iter = 1000;
     for (int i = 0; i < iter; i++) {
-        float loss = nn_train_step(net, x[0], t[0], 0.5, se_loss);
+        float loss = nn_train_step(&net, x[0], t[0], 0.5, se_loss);
         if ((i + 1) % (iter / 10) == 0) {
             printf("[%4d] loss=%f\n", (i + 1), loss);
         }
@@ -66,7 +71,7 @@ int main(void) {
     printf("********************\n");
     printf("Answer/predict\n");
     printf("********************\n");
-    float *y = nn_net_forward(net, x[0]);
+    float *y = nn_net_forward(&net, x[0]);
     for (int i = 0; i < BATCH_SIZE; i++) {
         printf("%d/%d (%f)\n", (int)t[0][i], get_class(y[i]), y[i]);
     }
@@ -75,7 +80,7 @@ int main(void) {
     printf("Accuracy=%f\n", get_accuracy(y, t[0], BATCH_SIZE));
     printf("********************\n");
 
-    nn_net_free(&net);
+    nn_net_free_layers(&net);
 
     return 0;
 }

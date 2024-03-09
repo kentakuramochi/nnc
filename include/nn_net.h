@@ -56,18 +56,22 @@ NnLayer *nn_net_output(const NnNet *net);
 NnNet *nn_net_alloc(void);
 
 /**
- * @brief Append a layer to the network
+ * @brief Allocate network layers on the heap
  *
  * @param[in,out] net Network
- * @param[in] params Layer parameter
+ * @param[in] num_layers Number of layers
+ * @param[in] paramList List of layer parameters
  * @return Pointer to the network, NULL if failed
  */
-NnNet *nn_net_append(NnNet *net, NnLayerParams params);
-
 NnNet *nn_net_alloc_layers(
     NnNet *net, const int num_layers, NnLayerParams *paramList
 );
 
+/**
+ * @brief Free network layers allocated on the heap
+ *
+ * @param[in,out] net Network
+ */
 void nn_net_free_layers(NnNet *net);
 
 /**
