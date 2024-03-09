@@ -27,24 +27,10 @@ NnLayer *nn_net_output(const NnNet *net) {
     return &net->layers[net->size - 1];
 }
 
-NnNet *nn_net_alloc(void) {
-    NnNet *net = malloc(sizeof(NnNet));
-    if (net == NULL) {
-        return NULL;
-    }
-
-    net->size = 0;
-    net->layers = NULL;
-
-    return net;
-}
-
 NnNet *nn_net_alloc_layers(
     NnNet *net, const int num_layers, NnLayerParams *paramList
 ) {
-    if ((net == NULL) ||
-        (num_layers < 1) ||
-        (paramList == NULL)) {
+    if ((net == NULL) || (num_layers < 1) || (paramList == NULL)) {
         return NULL;
     }
 
@@ -61,10 +47,22 @@ NnNet *nn_net_alloc_layers(
         layer->batch_size = paramList[i].batch_size;
         layer->in = paramList[i].in;
         layer->out = paramList[i].out;
+
         // Connect layers
         if (i > 0) {
             nn_layer_connect(&layers[i - 1], &layers[i]);
         }
+
+        layer->x = NULL;
+        layer->y = NULL;
+        layer->z = NULL;
+        layer->w = NULL;
+        layer->b = NULL;
+
+        layer->dx = NULL;
+        layer->dz = NULL;
+        layer->dw = NULL;
+        layer->db = NULL;
     }
 
     net->size = num_layers;
@@ -132,21 +130,4 @@ void nn_net_update(NnNet *net, const float learning_rate) {
     for (int i = 0; i < net->size; i++) {
         nn_layer_update(&net->layers[i], learning_rate);
     }
-}
-
-void nn_net_free(NnNet **net) {
-    if ((net == NULL) || (*net == NULL)) {
-        return;
-    }
-
-    NnNet *instance = *net;
-    for (int i = 0; i < instance->size; i++) {
-        nn_layer_free_params(&instance->layers[i]);
-    }
-
-    free(instance->layers);
-    instance->layers = NULL;
-
-    free(*net);
-    *net = NULL;
 }

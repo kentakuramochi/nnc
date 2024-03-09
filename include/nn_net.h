@@ -49,13 +49,6 @@ NnLayer *nn_net_input(const NnNet *net);
 NnLayer *nn_net_output(const NnNet *net);
 
 /**
- * @brief Allocate a network
- *
- * @return Pointer to the network, NULL if failed
- */
-NnNet *nn_net_alloc(void);
-
-/**
  * @brief Allocate network layers on the heap
  *
  * @param[in,out] net Network
@@ -99,12 +92,5 @@ float *nn_net_backward(NnNet *net, const float *dy);
  * @param[in] learning_rate Learning rate
  */
 void nn_net_update(NnNet *net, const float learning_rate);
-
-/**
- * @brief Free network
- *
- * @param[in,out] net Pointer to poiner of network
- */
-void nn_net_free(NnNet **net);
 
 #endif // NN_NET_H

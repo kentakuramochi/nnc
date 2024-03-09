@@ -14,43 +14,9 @@
 
 #include "unity.h"
 
-NnLayerParams dummy_layer_params[] = {
-    { .batch_size = 1, .in = 2, .out = 100 },
-    { .out = 10 },
-    { .out = 1 }
-};
-
-float dummy_x[3 * 28 * 28];
-float dummy_dy[2];
-
 void setUp(void) {}
 
 void tearDown(void) {}
-
-void test_allocate_and_free(void) {
-    NnNet *net = nn_net_alloc();
-
-    TEST_ASSERT_NOT_NULL(net);
-
-    TEST_ASSERT_EQUAL_INT(0, nn_net_size(net));
-
-    TEST_ASSERT_NULL(nn_net_layers(net));
-
-    TEST_ASSERT_NULL(nn_net_input(net));
-    TEST_ASSERT_NULL(nn_net_output(net));
-
-    nn_net_free(&net);
-    TEST_ASSERT_NULL(net);
-}
-
-void test_free_pointer_to_NULL(void) {
-    NnNet *net = NULL;
-    nn_net_free(&net);
-}
-
-void test_free_NULL(void) {
-    nn_net_free(NULL);
-}
 
 static void parameters_are_not_NULL(const NnLayer *layer) {
     TEST_ASSERT_NOT_NULL(layer->x);
@@ -69,7 +35,7 @@ void test_allocate_and_free_layer(void) {
     TEST_ASSERT_EQUAL_PTR(
         &net,
         nn_net_alloc_layers(&net, 1,
-            (NnLayerParams[]){ dummy_layer_params[0] }
+            (NnLayerParams[]){ { .batch_size = 1, .in = 2, .out = 10 } }
         )
     );
 
@@ -77,19 +43,10 @@ void test_allocate_and_free_layer(void) {
 
     TEST_ASSERT_NOT_NULL(nn_net_layers(&net));
 
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].batch_size, nn_net_layers(&net)[0].batch_size);
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, nn_net_layers(&net)[0].in);
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, nn_net_layers(&net)[0].out);
+    TEST_ASSERT_EQUAL_INT(1, nn_net_layers(&net)[0].batch_size);
+    TEST_ASSERT_EQUAL_INT(2, nn_net_layers(&net)[0].in);
+    TEST_ASSERT_EQUAL_INT(10, nn_net_layers(&net)[0].out);
     parameters_are_not_NULL(&nn_net_layers(&net)[0]);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].x);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].y);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].z);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].w);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].b);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].dx);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].dz);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].dw);
-    // TEST_ASSERT_NOT_NULL(nn_net_layers(&net)[0].db);
 
     TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[0], nn_net_input(&net));
     TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[0], nn_net_output(&net));
@@ -97,6 +54,12 @@ void test_allocate_and_free_layer(void) {
     nn_net_free_layers(&net);
     TEST_ASSERT_NULL(net.layers);
 }
+
+NnLayerParams dummy_layer_params[] = {
+    { .batch_size = 1, .in = 2, .out = 100 },
+    { .out = 10 },
+    { .out = 1 }
+};
 
 void test_allocate_and_free_3layers(void) {
     NnNet net;
@@ -107,13 +70,13 @@ void test_allocate_and_free_3layers(void) {
 
     TEST_ASSERT_EQUAL_INT(3, nn_net_size(&net));
 
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].batch_size, nn_net_layers(&net)[0].batch_size);
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, nn_net_layers(&net)[0].in);
-    TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].out, nn_net_layers(&net)[0].out);
-    parameters_are_not_NULL(&nn_net_layers(&net)[0]);
-    for (int i = 1; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].batch_size, nn_net_layers(&net)[i].batch_size);
-        TEST_ASSERT_EQUAL_INT(dummy_layer_params[i - 1].out, nn_net_layers(&net)[i].in);
+        if (i == 0) {
+            TEST_ASSERT_EQUAL_INT(dummy_layer_params[0].in, nn_net_layers(&net)[0].in);
+        } else {
+            TEST_ASSERT_EQUAL_INT(dummy_layer_params[i - 1].out, nn_net_layers(&net)[i].in);
+        }
         TEST_ASSERT_EQUAL_INT(dummy_layer_params[i].out, nn_net_layers(&net)[i].out);
         parameters_are_not_NULL(&nn_net_layers(&net)[i]);
     }
@@ -144,7 +107,7 @@ void test_allocation_fail_if_layer_parameter_is_invalid(void) {
     NnNet net;
     TEST_ASSERT_NULL(
         nn_net_alloc_layers(&net, 1,
-            (NnLayerParams[]){ {.in = 0 } }
+            (NnLayerParams[]){ { .in = 0 } }
         )
     );
 }
@@ -172,10 +135,12 @@ static void net_fill_with_value(NnNet *net, const float value) {
     }
 }
 
-void test_forward_1layer(void) {
+float dummy_x[2];
+
+void test_forward_layer(void) {
     NnNet net;
     nn_net_alloc_layers(&net, 1,
-        (NnLayerParams[]){ dummy_layer_params[0] }
+        (NnLayerParams[]){ { .batch_size = 1, .in = 2, .out = 10 } }
     );
 
     net_fill_with_value(&net, 0);
@@ -185,7 +150,7 @@ void test_forward_1layer(void) {
     nn_net_free_layers(&net);
 }
 
-void test_forward_3layer(void) {
+void test_forward_3layers(void) {
     NnNet net;
     nn_net_alloc_layers(&net, 3, dummy_layer_params);
 
@@ -211,7 +176,9 @@ void test_forward_fail_if_x_is_NULL(void) {
     nn_net_free_layers(&net);
 }
 
-void test_backward_1layer(void) {
+float dummy_dy[2];
+
+void test_backward_layer(void) {
     NnNet net;
     nn_net_alloc_layers(&net, 1,
         (NnLayerParams[]){ dummy_layer_params[0] }

@@ -13,7 +13,7 @@
 
 /**
  * @brief Set random values to an array
- * 
+ *
  * @param[in,out] array Array to set random values
  * @param[in] size Size of the array
 */
