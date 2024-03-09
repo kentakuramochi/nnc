@@ -75,14 +75,6 @@ NnNet *nn_net_alloc_layers(
 void nn_net_free_layers(NnNet *net);
 
 /**
- * @brief Initialize a network
- *
- * @param[in,out] net Network
- * @return Pointer to the network, NULL if failed
- */
-NnNet *nn_net_init(NnNet *net);
-
-/**
  * @brief Forward propagation of network
  *
  * @param[in,out] net Network

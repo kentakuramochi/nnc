@@ -34,8 +34,6 @@ int main(void) {
         }
     );
 
-    nn_net_init(&net);
-
     nn_net_init_random(&net);
 
     float x[][BATCH_SIZE * 2] = {
