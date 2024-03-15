@@ -100,7 +100,7 @@
 # tests or releases. These options are MERGED with the options in supplemental yaml files.
 :libraries:
   :placement: :end
-  :flag: "-l${1}"
+  :flag: "-std=c99 -l${1}"
   :path_flag: "-L ${1}"
   :system: ["m"]
   :test: []

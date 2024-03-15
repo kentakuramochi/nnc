@@ -4,7 +4,7 @@ add_library(${TARGET_LIB_NAME}
     ${SOURCES}
 )
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 target_compile_options(${TARGET_LIB_NAME}

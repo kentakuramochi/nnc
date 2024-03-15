@@ -8,7 +8,7 @@ add_custom_target(mnist
     DEPENDS ${TARGET_EXAMPLE_NAME}
 )
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 target_compile_options(${TARGET_EXAMPLE_NAME}
