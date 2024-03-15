@@ -1,10 +1,10 @@
-set(TARGET_EXAMPLE_NAME xor_example)
+set(TARGET_EXAMPLE_NAME xor)
 
 add_executable(${TARGET_EXAMPLE_NAME}
     ./xor.c
 )
 
-add_custom_target(xor
+add_custom_target(xor_example
     DEPENDS ${TARGET_EXAMPLE_NAME}
 )
 
