@@ -31,3 +31,13 @@ void test_se_loss(void) {
 
     TEST_ASSERT_EQUAL_FLOAT(0.0975f, loss);
 }
+
+void test_binary_cross_entropy_loss(void) {
+    float loss = binary_cross_entropy_loss(
+        FLOAT_ARRAY(0.7, 0.3),
+        FLOAT_ARRAY(1, 0),
+        2
+    );
+
+    TEST_ASSERT_EQUAL_FLOAT(0.514573f, loss);
+}
