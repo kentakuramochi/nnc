@@ -29,6 +29,9 @@ typedef struct NnLayer {
     float *dz; //!< Difference of activation
     float *dw; //!< Difference of weight matrix
     float *db; //!< Difference of bias matrix
+
+    float* (*forward)(struct NnLayer*, const float*);   //!< Forward
+    float* (*backward)(struct NnLayer*, const float*);  //!< Backward
 } NnLayer;
 
 /**
@@ -80,5 +83,10 @@ float *nn_layer_backward(NnLayer *layer, const float *dy);
  * @param[in] learning_rate Learning rate
  */
 void nn_layer_update(NnLayer *layer, const float learning_rate);
+
+// Temporal implementation of forward/backward prop
+// TODO: migrate to an implementation of the specific layer
+float* forward(NnLayer *layer, const float *x);
+float *backward(NnLayer *layer, const float *dy);
 
 #endif // NN_LAYER_H

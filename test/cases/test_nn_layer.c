@@ -100,7 +100,9 @@ void test_forward(void) {
         .dx = FLOAT_ZEROS(2),
         .dz = FLOAT_ZEROS(3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     COPY_ARRAY(
@@ -142,7 +144,9 @@ void test_forward_batch(void) {
         .dx = FLOAT_ZEROS(2 * 2),
         .dz = FLOAT_ZEROS(2 * 3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     COPY_ARRAY(
@@ -200,7 +204,9 @@ void test_forward_fail_if_x_is_NULL(void) {
         .dx = FLOAT_ZEROS(2),
         .dz = FLOAT_ZEROS(3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     TEST_ASSERT_NULL(nn_layer_forward(&layer, NULL));
@@ -219,7 +225,9 @@ void test_backward(void) {
         .dx = FLOAT_ZEROS(2),
         .dz = FLOAT_ZEROS(3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     COPY_ARRAY(
@@ -281,7 +289,9 @@ void test_backward_batch(void) {
         .dx = FLOAT_ZEROS(2 * 2),
         .dz = FLOAT_ZEROS(2 * 3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     COPY_ARRAY(
@@ -364,7 +374,9 @@ void test_backward_fail_if_dy_is_NULL(void) {
         .dx = FLOAT_ZEROS(2),
         .dz = FLOAT_ZEROS(3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     TEST_ASSERT_NULL(nn_layer_backward(&layer, NULL));
@@ -382,7 +394,9 @@ void test_update(void) {
         .dx = FLOAT_ZEROS(2),
         .dz = FLOAT_ZEROS(3),
         .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3)
+        .db = FLOAT_ZEROS(3),
+        .forward = forward,
+        .backward = backward
     };
 
     COPY_ARRAY(

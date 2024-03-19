@@ -16,6 +16,87 @@
     (ptr) = NULL; \
 }
 
+float* forward(NnLayer *layer, const float *x) {
+    const int m = layer->batch_size; // Batch dimension
+    const int n = layer->out;
+    const int k = layer->in;
+
+    scopy((m * k), x, 1, layer->x, 1);
+
+    // y = b: Broadcast for batch dimension
+    for (int i = 0; i < m; i++) {
+        scopy(n, layer->b, 1, &layer->y[i * n], 1);
+    }
+
+    // y = x * W + b
+    sgemm(
+        BLAS_NO_TRANS, BLAS_NO_TRANS,
+        m, n, k,
+        1.0, layer->x, k,
+        layer->w, n,
+        1.0, layer->y, n
+    );
+
+    // Activation
+    sigmoid(layer->y, layer->z, (m * n));
+
+    return layer->z;
+}
+
+float *backward(NnLayer *layer, const float *dy) {
+    int m = layer->batch_size; // Batch dimension
+    int n = layer->in;
+    int k = layer->out;
+
+    // dz = dy * z * (1 - z)
+    for (int i = 0; i < (m * k); i++) {
+        layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
+    }
+
+    // dx = 0
+    for (int i = 0; i < (m * n); i++) {
+        layer->dx[i] = 0;
+    }
+
+    // dx = dy * WT
+    sgemm(
+        BLAS_NO_TRANS, BLAS_TRANS,
+        m, n, k,
+        1.0, layer->dz, k,
+        layer->w, k,
+        1.0, layer->dx, n
+    );
+
+    // dw = 0
+    for (int i = 0; i < (n * k); i++) {
+        layer->dw[i] = 0;
+    }
+
+    // dW = xT * dy
+    sgemm(
+        BLAS_TRANS, BLAS_NO_TRANS,
+        n, k, m,
+        1.0, layer->x, n,
+        layer->dz, k,
+        1.0, layer->dw, k
+    );
+
+    // db = 0
+    for (int i = 0; i < k; i++) {
+        layer->db[i] = 0;
+    }
+
+    // db = sum(dy) for batch
+    for (int i = 0; i < m; i++) {
+        saxpy(
+            layer->out, 1, &layer->dz[i * k], 1,
+            layer->db, 1
+        );
+    }
+
+    return layer->dx;
+}
+
 NnLayer *nn_layer_alloc_params(NnLayer *layer) {
     if (layer == NULL) {
         return NULL;
@@ -75,6 +156,9 @@ NnLayer *nn_layer_alloc_params(NnLayer *layer) {
         goto FREE_LAYER_PARAMS;
     }
 
+    layer->forward = forward;
+    layer->backward = backward;
+
     return layer;
 
 FREE_LAYER_PARAMS:
@@ -117,30 +201,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
         return NULL;
     }
 
-    const int m = layer->batch_size; // Batch dimension
-    const int n = layer->out;
-    const int k = layer->in;
-
-    scopy((m * k), x, 1, layer->x, 1);
-
-    // y = b: Broadcast for batch dimension
-    for (int i = 0; i < m; i++) {
-        scopy(n, layer->b, 1, &layer->y[i * n], 1);
-    }
-
-    // y = x * W + b
-    sgemm(
-        BLAS_NO_TRANS, BLAS_NO_TRANS,
-        m, n, k,
-        1.0, layer->x, k,
-        layer->w, n,
-        1.0, layer->y, n
-    );
-
-    // Activation
-    sigmoid(layer->y, layer->z, (m * n));
-
-    return layer->z;
+    return layer->forward(layer, x);
 }
 
 float *nn_layer_backward(NnLayer *layer, const float *dy) {
@@ -148,57 +209,7 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
         return NULL;
     }
 
-    int m = layer->batch_size; // Batch dimension
-    int n = layer->in;
-    int k = layer->out;
-
-    // dz = dy * z * (1 - z)
-    for (int i = 0; i < (m * k); i++) {
-        layer->dz[i] = dy[i] * layer->z[i] * (1.0f - layer->z[i]);
-    }
-
-    // dx = 0
-    for (int i = 0; i < (m * n); i++) {
-        layer->dx[i] = 0;
-    }
-
-    // dx = dy * WT
-    sgemm(
-        BLAS_NO_TRANS, BLAS_TRANS,
-        m, n, k,
-        1.0, layer->dz, k,
-        layer->w, k,
-        1.0, layer->dx, n
-    );
-
-    // dw = 0
-    for (int i = 0; i < (n * k); i++) {
-        layer->dw[i] = 0;
-    }
-
-    // dW = xT * dy
-    sgemm(
-        BLAS_TRANS, BLAS_NO_TRANS,
-        n, k, m,
-        1.0, layer->x, n,
-        layer->dz, k,
-        1.0, layer->dw, k
-    );
-
-    // db = 0
-    for (int i = 0; i < k; i++) {
-        layer->db[i] = 0;
-    }
-
-    // db = sum(dy) for batch
-    for (int i = 0; i < m; i++) {
-        saxpy(
-            layer->out, 1, &layer->dz[i * k], 1,
-            layer->db, 1
-        );
-    }
-
-    return layer->dx;
+    return layer->backward(layer, dy);
 }
 
 void nn_layer_update(NnLayer *layer, const float learning_rate) {
