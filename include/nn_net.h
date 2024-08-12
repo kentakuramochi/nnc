@@ -53,11 +53,11 @@ NnLayer *nn_net_output(const NnNet *net);
  *
  * @param[in,out] net Network
  * @param[in] num_layers Number of layers
- * @param[in] paramList List of layer parameters
+ * @param[in] param_list List of layer parameters
  * @return Pointer to the network, NULL if failed
  */
 NnNet *nn_net_alloc_layers(
-    NnNet *net, const int num_layers, NnLayerParams *paramList
+    NnNet *net, const int num_layers, NnLayerParams *param_list
 );
 
 /**

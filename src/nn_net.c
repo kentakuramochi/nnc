@@ -28,9 +28,9 @@ NnLayer *nn_net_output(const NnNet *net) {
 }
 
 NnNet *nn_net_alloc_layers(
-    NnNet *net, const int num_layers, NnLayerParams *paramList
+    NnNet *net, const int num_layers, NnLayerParams *param_list
 ) {
-    if ((net == NULL) || (num_layers < 1) || (paramList == NULL)) {
+    if ((net == NULL) || (num_layers < 1) || (param_list == NULL)) {
         return NULL;
     }
 
@@ -44,9 +44,9 @@ NnNet *nn_net_alloc_layers(
     // Initialize new layers
     for (int i = 0; i < num_layers; i++) {
         NnLayer *layer = &layers[i];
-        layer->batch_size = paramList[i].batch_size;
-        layer->in = paramList[i].in;
-        layer->out = paramList[i].out;
+        layer->batch_size = param_list[i].batch_size;
+        layer->in = param_list[i].in;
+        layer->out = param_list[i].out;
 
         // Connect layers
         if (i > 0) {
