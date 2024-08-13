@@ -12,15 +12,15 @@ static int get_class(const float value) {
 }
 
 static float get_accuracy(const float *y, const float *t, const size_t size) {
-    int correct = 0;
+    int corrects = 0;
 
     for (size_t i = 0; i < size; i++) {
         if (get_class(y[i]) == (int)t[i]) {
-            correct++;
+            corrects++;
         }
     }
 
-    return (float)correct / size;
+    return (float)corrects / size;
 }
 
 int main(void) {
@@ -55,13 +55,15 @@ int main(void) {
     };
 
     printf("********************\n");
-    printf("Start learning\n");
+    printf("Start training\n");
     printf("********************\n");
 
-    const int iter = 1000;
-    for (int i = 0; i < iter; i++) {
-        float loss = nn_train_step(&net, x[0], t[0], 0.5, binary_cross_entropy_loss);
-        if ((i + 1) % (iter / 10) == 0) {
+    const int epochs = 1000;
+    for (int i = 0; i < epochs; i++) {
+        float loss = nn_train_step(
+            &net, x[0], t[0], 0.5, binary_cross_entropy_loss
+        );
+        if ((i + 1) % (epochs / 10) == 0) {
             printf("[%4d] loss=%f\n", (i + 1), loss);
         }
     }
@@ -74,9 +76,7 @@ int main(void) {
         printf("%d/%d (%f)\n", (int)t[0][i], get_class(y[i]), y[i]);
     }
 
-    printf("********************\n");
     printf("Accuracy=%f\n", get_accuracy(y, t[0], BATCH_SIZE));
-    printf("********************\n");
 
     nn_net_free_layers(&net);
 
