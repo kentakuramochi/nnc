@@ -6,11 +6,16 @@
 #ifndef NN_LAYER_H
 #define NN_LAYER_H
 
+// Dummy parameters for layer type
+#define NN_LAYER_TYPE_NONE 0
+#define NN_LAYER_TYPE_NORMAL 1
+
 /**
  * @brief Layer parameters
  *
  */
 typedef struct NnLayerParams {
+    int type; //!< Layer type
     int batch_size; //!< Number of batches
     int in; //!< Number of input elements
     int out; //!< Number of output elements
