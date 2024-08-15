@@ -52,13 +52,10 @@ NnLayer *nn_net_output(const NnNet *net);
  * @brief Allocate network layers on the heap
  *
  * @param[in,out] net Network
- * @param[in] num_layers Number of layers
  * @param[in] param_list List of layer parameters
  * @return Pointer to the network, NULL if failed
  */
-NnNet *nn_net_alloc_layers(
-    NnNet *net, const int num_layers, NnLayerParams *param_list
-);
+NnNet *nn_net_alloc_layers(NnNet *net, NnLayerParams *param_list);
 
 /**
  * @brief Free network layers allocated on the heap
@@ -92,5 +89,12 @@ float *nn_net_backward(NnNet *net, const float *dy);
  * @param[in] learning_rate Learning rate
  */
 void nn_net_update(NnNet *net, const float learning_rate);
+
+/**
+ * @brief Clear current gradients of network
+ *
+ * @param[in,out] net Network
+ */
+void nn_net_clear_grad(NnNet *net);
 
 #endif // NN_NET_H

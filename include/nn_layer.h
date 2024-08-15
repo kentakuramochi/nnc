@@ -89,6 +89,13 @@ float *nn_layer_backward(NnLayer *layer, const float *dy);
  */
 void nn_layer_update(NnLayer *layer, const float learning_rate);
 
+/**
+ * @brief Clear current gradients of layer
+ *
+ * @param[in,out] layer Pointer to the layer
+ */
+void nn_layer_clear_grad(NnLayer *layer);
+
 // Temporal implementation of forward/backward prop
 // TODO: migrate to an implementation of the specific layer
 float* forward(NnLayer *layer, const float *x);
