@@ -55,6 +55,8 @@ NnNet *nn_net_alloc_layers(
     for (int i = 0; i < num_layers; i++) {
         NnLayer *layer = &layers[i];
 
+        layer->params = param_list[i];
+
         // Connect layers
         if (i > 0) {
             nn_layer_connect(&layers[i - 1], &layers[i]);

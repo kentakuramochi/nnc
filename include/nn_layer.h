@@ -22,9 +22,8 @@ typedef struct NnLayerParams {
 } NnLayerParams;
 
 typedef struct NnLayer {
-    int batch_size; //!< Number of batches
-    int in; //!< Number of input elements
-    int out; //!< Number of output elements
+    NnLayerParams params;  //!< Layer parameters
+
     float *x; //!< Input matrix
     float *y; //!< Output matrix
     float *z; //!< Activation output matrix

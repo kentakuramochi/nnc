@@ -35,8 +35,14 @@ void test_allocate_and_free_layer(void) {
 
     TEST_ASSERT_NOT_NULL(nn_net_layers(&net));
 
-    TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[0], nn_net_input(&net));
-    TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[0], nn_net_output(&net));
+    NnLayer *layer = &nn_net_layers(&net)[0];
+    TEST_ASSERT_EQUAL_PTR(layer, nn_net_input(&net));
+    TEST_ASSERT_EQUAL_PTR(layer, nn_net_output(&net));
+
+    TEST_ASSERT_EQUAL_INT(NN_LAYER_TYPE_NORMAL, layer->params.type);
+    TEST_ASSERT_EQUAL_INT(1, layer->params.batch_size);
+    TEST_ASSERT_EQUAL_INT(2, layer->params.in);
+    TEST_ASSERT_EQUAL_INT(10, layer->params.out);
 
     // Same with `nn_layer_alloc_params`,
     // `nn_layer_free_params` is not fully tested
@@ -67,6 +73,14 @@ void test_allocate_and_free_3layers(void) {
 
     TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[0], nn_net_input(&net));
     TEST_ASSERT_EQUAL_PTR(&nn_net_layers(&net)[2], nn_net_output(&net));
+
+    for (int i = 0; i < 3; i++) {
+        NnLayer *layer = &nn_net_layers(&net)[i];
+        TEST_ASSERT_EQUAL_INT(layer_params[i].type, layer->params.type);
+        TEST_ASSERT_EQUAL_INT(layer_params[i].batch_size, layer->params.batch_size);
+        TEST_ASSERT_EQUAL_INT(layer_params[i].in, layer->params.in);
+        TEST_ASSERT_EQUAL_INT(layer_params[i].out, layer->params.out);
+    }
 
     nn_layer_free_params_ExpectAnyArgs();
     nn_layer_free_params_ExpectAnyArgs();
