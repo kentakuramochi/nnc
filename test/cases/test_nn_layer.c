@@ -72,22 +72,22 @@ void test_free_to_NULL(void) {
     nn_layer_free_params(NULL);
 }
 
-/*
 void test_connect(void) {
     NnLayer layer = {
-        .batch_size = 2, .in = 2, .out = 10,
+        .params={ .batch_size=8, .in=2, .out=10 }
     };
 
     NnLayer next_layer = {
-        .out = 1,
+        .params={ .out=3 }
     };
 
     nn_layer_connect(&layer, &next_layer);
 
-    TEST_ASSERT_EQUAL_INT(2, next_layer.batch_size);
-    TEST_ASSERT_EQUAL_INT(10, next_layer.in);
+    TEST_ASSERT_EQUAL_INT(8, next_layer.params.batch_size);
+    TEST_ASSERT_EQUAL_INT(10, next_layer.params.in);
 }
 
+/*
 void test_forward(void) {
     NnLayer layer = {
         .batch_size = 1,

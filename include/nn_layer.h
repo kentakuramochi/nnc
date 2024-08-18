@@ -57,8 +57,8 @@ void nn_layer_free_params(NnLayer *layer);
 /**
  * @brief Connect 2 layers
  *
- * @param[in,out] prev Previous layer, being connected from the next
- * @param[in,out] next Next layer, connect to the previous
+ * @param[in,out] prev Previous layer, being connected from the next one
+ * @param[in,out] next Next layer, connect to the previous one
  */
 void nn_layer_connect(NnLayer *prev, NnLayer *next);
 

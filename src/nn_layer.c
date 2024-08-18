@@ -40,12 +40,12 @@ void nn_layer_free_params(NnLayer *layer) {
     layer->backward = NULL;
 }
 
-/*
 void nn_layer_connect(NnLayer *prev, NnLayer *next) {
-    next->batch_size = prev->batch_size;
-    next->in = prev->out;
+    next->params.batch_size = prev->params.batch_size;
+    next->params.in = prev->params.out;
 }
 
+/*
 float *nn_layer_forward(NnLayer *layer, const float *x) {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
