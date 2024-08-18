@@ -65,12 +65,10 @@ NnNet *nn_net_alloc_layers(
         // Initialize pointers
         layer->x = NULL;
         layer->y = NULL;
-        layer->z = NULL;
         layer->w = NULL;
         layer->b = NULL;
 
         layer->dx = NULL;
-        layer->dz = NULL;
         layer->dw = NULL;
         layer->db = NULL;
 

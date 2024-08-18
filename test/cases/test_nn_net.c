@@ -25,7 +25,8 @@ void test_allocate_and_free_layer(void) {
         nn_net_alloc_layers(
             &net,
             (NnLayerParams[]){
-                { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+                // Test with an identity layer
+                { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
                 {}
             }
         )
@@ -39,10 +40,10 @@ void test_allocate_and_free_layer(void) {
     TEST_ASSERT_EQUAL_PTR(layer, nn_net_input(&net));
     TEST_ASSERT_EQUAL_PTR(layer, nn_net_output(&net));
 
-    TEST_ASSERT_EQUAL_INT(NN_LAYER_TYPE_NORMAL, layer->params.type);
+    TEST_ASSERT_EQUAL_INT(NN_LAYER_TYPE_IDENTITY, layer->params.type);
     TEST_ASSERT_EQUAL_INT(1, layer->params.batch_size);
     TEST_ASSERT_EQUAL_INT(2, layer->params.in);
-    TEST_ASSERT_EQUAL_INT(10, layer->params.out);
+    TEST_ASSERT_EQUAL_INT(2, layer->params.out);
 
     // Same with `nn_layer_alloc_params`,
     // `nn_layer_free_params` is not fully tested
@@ -55,9 +56,9 @@ void test_allocate_and_free_3layers(void) {
     NnNet net;
 
     NnLayerParams layer_params[] = {
-        { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=100 },
-        { NN_LAYER_TYPE_NORMAL, .out=10 },
-        { NN_LAYER_TYPE_NORMAL, .out=1 },
+        { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
+        { NN_LAYER_TYPE_IDENTITY },
+        { NN_LAYER_TYPE_IDENTITY },
         {}
     };
 
@@ -94,7 +95,7 @@ void test_allocation_fail_if_net_is_NULL(void) {
         nn_net_alloc_layers(
             NULL,
             (NnLayerParams[]){
-                { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+                { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
                 {}
             }
         )
@@ -130,7 +131,7 @@ void test_forward_layer(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
             {}
         }
     );
@@ -154,9 +155,9 @@ void test_forward_3layers(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
-            { NN_LAYER_TYPE_NORMAL, .out=10 },
-            { NN_LAYER_TYPE_NORMAL, .out=1 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
+            { NN_LAYER_TYPE_IDENTITY },
+            { NN_LAYER_TYPE_IDENTITY },
             {}
         }
     );
@@ -191,7 +192,7 @@ void test_forward_fail_if_x_is_NULL(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
             {}
         }
     );
@@ -211,7 +212,7 @@ void test_backward_layer(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
             {}
         }
     );
@@ -235,9 +236,9 @@ void test_backward_3layer(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
-            { NN_LAYER_TYPE_NORMAL, .out=10 },
-            { NN_LAYER_TYPE_NORMAL, .out=1 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
+            { NN_LAYER_TYPE_IDENTITY },
+            { NN_LAYER_TYPE_IDENTITY },
             {}
         }
     );
@@ -272,7 +273,7 @@ void test_backward_fail_if_dy_is_NULL(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=10 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
             {}
         }
     );
@@ -292,9 +293,9 @@ void test_clear_grad(void) {
     nn_net_alloc_layers(
         &net,
         (NnLayerParams[]){
-            { NN_LAYER_TYPE_NORMAL, .batch_size=1, .in=2, .out=100 },
-            { NN_LAYER_TYPE_NORMAL, .out=10 },
-            { NN_LAYER_TYPE_NORMAL, .out=1 },
+            { NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=2 },
+            { NN_LAYER_TYPE_IDENTITY },
+            { NN_LAYER_TYPE_IDENTITY },
             {}
         }
     );

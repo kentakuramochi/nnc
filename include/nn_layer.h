@@ -6,9 +6,11 @@
 #ifndef NN_LAYER_H
 #define NN_LAYER_H
 
+#include <stddef.h>
+
 // Dummy parameters for layer type
 #define NN_LAYER_TYPE_NONE 0
-#define NN_LAYER_TYPE_NORMAL 1
+#define NN_LAYER_TYPE_IDENTITY 1
 
 /**
  * @brief Layer parameters
@@ -26,11 +28,10 @@ typedef struct NnLayer {
 
     float *x; //!< Input matrix
     float *y; //!< Output matrix
-    float *z; //!< Activation output matrix
     float *w; //!< Weight matrix
     float *b; //!< Bias matrix
+
     float *dx; //!< Difference of input matrix
-    float *dz; //!< Difference of activation
     float *dw; //!< Difference of weight matrix
     float *db; //!< Difference of bias matrix
 
@@ -79,7 +80,6 @@ float *nn_layer_forward(NnLayer *layer, const float *x);
  */
 float *nn_layer_backward(NnLayer *layer, const float *dy);
 
-
 /**
  * @brief Update layer parameter
  *
@@ -95,9 +95,12 @@ void nn_layer_update(NnLayer *layer, const float learning_rate);
  */
 void nn_layer_clear_grad(NnLayer *layer);
 
-// Temporal implementation of forward/backward prop
-// TODO: migrate to an implementation of the specific layer
-float* forward(NnLayer *layer, const float *x);
-float *backward(NnLayer *layer, const float *dy);
+/**
+ * @brief Initialization and forward/backward function for the identity layer
+ * @note TODO: move to a separated module of identity layer
+ */
+NnLayer *identity_init(NnLayer *layer);
+float *identity_forward(NnLayer *layer, const float *x);
+float *identity_backward(NnLayer *layer, const float *dy);
 
 #endif // NN_LAYER_H
