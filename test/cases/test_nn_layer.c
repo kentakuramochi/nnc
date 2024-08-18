@@ -87,104 +87,23 @@ void test_connect(void) {
     TEST_ASSERT_EQUAL_INT(10, next_layer.params.in);
 }
 
-/*
-void test_forward(void) {
-    NnLayer layer = {
-        .batch_size = 1,
-        .in = 2,
-        .out = 3,
-        .x = FLOAT_ZEROS(2),
-        .y = FLOAT_ZEROS(3),
-        .z = FLOAT_ZEROS(3),
-        .w = FLOAT_ZEROS(3 * 2),
-        .b = FLOAT_ZEROS(3),
-        .dx = FLOAT_ZEROS(2),
-        .dz = FLOAT_ZEROS(3),
-        .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3),
-        .forward = forward,
-        .backward = backward
-    };
-
-    COPY_ARRAY(
-        layer.w,
-        FLOAT_ARRAY(
-            0, 1, 2,
-            3, 4, 5
-        )
-    );
-
-    COPY_ARRAY(
-        layer.b,
-        FLOAT_ARRAY(1, 1, 1)
-    );
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(0.982014f, 0.997527f, 0.999665f),
-        nn_layer_forward(&layer, FLOAT_ARRAY(1, 1)),
-        3
-    );
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(4, 6, 8),
-        layer.y,
-        3
-    );
+float *dummy_forward(NnLayer *layer, const float *x) {
+    for (int i = 0 ; i < 3; i++) {
+        layer->y[i] = x[i] * 2;
+    }
+    return layer->y;
 }
 
-void test_forward_batch(void) {
+void test_forward(void) {
     NnLayer layer = {
-        .batch_size = 2,
-        .in = 2,
-        .out = 3,
-        .x = FLOAT_ZEROS(2 * 2),
-        .y = FLOAT_ZEROS(2 * 3),
-        .z = FLOAT_ZEROS(2 * 3),
-        .w = FLOAT_ZEROS(3 * 2),
-        .b = FLOAT_ZEROS(3),
-        .dx = FLOAT_ZEROS(2 * 2),
-        .dz = FLOAT_ZEROS(2 * 3),
-        .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3),
-        .forward = forward,
-        .backward = backward
+        .y = FLOAT_ZEROS(3),
+        .forward = dummy_forward
     };
 
-    COPY_ARRAY(
-        layer.w,
-        FLOAT_ARRAY(
-            0, 1, 2,
-            3, 4, 5
-        )
-    );
-
-    COPY_ARRAY(
-        layer.b,
-        FLOAT_ARRAY(1, 1, 1)
-    );
+    float answer[] = { -2, 0, 2 };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(
-            0.982014f, 0.997527f, 0.999665f,
-            0.119203f, 0.047426f, 0.0179862f
-        ),
-        nn_layer_forward(
-            &layer,
-            FLOAT_ARRAY(
-                1, 1,
-                0, -1
-            )
-        ),
-        (2 * 3)
-    );
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(
-            4, 6, 8,
-            -2, -3, -4
-        ),
-        layer.y,
-        (2 * 3)
+        answer, nn_layer_forward(&layer, FLOAT_ARRAY(-1, 0, 1)), 3
     );
 }
 
@@ -194,25 +113,14 @@ void test_forward_fail_if_layer_is_NULL(void) {
 
 void test_forward_fail_if_x_is_NULL(void) {
     NnLayer layer = {
-        .batch_size = 1,
-        .in = 2,
-        .out = 3,
-        .x = FLOAT_ZEROS(2),
         .y = FLOAT_ZEROS(3),
-        .z = FLOAT_ZEROS(3),
-        .w = FLOAT_ZEROS(3 * 2),
-        .b = FLOAT_ZEROS(3),
-        .dx = FLOAT_ZEROS(2),
-        .dz = FLOAT_ZEROS(3),
-        .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3),
-        .forward = forward,
-        .backward = backward
+        .forward = dummy_forward
     };
 
     TEST_ASSERT_NULL(nn_layer_forward(&layer, NULL));
 }
 
+/*
 void test_backward(void) {
     NnLayer layer = {
         .batch_size = 1,

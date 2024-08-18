@@ -45,7 +45,6 @@ void nn_layer_connect(NnLayer *prev, NnLayer *next) {
     next->params.in = prev->params.out;
 }
 
-/*
 float *nn_layer_forward(NnLayer *layer, const float *x) {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
@@ -54,6 +53,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     return layer->forward(layer, x);
 }
 
+/*
 float *nn_layer_backward(NnLayer *layer, const float *dy) {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
