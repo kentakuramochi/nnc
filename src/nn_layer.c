@@ -53,7 +53,6 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     return layer->forward(layer, x);
 }
 
-/*
 float *nn_layer_backward(NnLayer *layer, const float *dy) {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
@@ -62,6 +61,7 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     return layer->backward(layer, dy);
 }
 
+/*
 void nn_layer_update(NnLayer *layer, const float learning_rate) {
     const int w_size = layer->in * layer->out;
 
