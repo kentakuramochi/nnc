@@ -215,3 +215,20 @@ void test_update(void) {
     );
 }
 */
+
+void test_clear_grad(void) {
+    NnLayer layer = {
+        .params = { .batch_size=4, .in=2, .out=3 },
+        .dx = FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
+        .dw = FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+        .db = FLOAT_ARRAY(-1, -2, -3),
+    };
+
+    nn_layer_clear_grad(&layer);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(FLOAT_ZEROS(2), layer.dx, 2);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        FLOAT_ZEROS(3 * 2), layer.dw, (3 * 2)
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(FLOAT_ZEROS(3), layer.db, 3);
+}
