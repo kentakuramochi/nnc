@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#include "loss.h"
+// #include "loss.h"
 #include "nn_layer.h"
-#include "nn_net.h"
+// #include "nn_net.h"
 
 /**
  * @brief Set random values to an array
@@ -23,38 +23,24 @@ static void set_random_values(float *array, const size_t size) {
     }
 }
 
-void nn_net_init_random(NnNet *net) {
+/*void nn_net_init_random(NnNet *net) {
     for (int i = 0; i < net->size; i++) {
         NnLayer *layer = &nn_net_layers(net)[i];
         set_random_values(layer->w, (layer->in * layer->out));
         set_random_values(layer->b, layer->out);
     }
-}
+}*/
 
-float nn_train_step(
-    NnNet *net, const float *x, const float *t, const float learning_rate,
-    float (*loss_func)(const float*, const float*, const size_t)
-) {
-    const float *y = nn_net_forward(net, x);
+void nn_train_step(NnNet *net, const float learning_rate) {
+    for (int i = 0; i < net->size; i++) {
+        NnLayer *layer = &net->layers[i];
+        NnLayerParams *params = &layer->params;
 
-    NnLayer *layer = &nn_net_layers(net)[net->size - 1];
-    const int osize = layer->batch_size * layer->out;
-
-    float *dy = malloc(sizeof(float) * osize);
-
-    // Get difference between the output and the label
-    for (int i = 0; i < osize; i++) {
-        dy[i] = y[i] - t[i];
+        for (int j = 0; j < (params->in * params->out); j++) {
+            layer->w[j] -= learning_rate * layer->dw[j];
+        }
+        for (int j = 0; j < params->out; j++) {
+            layer->b[j] -= learning_rate * layer->db[j];
+        }
     }
-
-    float loss = loss_func(y, t, osize);
-
-    nn_net_backward(net, dy);
-
-    nn_net_update(net, learning_rate);
-
-    free(dy);
-    dy = NULL;
-
-    return loss;
 }

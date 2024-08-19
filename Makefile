@@ -16,7 +16,7 @@ example:
 
 test:
 #	@./docker/docker_run.sh "ceedling test:$(CASE)"
-	@./docker/docker_run.sh "ceedling test:test_nn_net test:test_nn_layer"
+	@./docker/docker_run.sh "ceedling test:test_nn_net test:test_nn_layer test:test_nn_trainer"
 
 clean:
 	@cmake --build $(BUILD_DIR) --target clean
