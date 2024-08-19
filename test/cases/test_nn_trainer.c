@@ -1,6 +1,6 @@
 /**
  * @file test_nn_trainer.c
- * @brief Unit tests of trainer.c
+ * @brief Unit tests of nn_trainer.c
  *
  */
 #include "nn_trainer.h"
