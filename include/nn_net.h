@@ -83,14 +83,6 @@ float *nn_net_forward(NnNet *net, const float *x);
 float *nn_net_backward(NnNet *net, const float *dy);
 
 /**
- * @brief Update each layer parameter
- *
- * @param[in,out] net Pointer to the network
- * @param[in] learning_rate Learning rate
- */
-void nn_net_update(NnNet *net, const float learning_rate);
-
-/**
  * @brief Clear current gradients of network
  *
  * @param[in,out] net Network

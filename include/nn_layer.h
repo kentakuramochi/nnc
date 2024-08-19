@@ -81,14 +81,6 @@ float *nn_layer_forward(NnLayer *layer, const float *x);
 float *nn_layer_backward(NnLayer *layer, const float *dy);
 
 /**
- * @brief Update layer parameter
- *
- * @param[in,out] layer Pointer to the layer
- * @param[in] learning_rate Learning rate
- */
-void nn_layer_update(NnLayer *layer, const float learning_rate);
-
-/**
  * @brief Clear current gradients of layer
  *
  * @param[in,out] layer Pointer to the layer

@@ -17,11 +17,11 @@ void test_sigmoid(void) {
 
     TEST_ASSERT_EQUAL_PTR(
         y,
-        sigmoid(FLOAT_ARRAY(-1, 0, 1), y, 3)
+        sigmoid(TEST_UTIL_FLOAT_ARRAY(-1, 0, 1), y, 3)
     );
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(0.268941, 0.5, 0.731059),
+        TEST_UTIL_FLOAT_ARRAY(0.268941, 0.5, 0.731059),
         y,
         3
     );
@@ -32,11 +32,11 @@ void test_softmax(void) {
 
     TEST_ASSERT_EQUAL_PTR(
         y,
-        softmax(FLOAT_ARRAY(-1, 1, 4), y, 3)
+        softmax(TEST_UTIL_FLOAT_ARRAY(-1, 1, 4), y, 3)
     );
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(0.00637746f, 0.04712342f, 0.94649912f),
+        TEST_UTIL_FLOAT_ARRAY(0.00637746f, 0.04712342f, 0.94649912f),
         y,
         3
     );

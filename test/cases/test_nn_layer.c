@@ -49,9 +49,9 @@ void test_allocation_fail_if_layer_is_NULL(void) {
 
 void test_allocation_fail_if_parameters_contains_0(void) {
     NnLayer layer[3] = {
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=0, .in=2, .out=3} },
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=0, .out=3} },
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=0} }
+        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=0, .in=2, .out=3 } },
+        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=0, .out=3 } },
+        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=0 } }
     };
 
     for (int i = 0; i < 3; i++) {
@@ -96,24 +96,24 @@ float *dummy_forward(NnLayer *layer, const float *x) {
 
 void test_forward(void) {
     NnLayer layer = {
-        .y = FLOAT_ZEROS(3),
+        .y = TEST_UTIL_FLOAT_ZEROS(3),
         .forward = dummy_forward
     };
 
     float answer[] = { -2, 0, 2 };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        answer, nn_layer_forward(&layer, FLOAT_ARRAY(-1, 0, 1)), 3
+        answer, nn_layer_forward(&layer, TEST_UTIL_FLOAT_ARRAY(-1, 0, 1)), 3
     );
 }
 
 void test_forward_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(nn_layer_forward(NULL, FLOAT_ZEROS(1)));
+    TEST_ASSERT_NULL(nn_layer_forward(NULL, TEST_UTIL_FLOAT_ZEROS(1)));
 }
 
 void test_forward_fail_if_x_is_NULL(void) {
     NnLayer layer = {
-        .y = FLOAT_ZEROS(3),
+        .y = TEST_UTIL_FLOAT_ZEROS(3),
         .forward = dummy_forward
     };
 
@@ -129,106 +129,47 @@ float *dummy_backward(NnLayer *layer, const float *dy) {
 
 void test_backward(void) {
     NnLayer layer = {
-        .dx = FLOAT_ZEROS(3),
+        .dx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
 
     float answer[] = { -1, 0, 1 };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        answer, nn_layer_backward(&layer, FLOAT_ARRAY(-2, 0, 2)), 3
+        answer, nn_layer_backward(&layer, TEST_UTIL_FLOAT_ARRAY(-2, 0, 2)), 3
     );
 }
 
 void test_backward_fail_if_layer_is_NULL(void) {
-    TEST_ASSERT_NULL(nn_layer_backward(NULL, FLOAT_ZEROS(1)));
+    TEST_ASSERT_NULL(nn_layer_backward(NULL, TEST_UTIL_FLOAT_ZEROS(1)));
 }
 
 void test_backward_fail_if_dy_is_NULL(void) {
     NnLayer layer = {
-        .dx = FLOAT_ZEROS(3),
+        .dx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
 
     TEST_ASSERT_NULL(nn_layer_backward(&layer, NULL));
 }
 
-/*
-void test_update(void) {
-    NnLayer layer = {
-        .in = 2,
-        .out = 3,
-        .x = FLOAT_ZEROS(2),
-        .y = FLOAT_ZEROS(3),
-        .z = FLOAT_ZEROS(3),
-        .w = FLOAT_ZEROS(3 * 2),
-        .b = FLOAT_ZEROS(3),
-        .dx = FLOAT_ZEROS(2),
-        .dz = FLOAT_ZEROS(3),
-        .dw = FLOAT_ZEROS(3 * 2),
-        .db = FLOAT_ZEROS(3),
-        .forward = forward,
-        .backward = backward
-    };
-
-    COPY_ARRAY(
-        layer.w,
-        FLOAT_ARRAY(
-            1, 1, 1,
-            1, 1, 1
-        )
-    );
-
-    COPY_ARRAY(
-        layer.dw,
-        FLOAT_ARRAY(
-            1, 2, 3,
-            4, 5, 6
-        )
-    );
-
-    COPY_ARRAY(
-        layer.b,
-        FLOAT_ARRAY(1, 1, 1)
-    );
-
-    COPY_ARRAY(
-        layer.db,
-        FLOAT_ARRAY(1, 2, 3)
-    );
-
-    nn_layer_update(&layer, 0.01);
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(
-            0.99, 0.98, 0.97,
-            0.96, 0.95, 0.94
-        ),
-        layer.w,
-        (3 * 2)
-    );
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ARRAY(0.99, 0.98, 0.97),
-        layer.b,
-        3
-    );
-}
-*/
-
 void test_clear_grad(void) {
     NnLayer layer = {
         .params = { .batch_size=4, .in=2, .out=3 },
-        .dx = FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
-        .dw = FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
-        .db = FLOAT_ARRAY(-1, -2, -3),
+        .dx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
+        .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+        .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
     };
 
     nn_layer_clear_grad(&layer);
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(FLOAT_ZEROS(2), layer.dx, 2);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        FLOAT_ZEROS(3 * 2), layer.dw, (3 * 2)
+        TEST_UTIL_FLOAT_ZEROS(2), layer.dx, 2
     );
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(FLOAT_ZEROS(3), layer.db, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ZEROS(3 * 2), layer.dw, (3 * 2)
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ZEROS(3), layer.db, 3
+    );
 }

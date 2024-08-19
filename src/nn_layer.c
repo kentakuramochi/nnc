@@ -61,16 +61,6 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     return layer->backward(layer, dy);
 }
 
-/*
-void nn_layer_update(NnLayer *layer, const float learning_rate) {
-    const int w_size = layer->in * layer->out;
-
-    saxpy(w_size, -learning_rate, layer->dw, 1, layer->w, 1);
-
-    saxpy(layer->out, -learning_rate, layer->db, 1, layer->b, 1);
-}
-*/
-
 void nn_layer_clear_grad(NnLayer *layer) {
     const int x_size = layer->params.batch_size * layer->params.in;
     for (int i = 0; i < x_size; i++) {

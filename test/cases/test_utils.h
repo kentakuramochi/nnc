@@ -3,14 +3,14 @@
 
 #include <string.h>
 
-#define FLOAT_ARRAY(...) (float[]){ __VA_ARGS__ }
+#define TEST_UTIL_FLOAT_ARRAY(...) (float[]){ __VA_ARGS__ }
 
-#define FLOAT_ZEROS(size) (float[(size)]){ 0 }
+#define TEST_UTIL_FLOAT_ZEROS(size) (float[(size)]){ 0 }
 
-static inline void copy_array(float *dst, const float *src, const size_t size) {
+static inline void test_util_copy_array(float *dst, const float *src, const size_t size) {
     memcpy(dst, src, size);
 }
 
-#define COPY_ARRAY(dst, ...) copy_array((dst), __VA_ARGS__, sizeof(__VA_ARGS__))
+#define TEST_UTIL_COPY_ARRAY(dst, ...) test_util_copy_array((dst), __VA_ARGS__, sizeof(__VA_ARGS__))
 
 #endif // TEST_UTILS_H

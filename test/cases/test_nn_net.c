@@ -12,7 +12,6 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-
 void test_allocate_and_free_layer(void) {
     NnNet net;
 
@@ -78,7 +77,9 @@ void test_allocate_and_free_3layers(void) {
     for (int i = 0; i < 3; i++) {
         NnLayer *layer = &nn_net_layers(&net)[i];
         TEST_ASSERT_EQUAL_INT(layer_params[i].type, layer->params.type);
-        TEST_ASSERT_EQUAL_INT(layer_params[i].batch_size, layer->params.batch_size);
+        TEST_ASSERT_EQUAL_INT(
+            layer_params[i].batch_size, layer->params.batch_size
+        );
         TEST_ASSERT_EQUAL_INT(layer_params[i].in, layer->params.in);
         TEST_ASSERT_EQUAL_INT(layer_params[i].out, layer->params.out);
     }

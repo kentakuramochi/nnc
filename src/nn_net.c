@@ -130,12 +130,6 @@ float *nn_net_backward(NnNet *net, const float *dy) {
     return dout;
 }
 
-void nn_net_update(NnNet *net, const float learning_rate) {
-    for (int i = 0; i < net->size; i++) {
-        nn_layer_update(&net->layers[i], learning_rate);
-    }
-}
-
 void nn_net_clear_grad(NnNet *net) {
     for (int i = 0; i < net->size; i++) {
         nn_layer_clear_grad(&net->layers[i]);

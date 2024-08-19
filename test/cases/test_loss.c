@@ -14,8 +14,8 @@ void tearDown(void) {}
 
 void test_mse_loss(void) {
     float loss = mse_loss(
-        FLOAT_ARRAY(0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0.0, 0.1, 0.0, 0.0),
-        FLOAT_ARRAY(0, 0, 1, 0, 0, 0, 0, 0, 0, 0),
+        TEST_UTIL_FLOAT_ARRAY(0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0.0, 0.1, 0.0, 0.0),
+        TEST_UTIL_FLOAT_ARRAY(0, 0, 1, 0, 0, 0, 0, 0, 0, 0),
         10
     );
 
@@ -24,8 +24,8 @@ void test_mse_loss(void) {
 
 void test_binary_cross_entropy_loss(void) {
     float loss = binary_cross_entropy_loss(
-        FLOAT_ARRAY(0.7, 0.3),
-        FLOAT_ARRAY(1, 0),
+        TEST_UTIL_FLOAT_ARRAY(0.7, 0.3),
+        TEST_UTIL_FLOAT_ARRAY(1, 0),
         2
     );
 
