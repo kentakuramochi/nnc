@@ -1,9 +1,9 @@
 /**
- * @file loss.c
+ * @file nn_loss.c
  * @brief Loss function
  *
  */
-#include "loss.h"
+#include "nn_loss.h"
 
 #include <math.h>
 

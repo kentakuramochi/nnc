@@ -1,9 +1,9 @@
 /**
- * @file test_loss.c
- * @brief Unit tests of loss.c
+ * @file test_nn_loss.c
+ * @brief Unit tests of nn_loss.c
  *
  */
-#include "loss.h"
+#include "nn_loss.h"
 
 #include "unity.h"
 #include "test_utils.h"

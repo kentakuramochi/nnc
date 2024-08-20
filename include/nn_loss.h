@@ -1,10 +1,10 @@
 /**
- * @file loss.h
+ * @file nn_loss.h
  * @brief Loss function
  *
  */
-#ifndef LOSS_H
-#define LOSS_H
+#ifndef NN_LOSS_H
+#define NN_LOSS_H
 
 #include <stddef.h>
 
@@ -28,4 +28,4 @@ float mse_loss(const float *y, const float *t, const size_t size);
  */
 float binary_cross_entropy_loss(const float *y, const float *t, const size_t size);
 
-#endif // LOSS_H
+#endif // NN_LOSS_H
