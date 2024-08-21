@@ -7,6 +7,18 @@
 
 #include <math.h>
 
+/**
+ * @brief Table of loss functions
+*/
+float (*loss_forward[])(const float*, const float*, const size_t) = {
+    NULL,
+    mse_loss
+};
+
+float nn_loss(int type, const float *y, const float *t, const size_t size) {
+    return loss_forward[type](y, t, size);
+}
+
 float mse_loss(const float *y, const float *t, const size_t size) {
     float loss = 0.0f;
 

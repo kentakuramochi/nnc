@@ -12,6 +12,16 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
+void test_loss(void) {
+    float y[] = { 1, 0 };
+    float t[] = { 0, 0 };
+
+    TEST_ASSERT_EQUAL_FLOAT(
+        0.5,
+        nn_loss(NN_LOSS_TYPE_MSE, y, t, 2)
+    );
+}
+
 void test_mse_loss(void) {
     float loss = mse_loss(
         TEST_UTIL_FLOAT_ARRAY(0.1, 0.05, 0.6, 0.0, 0.05, 0.1, 0.0, 0.1, 0.0, 0.0),
