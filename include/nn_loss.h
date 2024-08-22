@@ -20,7 +20,7 @@
  * @param[in] size Size of data
  * @return float Loss
 */
-float nn_loss(int type, const float *y, const float *t, const size_t size);
+float nn_loss(const int type, const float *y, const float *t, const size_t size);
 
 /**
  * @brief Calculate the mean squared error (MSE)

@@ -16,10 +16,7 @@ void test_loss(void) {
     float y[] = { 1, 0 };
     float t[] = { 0, 0 };
 
-    TEST_ASSERT_EQUAL_FLOAT(
-        0.5,
-        nn_loss(NN_LOSS_TYPE_MSE, y, t, 2)
-    );
+    TEST_ASSERT_EQUAL_FLOAT(0.5, nn_loss(NN_LOSS_TYPE_MSE, y, t, 2));
 }
 
 void test_mse_loss(void) {

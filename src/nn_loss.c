@@ -15,7 +15,7 @@ float (*loss_forward[])(const float*, const float*, const size_t) = {
     mse_loss
 };
 
-float nn_loss(int type, const float *y, const float *t, const size_t size) {
+float nn_loss(const int type, const float *y, const float *t, const size_t size) {
     return loss_forward[type](y, t, size);
 }
 
