@@ -15,8 +15,22 @@ float (*loss_forward[])(const float*, const float*, const size_t) = {
     mse_loss
 };
 
+/**
+ * @brief Table of loss function backwardings
+*/
+void (*loss_backward[])(float*, const float*, const float*, const size_t) = {
+    NULL,
+    mse_loss_backward
+};
+
 float nn_loss(const int type, const float *y, const float *t, const size_t size) {
     return loss_forward[type](y, t, size);
+}
+
+void nn_loss_backward(
+    float *diff, const int type, const float *y, const float *t, const size_t size
+) {
+    loss_backward[type](diff, y, t, size);
 }
 
 float mse_loss(const float *y, const float *t, const size_t size) {
@@ -29,6 +43,15 @@ float mse_loss(const float *y, const float *t, const size_t size) {
     loss /= size;
 
     return loss;
+}
+
+void mse_loss_backward(
+    float *diff, const float *y, const float *t, const size_t size
+) {
+    // dE/dy based on the computational graph
+    for (size_t i = 0; i < size; i++) {
+        diff[i] = 2 * (y[i] - t[i]) / size;
+    }
 }
 
 float binary_cross_entropy_loss(const float *y, const float *t, const size_t size) {

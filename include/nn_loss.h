@@ -23,6 +23,19 @@
 float nn_loss(const int type, const float *y, const float *t, const size_t size);
 
 /**
+ * @brief Loss function backward interface
+ *
+ * @param[out] diff Difference of loss function by the output
+ * @param[in] type Type of loss function
+ * @param[in] y Predicted data
+ * @param[in] t Expected data
+ * @param[in] size Size of data
+*/
+void nn_loss_backward(
+    float *diff, const int type, const float *y, const float *t, const size_t size
+);
+
+/**
  * @brief Calculate the mean squared error (MSE)
  *
  * @param[in] y Predicted data
@@ -31,6 +44,18 @@ float nn_loss(const int type, const float *y, const float *t, const size_t size)
  * @return float MSE loss
  */
 float mse_loss(const float *y, const float *t, const size_t size);
+
+/**
+ * @brief Backward of MSE
+ *
+ * @param[out] diff Difference of the loss
+ * @param[in] y Predicted data
+ * @param[in] t Expected data
+ * @param[in] size Size of data
+ */
+void mse_loss_backward(
+    float *diff, const float *y, const float *t, const size_t size
+);
 
 /**
  * @brief Calculate the binary cross entropy
