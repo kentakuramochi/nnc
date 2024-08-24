@@ -8,15 +8,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "nn_layers.h"
-
 #define FREE_AND_NULL(ptr) { \
     free((ptr)); \
     (ptr) = NULL; \
 }
 
 NnLayer *nn_layer_alloc_params(NnLayer *layer) {
-    if (layer == NULL) {
+    if ((layer == NULL) ||
+        // Layer type is NONE or not specified
+        (layer->params.type == NN_LAYER_TYPE_NONE)) {
         return NULL;
     }
 

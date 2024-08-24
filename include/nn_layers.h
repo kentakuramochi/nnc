@@ -13,7 +13,7 @@
 /**
  * @brief Initialization functions for each layer
  */
-NnLayer* (*nn_layer_init_funcs[])(NnLayer*) = {
+NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*) = {
     NULL,
     identity_init
 };

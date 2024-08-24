@@ -5,8 +5,42 @@
  */
 #include "nn_layer.h"
 
+#include <stdlib.h>
+
 #include "unity.h"
 #include "test_utils.h"
+
+// Dummy layer type
+#define NN_LAYER_TYPE_DUMMY 1
+
+// Functions for the dummy layer
+static float *dummy_forward(NnLayer *layer, const float *x) {
+    for (int i = 0 ; i < 3; i++) {
+        layer->y[i] = x[i] * 2;
+    }
+    return layer->y;
+}
+
+static float *dummy_backward(NnLayer *layer, const float *dy) {
+    for (int i = 0 ; i < 3; i++) {
+        layer->dx[i] = dy[i] / 2;
+    }
+    return layer->dx;
+}
+
+static NnLayer *dummy_init(NnLayer *layer) {
+    layer->x = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
+    layer->y = malloc(sizeof(float) * layer->params.batch_size * layer->params.out);
+    layer->dx = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
+
+    layer->forward = dummy_forward;
+    layer->backward = dummy_backward;
+}
+
+NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*) = {
+    NULL, // NN_LAYER_TYPE_NONE
+    dummy_init
+};
 
 void setUp(void) {}
 
@@ -15,11 +49,10 @@ void tearDown(void) {}
 void test_allocate_and_free(void) {
     NnLayer layer = {
         .params={
-            NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=3
+            NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=3
         }
     };
 
-    // Test with an identity layer
     TEST_ASSERT_EQUAL_PTR(&layer, nn_layer_alloc_params(&layer));
     TEST_ASSERT_NOT_NULL(layer.x);
     TEST_ASSERT_NOT_NULL(layer.y);
@@ -28,8 +61,8 @@ void test_allocate_and_free(void) {
     TEST_ASSERT_NOT_NULL(layer.dx);
     TEST_ASSERT_NULL(layer.dw);
     TEST_ASSERT_NULL(layer.db);
-    TEST_ASSERT_EQUAL_PTR(identity_forward, layer.forward);
-    TEST_ASSERT_EQUAL_PTR(identity_backward, layer.backward);
+    TEST_ASSERT_EQUAL_PTR(dummy_forward, layer.forward);
+    TEST_ASSERT_EQUAL_PTR(dummy_backward, layer.backward);
 
     nn_layer_free_params(&layer);
     TEST_ASSERT_NULL(layer.x);
@@ -47,25 +80,21 @@ void test_allocation_fail_if_layer_is_NULL(void) {
     TEST_ASSERT_NULL(nn_layer_alloc_params(NULL));
 }
 
-void test_allocation_fail_if_parameters_contains_0(void) {
-    NnLayer layer[3] = {
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=0, .in=2, .out=3 } },
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=0, .out=3 } },
-        { .params={ NN_LAYER_TYPE_IDENTITY, .batch_size=1, .in=2, .out=0 } }
+void test_allocation_fail_if_layer_type_is_not_specified(void) {
+    NnLayer layer = {
+        .params={ .batch_size=1, .in=2, .out=3 }
     };
 
-    for (int i = 0; i < 3; i++) {
-        TEST_ASSERT_NULL(nn_layer_alloc_params(&layer[i]));
-        TEST_ASSERT_NULL(layer[i].x);
-        TEST_ASSERT_NULL(layer[i].y);
-        TEST_ASSERT_NULL(layer[i].w);
-        TEST_ASSERT_NULL(layer[i].b);
-        TEST_ASSERT_NULL(layer[i].dx);
-        TEST_ASSERT_NULL(layer[i].dw);
-        TEST_ASSERT_NULL(layer[i].db);
-        TEST_ASSERT_NULL(layer[i].forward);
-        TEST_ASSERT_NULL(layer[i].backward);
-    }
+    TEST_ASSERT_NULL(nn_layer_alloc_params(&layer));
+    TEST_ASSERT_NULL(layer.x);
+    TEST_ASSERT_NULL(layer.y);
+    TEST_ASSERT_NULL(layer.w);
+    TEST_ASSERT_NULL(layer.b);
+    TEST_ASSERT_NULL(layer.dx);
+    TEST_ASSERT_NULL(layer.dw);
+    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NULL(layer.forward);
+    TEST_ASSERT_NULL(layer.backward);
 }
 
 void test_free_to_NULL(void) {
@@ -85,13 +114,6 @@ void test_connect(void) {
 
     TEST_ASSERT_EQUAL_INT(8, next_layer.params.batch_size);
     TEST_ASSERT_EQUAL_INT(10, next_layer.params.in);
-}
-
-float *dummy_forward(NnLayer *layer, const float *x) {
-    for (int i = 0 ; i < 3; i++) {
-        layer->y[i] = x[i] * 2;
-    }
-    return layer->y;
 }
 
 void test_forward(void) {
@@ -118,13 +140,6 @@ void test_forward_fail_if_x_is_NULL(void) {
     };
 
     TEST_ASSERT_NULL(nn_layer_forward(&layer, NULL));
-}
-
-float *dummy_backward(NnLayer *layer, const float *dy) {
-    for (int i = 0 ; i < 3; i++) {
-        layer->dx[i] = dy[i] / 2;
-    }
-    return layer->dx;
 }
 
 void test_backward(void) {

@@ -11,6 +11,8 @@
 // Dummy parameters for layer type
 #define NN_LAYER_TYPE_NONE 0
 #define NN_LAYER_TYPE_IDENTITY 1
+// Num of layer types
+#define NUM_LAYER_TYPE 2
 
 /**
  * @brief Layer parameters
@@ -94,5 +96,10 @@ void nn_layer_clear_grad(NnLayer *layer);
 NnLayer *identity_init(NnLayer *layer);
 float *identity_forward(NnLayer *layer, const float *x);
 float *identity_backward(NnLayer *layer, const float *dy);
+
+/**
+ * @brief Initialization functions for each layer
+ */
+extern NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*);
 
 #endif // NN_LAYER_H
