@@ -11,6 +11,4 @@ static inline void test_util_copy_array(float *dst, const float *src, const size
     memcpy(dst, src, size);
 }
 
-#define TEST_UTIL_COPY_ARRAY(dst, ...) test_util_copy_array((dst), __VA_ARGS__, sizeof(__VA_ARGS__))
-
 #endif // TEST_UTILS_H

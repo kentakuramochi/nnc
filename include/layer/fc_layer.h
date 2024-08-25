@@ -6,8 +6,6 @@
 #ifndef FC_LAYER_H
 #define FC_LAYER_H
 
-#include <stddef.h>
-
 #include "nn_layer.h"
 
 // Temporal parameter for the layer type
