@@ -10,7 +10,6 @@
 
 // Dummy parameters for layer type
 #define NN_LAYER_TYPE_NONE 0
-#define NN_LAYER_TYPE_IDENTITY 1
 // Num of layer types
 #define NUM_LAYER_TYPE 3
 
