@@ -90,14 +90,6 @@ float *nn_layer_backward(NnLayer *layer, const float *dy);
 void nn_layer_clear_grad(NnLayer *layer);
 
 /**
- * @brief Initialization and forward/backward function for the identity layer
- * @note TODO: move to a separated module of identity layer
- */
-NnLayer *identity_init(NnLayer *layer);
-float *identity_forward(NnLayer *layer, const float *x);
-float *identity_backward(NnLayer *layer, const float *dy);
-
-/**
  * @brief Initialization functions for each layer
  */
 extern NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*);

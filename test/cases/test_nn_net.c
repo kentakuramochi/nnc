@@ -5,8 +5,6 @@
  */
 #include "nn_net.h"
 
-#include "nn_layers.h"
-
 #include "mock_nn_layer.h"
 #include "unity.h"
 
