@@ -36,35 +36,13 @@ void nn_loss_backward(
 );
 
 /**
- * @brief Calculate the mean squared error (MSE)
- *
- * @param[in] y Predicted data
- * @param[in] t Expected data
- * @param[in] size Size of data
- * @return float MSE loss
- */
-float mse_loss(const float *y, const float *t, const size_t size);
+ * @brief Table of loss functions
+*/
+extern float (*loss_forwards[])(const float*, const float*, const size_t);
 
 /**
- * @brief Backward of MSE
- *
- * @param[out] diff Difference of the loss
- * @param[in] y Predicted data
- * @param[in] t Expected data
- * @param[in] size Size of data
- */
-void mse_loss_backward(
-    float *diff, const float *y, const float *t, const size_t size
-);
-
-/**
- * @brief Calculate the binary cross entropy
- *
- * @param[in] y Predicted data
- * @param[in] t Expected data
- * @param[in] size Size of data
- * @return float Binary cross entropy loss
- */
-float binary_cross_entropy_loss(const float *y, const float *t, const size_t size);
+ * @brief Table of loss function backwards
+*/
+extern void (*loss_backwards[])(float*, const float*, const float*, const size_t);
 
 #endif // NN_LOSS_H
