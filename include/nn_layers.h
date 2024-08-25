@@ -10,12 +10,14 @@
 
 #include "nn_layer.h"
 
+#include "layer/fc_layer.h"
+
 /**
  * @brief Initialization functions for each layer
  */
 NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*) = {
     NULL,
-    identity_init
+    fc_layer_init
 };
 
 #endif // NN_LAYERS_H
