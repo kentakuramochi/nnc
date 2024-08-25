@@ -17,7 +17,7 @@ example:
 test:
 #	@./docker/docker_run.sh "ceedling test:$(CASE)"
 	@./docker/docker_run.sh "ceedling test:test_nn_net test:test_nn_layer test:test_nn_trainer test:test_nn_loss \
-    test:test_fc_layer"
+    test:test_fc_layer test:test_sigmoid_layer"
 
 
 clean:
