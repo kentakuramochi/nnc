@@ -24,6 +24,9 @@ typedef struct NnLayerParams {
     int out; //!< Number of output elements
 } NnLayerParams;
 
+/**
+ * @brief Layer structure
+*/
 typedef struct NnLayer {
     NnLayerParams params;  //!< Layer parameters
 
