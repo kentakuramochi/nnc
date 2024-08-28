@@ -18,3 +18,9 @@ float bce_loss(const float *y, const float *t, const size_t size) {
 
     return -loss;
 }
+
+void bce_loss_backward(float *diff, const float *y, const float *t, const size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        diff[i] = -(t[i] / y[i] - (1.0f - t[i]) / (1.0f - y[i])) / (size * logf(2));  // log2(x)=ln(x)/ln(2)
+    }
+}
