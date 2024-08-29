@@ -3,7 +3,7 @@
  * @brief Binary cross entropy loss
  *
  */
-#include "bce_loss.h"
+#include "loss/bce_loss.h"
 
 #include <math.h>
 

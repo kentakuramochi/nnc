@@ -3,7 +3,7 @@
  * @brief Fully connected layer
  *
  */
-#include "fc_layer.h"
+#include "layer/fc_layer.h"
 
 #include <stdlib.h>
 

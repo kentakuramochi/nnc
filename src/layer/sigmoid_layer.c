@@ -3,7 +3,7 @@
  * @brief Sigmoid layer
  *
  */
-#include "sigmoid_layer.h"
+#include "layer/sigmoid_layer.h"
 
 #include <float.h>
 #include <math.h>

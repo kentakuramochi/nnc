@@ -1,4 +1,4 @@
-file(GLOB SOURCES *.c)
+file(GLOB_RECURSE SOURCES *.c)
 
 add_library(${TARGET_LIB_NAME}
     ${SOURCES}
