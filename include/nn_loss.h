@@ -8,9 +8,6 @@
 
 #include <stddef.h>
 
-// Temporal loss type
-#define NN_LOSS_TYPE_MSE 1
-
 /**
  * @brief Loss function interface
  *

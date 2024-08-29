@@ -16,7 +16,7 @@
 /**
  * @brief Initialization functions for each layer
  */
-NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*) = {
+NnLayer* (*nn_layer_init_funcs[])(NnLayer*) = {
     NULL,
     fc_layer_init,
     sigmoid_layer_init
