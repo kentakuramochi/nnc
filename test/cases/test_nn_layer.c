@@ -37,7 +37,7 @@ static NnLayer *dummy_init(NnLayer *layer) {
     layer->backward = dummy_backward;
 }
 
-NnLayer* (*nn_layer_init_funcs[NUM_LAYER_TYPE])(NnLayer*) = {
+NnLayer* (*nn_layer_init_funcs[])(NnLayer*) = {
     NULL, // NN_LAYER_TYPE_NONE
     dummy_init
 };
@@ -169,22 +169,28 @@ void test_backward_fail_if_dy_is_NULL(void) {
 }
 
 void test_clear_grad(void) {
-    NnLayer layer = {
-        .params = { .batch_size=4, .in=2, .out=3 },
-        .dx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
-        .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
-        .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
+    NnLayer layers[] = {
+        {
+            .params = { .batch_size=4, .in=2, .out=3 },
+            .dx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
+            .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+            .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
+        },
+        { .params={ .batch_size=4, .in=3, .out=1 } }
     };
 
-    nn_layer_clear_grad(&layer);
+    nn_layer_clear_grad(&layers[0]);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(2), layer.dx, 2
+        TEST_UTIL_FLOAT_ZEROS(2), layers[0].dx, 2
     );
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(3 * 2), layer.dw, (3 * 2)
+        TEST_UTIL_FLOAT_ZEROS(3 * 2), layers[0].dw, (3 * 2)
     );
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(3), layer.db, 3
+        TEST_UTIL_FLOAT_ZEROS(3), layers[0].db, 3
     );
+
+    // Skip unallocated grads
+    nn_layer_clear_grad(&layers[1]);
 }

@@ -62,17 +62,23 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
 }
 
 void nn_layer_clear_grad(NnLayer *layer) {
-    const int x_size = layer->params.batch_size * layer->params.in;
-    for (int i = 0; i < x_size; i++) {
-        layer->dx[i] = 0;
+    if (layer->dx != NULL) {
+        const int x_size = layer->params.batch_size * layer->params.in;
+        for (int i = 0; i < x_size; i++) {
+            layer->dx[i] = 0;
+        }
     }
 
-    const int w_size = layer->params.in * layer->params.out;
-    for (int i = 0; i < w_size; i++) {
-        layer->dw[i] = 0;
+    if (layer->dw != NULL) {
+        const int w_size = layer->params.in * layer->params.out;
+        for (int i = 0; i < w_size; i++) {
+            layer->dw[i] = 0;
+        }
     }
 
-    for (int i = 0; i < layer->params.out; i++) {
-        layer->db[i] = 0;
+    if (layer->db != NULL) {
+        for (int i = 0; i < layer->params.out; i++) {
+            layer->db[i] = 0;
+        }
     }
 }
