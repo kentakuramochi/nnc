@@ -12,11 +12,15 @@ void nn_train_step(NnNet *net, const float learning_rate) {
         NnLayer *layer = &net->layers[i];
         NnLayerParams *params = &layer->params;
 
-        for (int j = 0; j < (params->in * params->out); j++) {
-            layer->w[j] -= learning_rate * layer->dw[j];
+        if (layer->w != NULL) {
+            for (int j = 0; j < (params->in * params->out); j++) {
+                layer->w[j] -= learning_rate * layer->dw[j];
+            }
         }
-        for (int j = 0; j < params->out; j++) {
-            layer->b[j] -= learning_rate * layer->db[j];
+        if (layer->b != NULL) {
+            for (int j = 0; j < params->out; j++) {
+                layer->b[j] -= learning_rate * layer->db[j];
+            }
         }
     }
 }
