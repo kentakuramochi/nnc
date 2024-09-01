@@ -77,6 +77,9 @@ NnLayer *sigmoid_layer_init(NnLayer *layer) {
         return NULL;
     }
 
+    // Set in = out if the allocation succeeded
+    params->out = params->in;
+
     layer->dw = NULL;
     layer->db = NULL;
 

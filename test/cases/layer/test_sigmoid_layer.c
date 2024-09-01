@@ -27,6 +27,7 @@ void test_alloc_and_free(void) {
     };
 
     TEST_ASSERT_EQUAL_PTR(&layer, sigmoid_layer_init(&layer));
+    TEST_ASSERT_EQUAL_INT(2, layer.params.out);
     TEST_ASSERT_NOT_NULL(layer.x);
     TEST_ASSERT_NOT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
