@@ -15,14 +15,14 @@
 
 // Functions for the dummy layer
 static float *dummy_forward(NnLayer *layer, const float *x) {
-    for (int i = 0 ; i < 3; i++) {
+    for (int i = 0 ; i < (layer->params.batch_size * layer->params.in); i++) {
         layer->y[i] = x[i] * 2;
     }
     return layer->y;
 }
 
 static float *dummy_backward(NnLayer *layer, const float *dy) {
-    for (int i = 0 ; i < 3; i++) {
+    for (int i = 0 ; i < (layer->params.batch_size * layer->params.out); i++) {
         layer->dx[i] = dy[i] / 2;
     }
     return layer->dx;
@@ -48,9 +48,7 @@ void tearDown(void) {}
 
 void test_allocate_and_free(void) {
     NnLayer layer = {
-        .params={
-            NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=3
-        }
+        .params={ NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 }
     };
 
     TEST_ASSERT_EQUAL_PTR(&layer, nn_layer_alloc_params(&layer));
@@ -81,9 +79,7 @@ void test_allocation_fail_if_layer_is_NULL(void) {
 }
 
 void test_allocation_fail_if_layer_type_is_not_specified(void) {
-    NnLayer layer = {
-        .params={ .batch_size=1, .in=2, .out=3 }
-    };
+    NnLayer layer = { .params={ .batch_size=1, .in=2, .out=2 } };
 
     TEST_ASSERT_NULL(nn_layer_alloc_params(&layer));
     TEST_ASSERT_NULL(layer.x);
@@ -102,13 +98,8 @@ void test_free_to_NULL(void) {
 }
 
 void test_connect(void) {
-    NnLayer layer = {
-        .params={ .batch_size=8, .in=2, .out=10 }
-    };
-
-    NnLayer next_layer = {
-        .params={ .out=3 }
-    };
+    NnLayer layer = { .params={ .batch_size=8, .in=2, .out=10 } };
+    NnLayer next_layer = { .params={ .out=3 } };
 
     nn_layer_connect(&layer, &next_layer);
 
@@ -118,6 +109,7 @@ void test_connect(void) {
 
 void test_forward(void) {
     NnLayer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
         .y = TEST_UTIL_FLOAT_ZEROS(3),
         .forward = dummy_forward
     };
@@ -135,6 +127,7 @@ void test_forward_fail_if_layer_is_NULL(void) {
 
 void test_forward_fail_if_x_is_NULL(void) {
     NnLayer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
         .y = TEST_UTIL_FLOAT_ZEROS(3),
         .forward = dummy_forward
     };
@@ -144,6 +137,7 @@ void test_forward_fail_if_x_is_NULL(void) {
 
 void test_backward(void) {
     NnLayer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
         .dx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
@@ -161,6 +155,7 @@ void test_backward_fail_if_layer_is_NULL(void) {
 
 void test_backward_fail_if_dy_is_NULL(void) {
     NnLayer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
         .dx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
@@ -176,7 +171,7 @@ void test_clear_grad(void) {
             .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
             .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
         },
-        { .params={ .batch_size=4, .in=3, .out=1 } }
+        { .params = { .batch_size=4, .in=3, .out=1 } }
     };
 
     nn_layer_clear_grad(&layers[0]);
