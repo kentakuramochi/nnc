@@ -8,15 +8,21 @@
 
 #include <stddef.h>
 
-// Dummy parameters for layer type
-#define NN_LAYER_TYPE_NONE 0
+/**
+ * @brief Type of layers
+*/
+typedef enum NnLayerType {
+    NN_LAYER_TYPE_NONE, //!< None
+    NN_LAYER_TYPE_FC, //!< Fully connected layer
+    NN_LAYER_TYPE_SIGMOID //!< Sigmoid layer
+} NnLayerType;
 
 /**
  * @brief Layer parameters
  *
  */
 typedef struct NnLayerParams {
-    int type; //!< Layer type
+    NnLayerType type; //!< Layer type
     int batch_size; //!< Number of batches
     int in; //!< Number of input elements
     int out; //!< Number of output elements

@@ -8,9 +8,6 @@
 
 #include "nn_layer.h"
 
-// Temporal parameter for the layer type
-#define NN_LAYER_TYPE_SIGMOID 2
-
 /**
  * @brief Allocate a sigmoid layer
  * 

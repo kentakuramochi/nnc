@@ -8,9 +8,6 @@
 
 #include "nn_layer.h"
 
-// Temporal parameter for the layer type
-#define NN_LAYER_TYPE_FC 1
-
 /**
  * @brief Allocate a fully connected layer
  * 

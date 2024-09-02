@@ -9,6 +9,14 @@
 #include <stddef.h>
 
 /**
+ * @brief Type of loss functions
+*/
+typedef enum NnLossType {
+    NN_LOSS_TYPE_NONE, //!< None
+    NN_LOSS_TYPE_BCE //!< Binary cross entropy loss
+} NnLossType;
+
+/**
  * @brief Loss function interface
  *
  * @param[in] type Type of loss function

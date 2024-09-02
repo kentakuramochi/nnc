@@ -8,9 +8,6 @@
 
 #include "nn_loss.h"
 
-// Temporal parameter for the loss type
-#define NN_LOSS_TYPE_BCE 1
-
 /**
  * @brief Binary cross entropy loss
  *
