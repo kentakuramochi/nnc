@@ -31,7 +31,7 @@ void test_allocate_and_free_layer(void) {
             &net,
             (NnLayerParams[]){
                 params,
-                {}
+                { NN_LAYER_TYPE_NONE } // Empty struct is bad in C99
             }
         )
     );
@@ -60,7 +60,7 @@ void test_allocate_and_free_3layers(void) {
         { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
         { NN_LAYER_TYPE_DUMMY },
         { NN_LAYER_TYPE_DUMMY },
-        {}
+        { NN_LAYER_TYPE_NONE }
     };
 
     NnLayer dummy_layer;
@@ -96,7 +96,7 @@ void test_allocation_fail_if_net_is_NULL(void) {
             NULL,
             (NnLayerParams[]){
                 { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
-                {}
+                { NN_LAYER_TYPE_NONE }
             }
         )
     );
@@ -132,7 +132,7 @@ void test_forward_layer(void) {
         &net,
         (NnLayerParams[]){
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -158,7 +158,7 @@ void test_forward_3layers(void) {
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
             { NN_LAYER_TYPE_DUMMY },
             { NN_LAYER_TYPE_DUMMY },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -193,7 +193,7 @@ void test_forward_fail_if_x_is_NULL(void) {
         &net,
         (NnLayerParams[]){
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -213,7 +213,7 @@ void test_backward_layer(void) {
         &net,
         (NnLayerParams[]){
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -239,7 +239,7 @@ void test_backward_3layer(void) {
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
             { NN_LAYER_TYPE_DUMMY },
             { NN_LAYER_TYPE_DUMMY },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -274,7 +274,7 @@ void test_backward_fail_if_dy_is_NULL(void) {
         &net,
         (NnLayerParams[]){
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
@@ -296,7 +296,7 @@ void test_clear_grad(void) {
             { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
             { NN_LAYER_TYPE_DUMMY },
             { NN_LAYER_TYPE_DUMMY },
-            {}
+            { NN_LAYER_TYPE_NONE }
         }
     );
 
