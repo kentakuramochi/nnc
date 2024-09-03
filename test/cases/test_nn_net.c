@@ -18,17 +18,19 @@ void tearDown(void) {}
 void test_allocate_and_free_layer(void) {
     NnNet net;
 
-    NnLayer dummy_layer;
     // Function `nn_layer_alloc` call isn't fully tested
     // arguments are not verified because of using malloc internally
+    NnLayer dummy_layer;
     nn_layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
+    NnLayerParams params = {
+        .type=NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2
+    };
     TEST_ASSERT_EQUAL_PTR(
         &net,
         nn_net_alloc_layers(
             &net,
             (NnLayerParams[]){
-                // Test with an identity layer
-                { NN_LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+                params,
                 {}
             }
         )
@@ -42,10 +44,7 @@ void test_allocate_and_free_layer(void) {
     TEST_ASSERT_EQUAL_PTR(layer, nn_net_input(&net));
     TEST_ASSERT_EQUAL_PTR(layer, nn_net_output(&net));
 
-    TEST_ASSERT_EQUAL_INT(NN_LAYER_TYPE_DUMMY, layer->params.type);
-    TEST_ASSERT_EQUAL_INT(1, layer->params.batch_size);
-    TEST_ASSERT_EQUAL_INT(2, layer->params.in);
-    TEST_ASSERT_EQUAL_INT(2, layer->params.out);
+    TEST_ASSERT_EQUAL_MEMORY(&params, &layer->params, sizeof(NnLayerParams));
 
     // Same with `nn_layer_alloc_params`,
     // `nn_layer_free_params` is not fully tested
@@ -79,12 +78,9 @@ void test_allocate_and_free_3layers(void) {
 
     for (int i = 0; i < 3; i++) {
         NnLayer *layer = &nn_net_layers(&net)[i];
-        TEST_ASSERT_EQUAL_INT(layer_params[i].type, layer->params.type);
-        TEST_ASSERT_EQUAL_INT(
-            layer_params[i].batch_size, layer->params.batch_size
+        TEST_ASSERT_EQUAL_MEMORY(
+            &layer_params[i], &layer->params, sizeof(NnLayerParams)
         );
-        TEST_ASSERT_EQUAL_INT(layer_params[i].in, layer->params.in);
-        TEST_ASSERT_EQUAL_INT(layer_params[i].out, layer->params.out);
     }
 
     nn_layer_free_params_ExpectAnyArgs();
@@ -111,7 +107,7 @@ void test_allocation_fail_if_param_list_is_NULL(void) {
     TEST_ASSERT_NULL(nn_net_alloc_layers(&net, NULL));
 }
 
-void test_allocation_fail_if_layer_parameter_is_invalid(void) {
+void test_allocation_fail_if_layer_parameter_is_empty(void) {
     NnNet net;
     TEST_ASSERT_NULL(nn_net_alloc_layers(&net, (NnLayerParams[]){ {} }));
 }
