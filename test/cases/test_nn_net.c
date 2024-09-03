@@ -66,9 +66,9 @@ void test_allocate_and_free_3layers(void) {
 
     NnLayer dummy_layer;
     nn_layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
-    nn_layer_connect_ExpectAnyArgs();
+    nn_layer_connect_ExpectAnyArgsAndReturn(true);
     nn_layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
-    nn_layer_connect_ExpectAnyArgs();
+    nn_layer_connect_ExpectAnyArgsAndReturn(true);
     nn_layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
     TEST_ASSERT_EQUAL_PTR(&net, nn_net_alloc_layers(&net, layer_params));
 
@@ -129,7 +129,7 @@ void test_free_layers_when_layers_are_NULL(void) {
 void test_forward_layer(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -153,7 +153,7 @@ void test_forward_layer(void) {
 void test_forward_3layers(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -190,7 +190,7 @@ void test_forward_fail_if_net_is_NULL(void) {
 void test_forward_fail_if_x_is_NULL(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -210,7 +210,7 @@ void test_forward_fail_if_x_is_NULL(void) {
 void test_backward_layer(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -234,7 +234,7 @@ void test_backward_layer(void) {
 void test_backward_3layer(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -271,7 +271,7 @@ void test_backward_fail_if_net_is_NULL(void) {
 void test_backward_fail_if_dy_is_NULL(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(
@@ -291,7 +291,7 @@ void test_backward_fail_if_dy_is_NULL(void) {
 void test_clear_grad(void) {
     NnNet net;
 
-    nn_layer_connect_Ignore();
+    nn_layer_connect_IgnoreAndReturn(true);
     NnLayer dummy_layer;
     nn_layer_alloc_params_IgnoreAndReturn(&dummy_layer);
     nn_net_alloc_layers(

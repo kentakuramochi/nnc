@@ -6,6 +6,7 @@
 #ifndef NN_LAYER_H
 #define NN_LAYER_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 /**
@@ -67,8 +68,9 @@ void nn_layer_free_params(NnLayer *layer);
  *
  * @param[in,out] prev Previous layer, being connected from the next one
  * @param[in,out] next Next layer, connect to the previous one
+ * @return true if 2 layers are connected, otherwise false
  */
-void nn_layer_connect(NnLayer *prev, NnLayer *next);
+bool nn_layer_connect(NnLayer *prev, NnLayer *next);
 
 /**
  * @brief Forward propagation of a layer

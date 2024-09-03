@@ -40,9 +40,17 @@ void nn_layer_free_params(NnLayer *layer) {
     layer->backward = NULL;
 }
 
-void nn_layer_connect(NnLayer *prev, NnLayer *next) {
-    next->params.batch_size = prev->params.batch_size;
-    next->params.in = prev->params.out;
+bool nn_layer_connect(NnLayer *prev, NnLayer *next) {
+    NnLayerParams *n_params = &next->params;
+    if ((n_params->batch_size != 0) ||
+        (n_params->in !=0)) {
+        return false;
+    }
+
+    n_params->batch_size = prev->params.batch_size;
+    n_params->in = prev->params.out;
+
+    return true;
 }
 
 float *nn_layer_forward(NnLayer *layer, const float *x) {

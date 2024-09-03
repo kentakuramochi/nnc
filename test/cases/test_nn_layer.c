@@ -101,10 +101,20 @@ void test_connect(void) {
     NnLayer layer = { .params={ .batch_size=8, .in=2, .out=10 } };
     NnLayer next_layer = { .params={ .out=3 } };
 
-    nn_layer_connect(&layer, &next_layer);
+    TEST_ASSERT_TRUE(nn_layer_connect(&layer, &next_layer));
 
     TEST_ASSERT_EQUAL_INT(8, next_layer.params.batch_size);
     TEST_ASSERT_EQUAL_INT(10, next_layer.params.in);
+}
+
+void test_fail_connect_when_different_value_is_set(void) {
+    NnLayer layer = { .params={ .batch_size=8, .in=2, .out=10 } };
+    NnLayer next_layer = { .params={ .in=5, .out=3 } };
+
+    TEST_ASSERT_FALSE(nn_layer_connect(&layer, &next_layer));
+
+    TEST_ASSERT_EQUAL_INT(0, next_layer.params.batch_size);
+    TEST_ASSERT_EQUAL_INT(5, next_layer.params.in);
 }
 
 void test_forward(void) {
