@@ -15,7 +15,7 @@ void test_bce_loss(void) {
     float y[] = { 0.7, 0.3 };
     float t[] = { 1, 0 };
 
-    TEST_ASSERT_EQUAL_FLOAT(0.514573, bce_loss(y, t, 2));
+    TEST_ASSERT_EQUAL_FLOAT(0.356675, bce_loss(y, t, 2));
 }
 
 void test_bce_loss_backward(void) {
@@ -25,6 +25,6 @@ void test_bce_loss_backward(void) {
     float diff[2];
     bce_loss_backward(diff, y, t, 2);
 
-    float answer[] = { -1.0305, 1.0305 };
+    float answer[] = { -0.714285, 0.714285 };
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, diff, 2);
 }
