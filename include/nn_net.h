@@ -9,6 +9,13 @@
 #include "nn_layer.h"
 
 /**
+ * @brief Sequential list of layer parameters
+ * @note Terminated with NONE layer for network initialization
+ *
+*/
+#define NN_LAYER_PARAMS_LIST(...) (NnLayerParams[]){ __VA_ARGS__, (NnLayerParams){ .type=NN_LAYER_TYPE_NONE } }
+
+/**
  * @brief Network structure
  *
  */
