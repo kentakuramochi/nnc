@@ -9,45 +9,28 @@
 #include <stddef.h>
 
 /**
- * @brief Type of loss functions
+ * @brief Loss funcion interface
 */
-typedef enum NnLossType {
-    NN_LOSS_TYPE_NONE, //!< None
-    NN_LOSS_TYPE_BCE //!< Binary cross entropy loss
-} NnLossType;
+typedef struct LossFunc {
+    /**
+     * @brief Loss function
+     *
+     * @param[in] y Predicted data
+     * @param[in] t Expected data
+     * @param[in] size Size of data
+     * @return float Loss
+    */
+    float (*forward)(const float*, const float*, const size_t);
 
-/**
- * @brief Loss function interface
- *
- * @param[in] type Type of loss function
- * @param[in] y Predicted data
- * @param[in] t Expected data
- * @param[in] size Size of data
- * @return float Loss
-*/
-float nn_loss(const int type, const float *y, const float *t, const size_t size);
-
-/**
- * @brief Loss function backward interface
- *
- * @param[out] diff Difference of loss function by the output
- * @param[in] type Type of loss function
- * @param[in] y Predicted data
- * @param[in] t Expected data
- * @param[in] size Size of data
-*/
-void nn_loss_backward(
-    float *diff, const int type, const float *y, const float *t, const size_t size
-);
-
-/**
- * @brief Table of loss functions
-*/
-extern float (*loss_forwards[])(const float*, const float*, const size_t);
-
-/**
- * @brief Table of loss function backwards
-*/
-extern void (*loss_backwards[])(float*, const float*, const float*, const size_t);
+    /**
+     * @brief Backward of the loss
+     *
+     * @param[out] diff Difference of loss function by the output
+     * @param[in] y Predicted data
+     * @param[in] t Expected data
+     * @param[in] size Size of data
+    */
+    void (*backward)(float*, const float*, const float*, const size_t);
+} LossFunc;
 
 #endif // NN_LOSS_H
