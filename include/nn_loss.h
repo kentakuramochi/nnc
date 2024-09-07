@@ -17,10 +17,11 @@ typedef struct LossFunc {
      *
      * @param[in] y Predicted data
      * @param[in] t Expected data
+     * @param[in] batch_size Batch size of data
      * @param[in] size Size of data
      * @return float Loss
     */
-    float (*forward)(const float*, const float*, const size_t);
+    float (*forward)(const float*, const float*, const size_t, const size_t);
 
     /**
      * @brief Backward of the loss
@@ -28,9 +29,10 @@ typedef struct LossFunc {
      * @param[out] diff Difference of loss function by the output
      * @param[in] y Predicted data
      * @param[in] t Expected data
+     * @param[in] batch_size Batch size of data
      * @param[in] size Size of data
     */
-    void (*backward)(float*, const float*, const float*, const size_t);
+    void (*backward)(float*, const float*, const float*, const size_t, const size_t);
 } LossFunc;
 
 #endif // NN_LOSS_H
