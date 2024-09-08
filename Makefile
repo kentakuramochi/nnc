@@ -12,13 +12,10 @@ example:
 	@cmake -B $(BUILD_DIR) . && cmake --build $(BUILD_DIR) --target example
 
 # Run all test cases in default
-# CASE=all
+CASE=all
 
 test:
-#	@./docker/docker_run.sh "ceedling test:$(CASE)"
-	@./docker/docker_run.sh "ceedling test:test_nn_net test:test_nn_layer test:test_nn_trainer \
-    test:test_fc_layer test:test_sigmoid_layer \
-    test:test_bce_loss"
+	@./docker/docker_run.sh "ceedling test:$(CASE)"
 
 
 clean:
