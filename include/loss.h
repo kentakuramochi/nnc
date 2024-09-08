@@ -1,10 +1,10 @@
 /**
- * @file nn_loss.h
+ * @file loss.h
  * @brief Loss function
  *
  */
-#ifndef NN_LOSS_H
-#define NN_LOSS_H
+#ifndef LOSS_H
+#define LOSS_H
 
 #include <stddef.h>
 
@@ -35,4 +35,4 @@ typedef struct LossFunc {
     void (*backward)(float*, const float*, const float*, const size_t, const size_t);
 } LossFunc;
 
-#endif // NN_LOSS_H
+#endif // LOSS_H

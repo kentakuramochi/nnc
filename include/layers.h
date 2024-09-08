@@ -1,14 +1,14 @@
 /**
- * @file nn_layers.h
+ * @file layers.h
  * @brief Interface to network layers
  *
  */
-#ifndef NN_LAYERS_H
-#define NN_LAYERS_H
+#ifndef LAYERS_H
+#define LAYERS_H
 
 #include <stddef.h>
 
-#include "nn_layer.h"
+#include "layer.h"
 
 #include "layer/fc_layer.h"
 #include "layer/sigmoid_layer.h"
@@ -16,10 +16,10 @@
 /**
  * @brief Initialization functions for each layer
  */
-NnLayer* (*nn_layer_init_funcs[])(NnLayer*) = {
+Layer* (*layer_init_funcs[])(Layer*) = {
     NULL,
     fc_layer_init,
     sigmoid_layer_init
 };
 
-#endif // NN_LAYERS_H
+#endif // LAYERS_H

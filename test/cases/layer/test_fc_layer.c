@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "mock_nn_layer.h"
+#include "mock_layer.h"
 #include "unity.h"
 #include "test_utils.h"
 
@@ -15,7 +15,7 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-static void free_memories(NnLayer *layer) {
+static void free_memories(Layer *layer) {
     free(layer->x);
     free(layer->y);
     free(layer->w);
@@ -26,8 +26,8 @@ static void free_memories(NnLayer *layer) {
 }
 
 void test_alloc_and_free(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_FC, .batch_size=1, .in=2, .out=3 }
+    Layer layer = {
+        .params={ LAYER_TYPE_FC, .batch_size=1, .in=2, .out=3 }
     };
 
     TEST_ASSERT_EQUAL_PTR(&layer, fc_layer_init(&layer));
@@ -45,8 +45,8 @@ void test_alloc_and_free(void) {
 }
 
 void test_forward(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_FC, .batch_size=2, .in=2, .out=3 }
+    Layer layer = {
+        .params={ LAYER_TYPE_FC, .batch_size=2, .in=2, .out=3 }
     };
 
     fc_layer_init(&layer);
@@ -83,8 +83,8 @@ void test_forward(void) {
 }
 
 void test_backward(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_FC, .batch_size=2, .in=2, .out=3 }
+    Layer layer = {
+        .params={ LAYER_TYPE_FC, .batch_size=2, .in=2, .out=3 }
     };
 
     fc_layer_init(&layer);

@@ -1,10 +1,10 @@
 /**
- * @file nn_layer.h
+ * @file layer.h
  * @brief Layer structure
  *
  */
-#ifndef NN_LAYER_H
-#define NN_LAYER_H
+#ifndef LAYER_H
+#define LAYER_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -12,28 +12,28 @@
 /**
  * @brief Type of layers
 */
-typedef enum NnLayerType {
-    NN_LAYER_TYPE_NONE, //!< None
-    NN_LAYER_TYPE_FC, //!< Fully connected layer
-    NN_LAYER_TYPE_SIGMOID //!< Sigmoid layer
-} NnLayerType;
+typedef enum LayerType {
+    LAYER_TYPE_NONE, //!< None
+    LAYER_TYPE_FC, //!< Fully connected layer
+    LAYER_TYPE_SIGMOID //!< Sigmoid layer
+} LayerType;
 
 /**
  * @brief Layer parameters
  *
  */
-typedef struct NnLayerParams {
-    NnLayerType type; //!< Layer type
+typedef struct LayerParams {
+    LayerType type; //!< Layer type
     int batch_size; //!< Number of batches
     int in; //!< Number of input elements
     int out; //!< Number of output elements
-} NnLayerParams;
+} LayerParams;
 
 /**
  * @brief Layer structure
 */
-typedef struct NnLayer {
-    NnLayerParams params;  //!< Layer parameters
+typedef struct Layer {
+    LayerParams params;  //!< Layer parameters
 
     float *x; //!< Input matrix
     float *y; //!< Output matrix
@@ -44,9 +44,9 @@ typedef struct NnLayer {
     float *dw; //!< Difference of weight matrix
     float *db; //!< Difference of bias matrix
 
-    float* (*forward)(struct NnLayer*, const float*);   //!< Forward
-    float* (*backward)(struct NnLayer*, const float*);  //!< Backward
-} NnLayer;
+    float* (*forward)(struct Layer*, const float*);   //!< Forward
+    float* (*backward)(struct Layer*, const float*);  //!< Backward
+} Layer;
 
 /**
  * @brief Allocate layer parameters
@@ -54,14 +54,14 @@ typedef struct NnLayer {
  * @param[in,out] layer Pointer to a layer
  * @return Pointer to the layer, NULL if failed
  */
-NnLayer *nn_layer_alloc_params(NnLayer *layer);
+Layer *layer_alloc_params(Layer *layer);
 
 /**
  * @brief Free layer parameters
  *
  * @param[in,out] layer Pointer to a layer
  */
-void nn_layer_free_params(NnLayer *layer);
+void layer_free_params(Layer *layer);
 
 /**
  * @brief Connect 2 layers
@@ -70,7 +70,7 @@ void nn_layer_free_params(NnLayer *layer);
  * @param[in,out] next Next layer, connect to the previous one
  * @return true if 2 layers are connected, otherwise false
  */
-bool nn_layer_connect(NnLayer *prev, NnLayer *next);
+bool layer_connect(Layer *prev, Layer *next);
 
 /**
  * @brief Forward propagation of a layer
@@ -79,7 +79,7 @@ bool nn_layer_connect(NnLayer *prev, NnLayer *next);
  * @param[in] x An input of the layer
  * @return Pointer to the layer output
  */
-float *nn_layer_forward(NnLayer *layer, const float *x);
+float *layer_forward(Layer *layer, const float *x);
 
 /**
  * @brief Backward propagation of a layer
@@ -88,18 +88,18 @@ float *nn_layer_forward(NnLayer *layer, const float *x);
  * @param[in] dy A differential of previous layer
  * @return Pointer to differential of an input of the layer
  */
-float *nn_layer_backward(NnLayer *layer, const float *dy);
+float *layer_backward(Layer *layer, const float *dy);
 
 /**
  * @brief Clear current gradients of layer
  *
  * @param[in,out] layer Pointer to the layer
  */
-void nn_layer_clear_grad(NnLayer *layer);
+void layer_clear_grad(Layer *layer);
 
 /**
  * @brief Initialization functions for each layer
  */
-extern NnLayer* (*nn_layer_init_funcs[])(NnLayer*);
+extern Layer* (*layer_init_funcs[])(Layer*);
 
-#endif // NN_LAYER_H
+#endif // LAYER_H

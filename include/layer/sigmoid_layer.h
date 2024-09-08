@@ -6,7 +6,7 @@
 #ifndef SIGMOID_LAYER_H
 #define SIGMOID_LAYER_H
 
-#include "nn_layer.h"
+#include "layer.h"
 
 /**
  * @brief Allocate a sigmoid layer
@@ -14,6 +14,6 @@
  * @param[in,out] layer Pointer to a layer
  * @return Pointer to the layer, NULL if failed
 */
-NnLayer *sigmoid_layer_init(NnLayer *layer);
+Layer *sigmoid_layer_init(Layer *layer);
 
 #endif // SIGMOID_LAYER_H

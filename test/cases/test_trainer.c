@@ -1,11 +1,11 @@
 /**
- * @file test_nn_trainer.c
- * @brief Unit tests of nn_trainer.c
+ * @file test_trainer.c
+ * @brief Unit tests of trainer.c
  *
  */
-#include "nn_trainer.h"
+#include "trainer.h"
 
-#include "mock_nn_net.h"
+#include "mock_net.h"
 #include "test_utils.h"
 #include "unity.h"
 
@@ -14,7 +14,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 void test_train_step(void) {
-    NnLayer layers[] = {
+    Layer layers[] = {
         {
             .params={ .batch_size=1, .in=2, .out=3 },
             // 3x2, kind of fully connected layer
@@ -37,12 +37,12 @@ void test_train_step(void) {
         }
     };
 
-    NnNet net = {
+    Net net = {
         .size = 3,
         .layers = layers
     };
 
-    nn_train_step(&net, 0.01);
+    train_step(&net, 0.01);
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         TEST_UTIL_FLOAT_ARRAY(0.99, 0.98, 0.97, 0.96, 0.95, 0.94),
         net.layers[0].w,

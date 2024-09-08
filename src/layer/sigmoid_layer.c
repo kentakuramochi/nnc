@@ -16,8 +16,8 @@
  * @param[in] x An input of the layer
  * @return Pointer to the layer output
  */
-static float *sigmoid_forward(NnLayer *layer, const float *x) {
-    NnLayerParams *params = &layer->params;
+static float *sigmoid_forward(Layer *layer, const float *x) {
+    LayerParams *params = &layer->params;
 
     for (int i = 0; i < (params->batch_size * params->in); i++) {
         layer->x[i] = x[i];
@@ -37,8 +37,8 @@ static float *sigmoid_forward(NnLayer *layer, const float *x) {
  * @param[in] dy A differential of previous layer
  * @return Pointer to differential of an input of the layer
  */
-static float *sigmoid_backward(NnLayer *layer, const float *dy) {
-    NnLayerParams *params = &layer->params;
+static float *sigmoid_backward(Layer *layer, const float *dy) {
+    LayerParams *params = &layer->params;
 
     for (int i = 0; i < (params->batch_size * params->in); i++) {
         layer->dx[i] = dy[i] * layer->y[i] * (1 - layer->y[i]);
@@ -47,8 +47,8 @@ static float *sigmoid_backward(NnLayer *layer, const float *dy) {
     return layer->dx;
 }
 
-NnLayer *sigmoid_layer_init(NnLayer *layer) {
-    NnLayerParams *params = &layer->params;
+Layer *sigmoid_layer_init(Layer *layer) {
+    LayerParams *params = &layer->params;
 
     if ((params->batch_size == 0) ||
         (params->in == 0)) {
@@ -58,13 +58,13 @@ NnLayer *sigmoid_layer_init(NnLayer *layer) {
     size_t x_byte_size = sizeof(float) * params->in;
     layer->x = malloc(params->batch_size * x_byte_size);
     if (layer->x == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     layer->y = malloc(params->batch_size * x_byte_size);
     if (layer->y == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
@@ -73,7 +73,7 @@ NnLayer *sigmoid_layer_init(NnLayer *layer) {
 
     layer->dx = malloc(params->batch_size * x_byte_size);
     if (layer->dx == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 

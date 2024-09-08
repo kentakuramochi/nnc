@@ -1,12 +1,12 @@
 /**
- * @file nn_trainer.h
+ * @file trainer.h
  * @brief Train a network
  *
  */
-#ifndef NN_TRAINER_H
-#define NN_TRAINER_H
+#ifndef TRAINER_H
+#define TRAINER_H
 
-#include "nn_net.h"
+#include "net.h"
 
 /**
  * @brief Train a network in one step
@@ -14,6 +14,6 @@
  * @param[in,out] net Target network
  * @param[in] learning_rate Learning rate
  */
-void nn_train_step(NnNet *net, const float learning_rate);
+void train_step(Net *net, const float learning_rate);
 
-#endif // NN_TRAINER_H
+#endif // TRAINER_H

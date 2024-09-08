@@ -1,28 +1,28 @@
 /**
- * @file nn_net.h
+ * @file net.h
  * @brief Network structure
  *
  */
-#ifndef NN_NET_H
-#define NN_NET_H
+#ifndef NET_H
+#define NET_H
 
-#include "nn_layer.h"
+#include "layer.h"
 
 /**
  * @brief Sequential list of layer parameters
  * @note Terminated with NONE layer for network initialization
  *
 */
-#define NN_LAYER_PARAMS_LIST(...) (NnLayerParams[]){ __VA_ARGS__, (NnLayerParams){ .type=NN_LAYER_TYPE_NONE } }
+#define LAYER_PARAMS_LIST(...) (LayerParams[]){ __VA_ARGS__, (LayerParams){ .type=LAYER_TYPE_NONE } }
 
 /**
  * @brief Network structure
  *
  */
-typedef struct NnNet {
+typedef struct Net {
     int size; //!< The number of layers
-    NnLayer *layers; //!< Layers
-} NnNet;
+    Layer *layers; //!< Layers
+} Net;
 
 /**
  * @brief Get the number of layers of a network
@@ -30,7 +30,7 @@ typedef struct NnNet {
  * @param[in] net Network
  * @return The number of layers in the network
  */
-int nn_net_size(const NnNet *net);
+int net_size(const Net *net);
 
 /**
  * @brief Get layers in the network
@@ -38,7 +38,7 @@ int nn_net_size(const NnNet *net);
  * @param[in] net Network
  * @return Pointer to layers in the network
  */
-NnLayer *nn_net_layers(NnNet *net);
+Layer *net_layers(Net *net);
 
 /**
  * @brief Get an input layer of the network
@@ -46,14 +46,14 @@ NnLayer *nn_net_layers(NnNet *net);
  * @param[in] net Network
  * @return Pointer to the input layer of network
  */
-NnLayer *nn_net_input(const NnNet *net);
+Layer *net_input(const Net *net);
  
 /**
  * @brief Get an output layer of the network
  * @param[in] net Network
  * @return Pointer to the output layer of network
  */
-NnLayer *nn_net_output(const NnNet *net);
+Layer *net_output(const Net *net);
 
 /**
  * @brief Allocate network layers on the heap
@@ -62,21 +62,21 @@ NnLayer *nn_net_output(const NnNet *net);
  * @param[in] param_list List of layer parameters
  * @return Pointer to the network, NULL if failed
  */
-NnNet *nn_net_alloc_layers(NnNet *net, NnLayerParams *param_list);
+Net *net_alloc_layers(Net *net, LayerParams *param_list);
 
 /**
  * @brief Free network layers allocated on the heap
  *
  * @param[in,out] net Network
  */
-void nn_net_free_layers(NnNet *net);
+void net_free_layers(Net *net);
 
 /**
  * @brief Initialize network parameters
  *
  * @param[in,out] net Network
 */
-void net_init_params(NnNet *net);
+void net_init_params(Net *net);
 
 /**
  * @brief Forward propagation of network
@@ -85,7 +85,7 @@ void net_init_params(NnNet *net);
  * @param[in] x Network input
  * @return Pointer to the network output, NULL if failed
  */
-float *nn_net_forward(NnNet *net, const float *x);
+float *net_forward(Net *net, const float *x);
 
 /**
  * @brief Backward propagation of network
@@ -94,13 +94,13 @@ float *nn_net_forward(NnNet *net, const float *x);
  * @param[in] dy Differential of network output
  * @return Pointer to differential of an input of the network, NULL if failed
  */
-float *nn_net_backward(NnNet *net, const float *dy);
+float *net_backward(Net *net, const float *dy);
 
 /**
  * @brief Clear current gradients of network
  *
  * @param[in,out] net Network
  */
-void nn_net_clear_grad(NnNet *net);
+void net_clear_grad(Net *net);
 
-#endif // NN_NET_H
+#endif // NET_H

@@ -1,9 +1,9 @@
 /**
- * @file nn_net.c
+ * @file net.c
  * @brief Network structure
  *
  */
-#include "nn_net.h"
+#include "net.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -12,34 +12,34 @@
 
 #include "random.h"
 
-int nn_net_size(const NnNet *net) {
+int net_size(const Net *net) {
     return net->size;
 }
 
-NnLayer *nn_net_layers(NnNet *net) {
+Layer *net_layers(Net *net) {
     return net->layers;
 }
 
-NnLayer *nn_net_input(const NnNet *net) {
+Layer *net_input(const Net *net) {
     return &net->layers[0];
 }
  
-NnLayer *nn_net_output(const NnNet *net) {
+Layer *net_output(const Net *net) {
     if (net->size == 0) {
         return NULL;
     }
     return &net->layers[net->size - 1];
 }
 
-NnNet *nn_net_alloc_layers(
-    NnNet *net, NnLayerParams *param_list
+Net *net_alloc_layers(
+    Net *net, LayerParams *param_list
 ) {
     if ((net == NULL) || (param_list == NULL)) {
         return NULL;
     }
 
     int num_layers = 0;
-    while (param_list[num_layers].type != NN_LAYER_TYPE_NONE) {
+    while (param_list[num_layers].type != LAYER_TYPE_NONE) {
         num_layers++;
     }
 
@@ -47,7 +47,7 @@ NnNet *nn_net_alloc_layers(
         return NULL;
     }
 
-    NnLayer *layers = malloc(sizeof(NnLayer) * num_layers);
+    Layer *layers = malloc(sizeof(Layer) * num_layers);
     if (layers == NULL) {
         return NULL;
     }
@@ -57,13 +57,13 @@ NnNet *nn_net_alloc_layers(
     // Initialize new layers
     net->size = 0;
     for (int i = 0; i < num_layers; i++) {
-        NnLayer *layer = &layers[i];
+        Layer *layer = &layers[i];
 
         layer->params = param_list[i];
 
         // Connect layers
         if (i > 0) {
-            nn_layer_connect(&layers[i - 1], &layers[i]);
+            layer_connect(&layers[i - 1], &layers[i]);
         }
 
         // Initialize pointers
@@ -76,7 +76,7 @@ NnNet *nn_net_alloc_layers(
         layer->dw = NULL;
         layer->db = NULL;
 
-        if (nn_layer_alloc_params(layer) == NULL) {
+        if (layer_alloc_params(layer) == NULL) {
             goto FREE_LAYERS;
         }
 
@@ -86,30 +86,30 @@ NnNet *nn_net_alloc_layers(
     return net;
 
 FREE_LAYERS:
-    nn_net_free_layers(net);
+    net_free_layers(net);
 
     return NULL;
 }
 
-void nn_net_free_layers(NnNet *net) {
+void net_free_layers(Net *net) {
     if ((net == NULL) || (net->layers == NULL)) {
         return;
     }
 
     for (int i = 0; i < net->size; i++) {
-        nn_layer_free_params(&net->layers[i]);
+        layer_free_params(&net->layers[i]);
     }
 
     free(net->layers);
     net->layers = NULL;
 }
 
-void net_init_params(NnNet *net) {
+void net_init_params(Net *net) {
     srand(time(NULL));
 
     for (int i = 0; i < net->size; i++) {
-        NnLayer *layer = &nn_net_layers(net)[i];
-        NnLayerParams *params = &layer->params;
+        Layer *layer = &net_layers(net)[i];
+        LayerParams *params = &layer->params;
 
         // Initialize weights by Xavier initialization
         const float n = (float)params->in;
@@ -128,7 +128,7 @@ void net_init_params(NnNet *net) {
     }
 }
 
-float *nn_net_forward(NnNet *net, const float *x) {
+float *net_forward(Net *net, const float *x) {
     if ((net == NULL) || (x == NULL)) {
         return NULL;
     }
@@ -136,14 +136,14 @@ float *nn_net_forward(NnNet *net, const float *x) {
     float *in = (float*)x;
     float *out = NULL;
     for (int i = 0; i < net->size; i++) {
-        out = nn_layer_forward(&net->layers[i], in);
+        out = layer_forward(&net->layers[i], in);
         in = out;
     }
 
     return out;
 }
 
-float *nn_net_backward(NnNet *net, const float *dy) {
+float *net_backward(Net *net, const float *dy) {
     if ((net == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -151,15 +151,15 @@ float *nn_net_backward(NnNet *net, const float *dy) {
     float *din = (float*)dy;
     float *dout = NULL;
     for (int i = (net->size - 1); i >= 0; i--) {
-        dout = nn_layer_backward(&net->layers[i], din);
+        dout = layer_backward(&net->layers[i], din);
         din = dout;
     }
 
     return dout;
 }
 
-void nn_net_clear_grad(NnNet *net) {
+void net_clear_grad(Net *net) {
     for (int i = 0; i < net->size; i++) {
-        nn_layer_clear_grad(&net->layers[i]);
+        layer_clear_grad(&net->layers[i]);
     }
 }

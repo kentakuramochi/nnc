@@ -6,7 +6,7 @@
 #ifndef BCE_LOSS_H
 #define BCE_LOSS_H
 
-#include "nn_loss.h"
+#include "loss.h"
 
 /**
  * @brief Binary cross entropy loss

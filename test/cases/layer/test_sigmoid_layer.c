@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "mock_nn_layer.h"
+#include "mock_layer.h"
 #include "unity.h"
 #include "test_utils.h"
 
@@ -15,15 +15,15 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-static void free_memories(NnLayer *layer) {
+static void free_memories(Layer *layer) {
     free(layer->x);
     free(layer->y);
     free(layer->dx);
 }
 
 void test_alloc_and_free(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_SIGMOID, .batch_size=1, .in=2 }
+    Layer layer = {
+        .params={ LAYER_TYPE_SIGMOID, .batch_size=1, .in=2 }
     };
 
     TEST_ASSERT_EQUAL_PTR(&layer, sigmoid_layer_init(&layer));
@@ -42,8 +42,8 @@ void test_alloc_and_free(void) {
 }
 
 void test_forward(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_SIGMOID, .batch_size=2, .in=3 }
+    Layer layer = {
+        .params={ LAYER_TYPE_SIGMOID, .batch_size=2, .in=3 }
     };
 
     sigmoid_layer_init(&layer);
@@ -66,8 +66,8 @@ void test_forward(void) {
 }
 
 void test_backward(void) {
-    NnLayer layer = {
-        .params={ NN_LAYER_TYPE_SIGMOID, .batch_size=2, .in=3 }
+    Layer layer = {
+        .params={ LAYER_TYPE_SIGMOID, .batch_size=2, .in=3 }
     };
 
     sigmoid_layer_init(&layer);

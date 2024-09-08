@@ -14,8 +14,8 @@
  * @param[in] x An input of the layer
  * @return Pointer to the layer output
  */
-static float *fc_forward(NnLayer *layer, const float *x) {
-    NnLayerParams *params = &layer->params;
+static float *fc_forward(Layer *layer, const float *x) {
+    LayerParams *params = &layer->params;
 
     for (int i = 0; i < (params->batch_size * params->in); i++) {
         layer->x[i] = x[i];
@@ -44,8 +44,8 @@ static float *fc_forward(NnLayer *layer, const float *x) {
  * @param[in] dy A differential of previous layer
  * @return Pointer to differential of an input of the layer
  */
-static float *fc_backward(NnLayer *layer, const float *dy) {
-    NnLayerParams *params = &layer->params;
+static float *fc_backward(Layer *layer, const float *dy) {
+    LayerParams *params = &layer->params;
 
     for (int i = 0; i < params->batch_size; i++) {
         for (int j = 0; j < params->in; j++) {
@@ -80,8 +80,8 @@ static float *fc_backward(NnLayer *layer, const float *dy) {
     return layer->dx;
 }
 
-NnLayer *fc_layer_init(NnLayer *layer) {
-    NnLayerParams *params = &layer->params;
+Layer *fc_layer_init(Layer *layer) {
+    LayerParams *params = &layer->params;
 
     if ((params->batch_size == 0) ||
         (params->in == 0) ||
@@ -92,45 +92,45 @@ NnLayer *fc_layer_init(NnLayer *layer) {
     size_t x_byte_size = sizeof(float) * params->in;
     layer->x = malloc(params->batch_size * x_byte_size);
     if (layer->x == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     size_t y_byte_size = sizeof(float) * params->out;
     layer->y = malloc(params->batch_size * y_byte_size);
     if (layer->y == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     size_t w_byte_size = sizeof(float) * params->in * params->out;
     layer->w = malloc(params->batch_size * w_byte_size);
     if (layer->w == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     layer->b = malloc(params->batch_size * y_byte_size);
     if (layer->b == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     layer->dx = malloc(params->batch_size * x_byte_size);
     if (layer->dx == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     layer->dw = malloc(params->batch_size * w_byte_size);
     if (layer->dw == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 
     layer->db = malloc(params->batch_size * y_byte_size);
     if (layer->db == NULL) {
-        nn_layer_free_params(layer);
+        layer_free_params(layer);
         return NULL;
     }
 

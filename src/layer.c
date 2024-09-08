@@ -1,9 +1,9 @@
 /**
- * @file nn_layer.c
+ * @file layer.c
  * @brief Layer structure
  *
  */
-#include "nn_layer.h"
+#include "layer.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -13,17 +13,17 @@
     (ptr) = NULL; \
 }
 
-NnLayer *nn_layer_alloc_params(NnLayer *layer) {
+Layer *layer_alloc_params(Layer *layer) {
     if ((layer == NULL) ||
         // Layer type is NONE or not specified
-        (layer->params.type == NN_LAYER_TYPE_NONE)) {
+        (layer->params.type == LAYER_TYPE_NONE)) {
         return NULL;
     }
 
-    return nn_layer_init_funcs[layer->params.type](layer);
+    return layer_init_funcs[layer->params.type](layer);
 }
 
-void nn_layer_free_params(NnLayer *layer) {
+void layer_free_params(Layer *layer) {
     if (layer == NULL) {
         return;
     }
@@ -40,8 +40,8 @@ void nn_layer_free_params(NnLayer *layer) {
     layer->backward = NULL;
 }
 
-bool nn_layer_connect(NnLayer *prev, NnLayer *next) {
-    NnLayerParams *n_params = &next->params;
+bool layer_connect(Layer *prev, Layer *next) {
+    LayerParams *n_params = &next->params;
     if ((n_params->batch_size != 0) ||
         (n_params->in !=0)) {
         return false;
@@ -53,7 +53,7 @@ bool nn_layer_connect(NnLayer *prev, NnLayer *next) {
     return true;
 }
 
-float *nn_layer_forward(NnLayer *layer, const float *x) {
+float *layer_forward(Layer *layer, const float *x) {
     if ((layer == NULL) || (x == NULL)) {
         return NULL;
     }
@@ -61,7 +61,7 @@ float *nn_layer_forward(NnLayer *layer, const float *x) {
     return layer->forward(layer, x);
 }
 
-float *nn_layer_backward(NnLayer *layer, const float *dy) {
+float *layer_backward(Layer *layer, const float *dy) {
     if ((layer == NULL) || (dy == NULL)) {
         return NULL;
     }
@@ -69,7 +69,7 @@ float *nn_layer_backward(NnLayer *layer, const float *dy) {
     return layer->backward(layer, dy);
 }
 
-void nn_layer_clear_grad(NnLayer *layer) {
+void layer_clear_grad(Layer *layer) {
     if (layer->dx != NULL) {
         const int x_size = layer->params.batch_size * layer->params.in;
         for (int i = 0; i < x_size; i++) {
