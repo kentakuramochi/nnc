@@ -1,4 +1,4 @@
-.PHONY: release test example clean
+.PHONY: release debug test sample clean
 
 BUILD_DIR=./build
 
@@ -8,8 +8,8 @@ release:
 debug:
 	@cmake -DCMAKE_BUILD_TYPE=Debug -B $(BUILD_DIR) . && cmake --build $(BUILD_DIR)
 
-example:
-	@cmake -B $(BUILD_DIR) . && cmake --build $(BUILD_DIR) --target example
+sample:
+	@cmake -B $(BUILD_DIR) . && cmake --build $(BUILD_DIR) --target sample
 
 # Run all test cases in default
 CASE=all
