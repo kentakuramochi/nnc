@@ -1,72 +1,201 @@
 /**
  * @file test_layer.c
- * @brief unit tests of layer.c
- * 
+ * @brief Unit tests of layer.c
+ *
  */
 #include "layer.h"
 
-#include "unity_fixture.h"
+#include <stdlib.h>
 
-TEST_GROUP(layer);
+#include "unity.h"
+#include "test_utils.h"
 
-TEST_SETUP(layer)
-{}
+// Dummy layer type
+#define LAYER_TYPE_DUMMY 1
 
-TEST_TEAR_DOWN(layer)
-{}
+// Functions for the dummy layer
+static float *dummy_forward(Layer *layer, const float *x) {
+    for (int i = 0 ; i < (layer->params.batch_size * layer->params.in); i++) {
+        layer->y[i] = x[i] * 2;
+    }
+    return layer->y;
+}
 
-TEST(layer, layer_alloc_and_free)
-{
-    Layer *layer = layer_alloc();
+static float *dummy_backward(Layer *layer, const float *dy) {
+    for (int i = 0 ; i < (layer->params.batch_size * layer->params.out); i++) {
+        layer->dx[i] = dy[i] / 2;
+    }
+    return layer->dx;
+}
 
-    TEST_ASSERT_NOT_NULL(layer);
+static Layer *dummy_init(Layer *layer) {
+    layer->x = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
+    layer->y = malloc(sizeof(float) * layer->params.batch_size * layer->params.out);
+    layer->dx = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
 
-    TEST_ASSERT_EQUAL(-1, layer->id);
+    layer->forward = dummy_forward;
+    layer->backward = dummy_backward;
+}
 
-    TEST_ASSERT_NULL(layer->x);
+Layer* (*layer_init_funcs[])(Layer*) = {
+    NULL, // LAYER_TYPE_NONE
+    dummy_init
+};
 
-    TEST_ASSERT_NULL(layer->y);
+void setUp(void) {}
 
-    TEST_ASSERT_NULL(layer->w);
-    TEST_ASSERT_NULL(layer->b);
+void tearDown(void) {}
 
-    TEST_ASSERT_NULL(layer->dx);
-    TEST_ASSERT_NULL(layer->dw);
-    TEST_ASSERT_NULL(layer->db);
+void test_allocate_and_free(void) {
+    Layer layer = {
+        .params={ LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 }
+    };
 
-    TEST_ASSERT_EQUAL_INT(-1, layer->prev_id);
-    TEST_ASSERT_EQUAL_INT(-1, layer->next_id);
+    TEST_ASSERT_EQUAL_PTR(&layer, layer_alloc_params(&layer));
+    TEST_ASSERT_NOT_NULL(layer.x);
+    TEST_ASSERT_NOT_NULL(layer.y);
+    TEST_ASSERT_NULL(layer.w);
+    TEST_ASSERT_NULL(layer.b);
+    TEST_ASSERT_NOT_NULL(layer.dx);
+    TEST_ASSERT_NULL(layer.dw);
+    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_EQUAL_PTR(dummy_forward, layer.forward);
+    TEST_ASSERT_EQUAL_PTR(dummy_backward, layer.backward);
 
-    TEST_ASSERT_NULL(layer->forward);
-    TEST_ASSERT_NULL(layer->backward);
+    layer_free_params(&layer);
+    TEST_ASSERT_NULL(layer.x);
+    TEST_ASSERT_NULL(layer.y);
+    TEST_ASSERT_NULL(layer.w);
+    TEST_ASSERT_NULL(layer.b);
+    TEST_ASSERT_NULL(layer.dx);
+    TEST_ASSERT_NULL(layer.dw);
+    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NULL(layer.forward);
+    TEST_ASSERT_NULL(layer.backward);
+}
 
-    TEST_ASSERT_NOT_NULL(layer->init_params);
+void test_allocation_fail_if_layer_is_NULL(void) {
+    TEST_ASSERT_NULL(layer_alloc_params(NULL));
+}
 
-    TEST_ASSERT_NOT_NULL(layer->update);
+void test_allocation_fail_if_layer_type_is_not_specified(void) {
+    Layer layer = { .params={ .batch_size=1, .in=2, .out=2 } };
 
-    const float *ptr_x = layer->x;
+    TEST_ASSERT_NULL(layer_alloc_params(&layer));
+    TEST_ASSERT_NULL(layer.x);
+    TEST_ASSERT_NULL(layer.y);
+    TEST_ASSERT_NULL(layer.w);
+    TEST_ASSERT_NULL(layer.b);
+    TEST_ASSERT_NULL(layer.dx);
+    TEST_ASSERT_NULL(layer.dw);
+    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NULL(layer.forward);
+    TEST_ASSERT_NULL(layer.backward);
+}
 
-    float *ptr_y = layer->y;
+void test_free_to_NULL(void) {
+    layer_free_params(NULL);
+}
 
-    float *ptr_w = layer->w;
-    float *ptr_b = layer->b;
+void test_connect(void) {
+    Layer layer = { .params={ .batch_size=8, .in=2, .out=10 } };
+    Layer next_layer = { .params={ .out=3 } };
 
-    float *ptr_dx = layer->dx;
-    float *ptr_dw = layer->dw;
-    float *ptr_db = layer->db;
+    TEST_ASSERT_TRUE(layer_connect(&layer, &next_layer));
 
-    layer_free(&layer);
+    TEST_ASSERT_EQUAL_INT(8, next_layer.params.batch_size);
+    TEST_ASSERT_EQUAL_INT(10, next_layer.params.in);
+}
 
-    TEST_ASSERT_NULL(layer);
+void test_fail_connect_when_different_value_is_set(void) {
+    Layer layer = { .params={ .batch_size=8, .in=2, .out=10 } };
+    Layer next_layer = { .params={ .in=5, .out=3 } };
 
-    TEST_ASSERT_NULL(ptr_x);
+    TEST_ASSERT_FALSE(layer_connect(&layer, &next_layer));
 
-    TEST_ASSERT_NULL(ptr_y);
+    TEST_ASSERT_EQUAL_INT(0, next_layer.params.batch_size);
+    TEST_ASSERT_EQUAL_INT(5, next_layer.params.in);
+}
 
-    TEST_ASSERT_NULL(ptr_w);
-    TEST_ASSERT_NULL(ptr_b);
+void test_forward(void) {
+    Layer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
+        .y = TEST_UTIL_FLOAT_ZEROS(3),
+        .forward = dummy_forward
+    };
 
-    TEST_ASSERT_NULL(ptr_dx);
-    TEST_ASSERT_NULL(ptr_dw);
-    TEST_ASSERT_NULL(ptr_db);
+    float answer[] = { -2, 0, 2 };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        answer, layer_forward(&layer, TEST_UTIL_FLOAT_ARRAY(-1, 0, 1)), 3
+    );
+}
+
+void test_forward_fail_if_layer_is_NULL(void) {
+    TEST_ASSERT_NULL(layer_forward(NULL, TEST_UTIL_FLOAT_ZEROS(1)));
+}
+
+void test_forward_fail_if_x_is_NULL(void) {
+    Layer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
+        .y = TEST_UTIL_FLOAT_ZEROS(3),
+        .forward = dummy_forward
+    };
+
+    TEST_ASSERT_NULL(layer_forward(&layer, NULL));
+}
+
+void test_backward(void) {
+    Layer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
+        .dx = TEST_UTIL_FLOAT_ZEROS(3),
+        .backward = dummy_backward
+    };
+
+    float answer[] = { -1, 0, 1 };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        answer, layer_backward(&layer, TEST_UTIL_FLOAT_ARRAY(-2, 0, 2)), 3
+    );
+}
+
+void test_backward_fail_if_layer_is_NULL(void) {
+    TEST_ASSERT_NULL(layer_backward(NULL, TEST_UTIL_FLOAT_ZEROS(1)));
+}
+
+void test_backward_fail_if_dy_is_NULL(void) {
+    Layer layer = {
+        .params = { .batch_size=1, .in=3, .out=3 },
+        .dx = TEST_UTIL_FLOAT_ZEROS(3),
+        .backward = dummy_backward
+    };
+
+    TEST_ASSERT_NULL(layer_backward(&layer, NULL));
+}
+
+void test_clear_grad(void) {
+    Layer layers[] = {
+        {
+            .params = { .batch_size=4, .in=2, .out=3 },
+            .dx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
+            .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+            .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
+        },
+        { .params = { .batch_size=4, .in=3, .out=1 } }
+    };
+
+    layer_clear_grad(&layers[0]);
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ZEROS(2), layers[0].dx, 2
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ZEROS(3 * 2), layers[0].dw, (3 * 2)
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ZEROS(3), layers[0].db, 3
+    );
+
+    // Skip unallocated grads
+    layer_clear_grad(&layers[1]);
 }

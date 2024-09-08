@@ -1,89 +1,105 @@
 /**
  * @file layer.h
- * @brief basic layer structure and operations
- * 
+ * @brief Layer structure
+ *
  */
 #ifndef LAYER_H
 #define LAYER_H
 
-#define N_DIM 4 //!< num of data dimensions, fixed to 4 for CNN
+#include <stdbool.h>
+#include <stddef.h>
 
 /**
- * @brief set dimension of matrix array
- * 
- */
-#define SET_DIM(x, n, c, h, w) {\
-    (x)[0] = n;\
-    (x)[1] = c;\
-    (x)[2] = h;\
-    (x)[3] = w;\
-}
+ * @brief Type of layers
+*/
+typedef enum LayerType {
+    LAYER_TYPE_NONE, //!< None
+    LAYER_TYPE_FC, //!< Fully connected layer
+    LAYER_TYPE_SIGMOID //!< Sigmoid layer
+} LayerType;
 
 /**
- * @struct 
- * @brief basic layer structure
- * 
+ * @brief Layer parameters
+ *
  */
+typedef struct LayerParams {
+    LayerType type; //!< Layer type
+    int batch_size; //!< Number of batches
+    int in; //!< Number of input elements
+    int out; //!< Number of output elements
+} LayerParams;
+
+/**
+ * @brief Layer structure
+*/
 typedef struct Layer {
-    int id;             //!< layer ID internal network
+    LayerParams params;  //!< Layer parameters
 
-    const float *x;     //!< layer input matrix
-    int x_dim[N_DIM];   //!< dimension of x
-    int x_size;         //!< num of elements of x
+    float *x; //!< Input matrix
+    float *y; //!< Output matrix
+    float *w; //!< Weight matrix
+    float *b; //!< Bias matrix
 
-    float *y;           //!< layer output matrix
-    int y_dim[N_DIM];   //!< dimension of y
-    int y_size;         //!< num of elements of y
+    float *dx; //!< Difference of input matrix
+    float *dw; //!< Difference of weight matrix
+    float *db; //!< Difference of bias matrix
 
-    float *w;           //!< layer weight
-    int w_dim[N_DIM];   //!< dimension of w
-    int w_size;         //!< num of elements of w
-
-    float *b;           //!< layer bias
-    int b_dim[N_DIM];   //!< dimension of b
-    int b_size;         //!< num of elements of b
-
-    float *dx;  //!< differential of x
-    float *dw;  //!< differential of w
-    float *db;  //!< differential of b
-
-    int prev_id;    //!< ID of previous layer
-    int next_id;    //!< ID of next layer
-
-    void (*forward)(struct Layer *self, const float *x);     //!< forward propagation
-    void (*backward)(struct Layer *self, const float *dy);   //!< backward propagation
-
-    void (*init_params)(struct Layer *self);                        //!< parameter initialization
-    void (*update)(struct Layer *self, const float learning_rate);  //!< parameter updating
+    float* (*forward)(struct Layer*, const float*);   //!< Forward
+    float* (*backward)(struct Layer*, const float*);  //!< Backward
 } Layer;
 
 /**
- * @brief layer parameter structure
- * 
+ * @brief Allocate layer parameters
+ *
+ * @param[in,out] layer Pointer to a layer
+ * @return Pointer to the layer, NULL if failed
  */
-typedef struct LayerParameter {
-    int in;     //!< num of layer input
-    int out;    //!< num of layer output
-} LayerParameter;
+Layer *layer_alloc_params(Layer *layer);
 
 /**
- * @brief macro to set LayerParameter
- * 
+ * @brief Free layer parameters
+ *
+ * @param[in,out] layer Pointer to a layer
  */
-#define SET_PARAM(...) (LayerParameter){ __VA_ARGS__ }
+void layer_free_params(Layer *layer);
 
 /**
- * @brief allocate basic layer structure
- * 
- * @return Layer* poiner to layer structure
+ * @brief Connect 2 layers
+ *
+ * @param[in,out] prev Previous layer, being connected from the next one
+ * @param[in,out] next Next layer, connect to the previous one
+ * @return true if 2 layers are connected, otherwise false
  */
-Layer *layer_alloc(void);
+bool layer_connect(Layer *prev, Layer *next);
 
 /**
- * @brief deallocate layer structure
- * 
- * @param[in,out] layer layer structure to be deallocated
+ * @brief Forward propagation of a layer
+ *
+ * @param[in,out] layer Layer
+ * @param[in] x An input of the layer
+ * @return Pointer to the layer output
  */
-void layer_free(Layer **layer);
+float *layer_forward(Layer *layer, const float *x);
+
+/**
+ * @brief Backward propagation of a layer
+ *
+ * @param[in,out] layer Layer
+ * @param[in] dy A differential of previous layer
+ * @return Pointer to differential of an input of the layer
+ */
+float *layer_backward(Layer *layer, const float *dy);
+
+/**
+ * @brief Clear current gradients of layer
+ *
+ * @param[in,out] layer Pointer to the layer
+ */
+void layer_clear_grad(Layer *layer);
+
+/**
+ * @brief Initialization functions for each layer
+ */
+extern Layer* (*layer_init_funcs[])(Layer*);
 
 #endif // LAYER_H

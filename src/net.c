@@ -1,167 +1,165 @@
 /**
  * @file net.c
- * @brief network structure
- * 
+ * @brief Network structure
+ *
  */
 #include "net.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
-#include "data.h"
-#include "util.h"
-#include "mat.h"
+#include "random.h"
 
-Net *net_alloc(void)
-{
-    Net *net = malloc(sizeof(Net));
-    if (net == NULL) {
-        return NULL;
-    }
-
-    // initialize member
-    net->size = 0;
-
-    for (int i = 0; i < NET_LAYER_MAX_SIZE; i++) {
-        net->layers[i] = NULL;
-    }
-
-    net->input_layer  = NULL;
-    net->output_layer = NULL;
-
-    return net;
+int net_size(const Net *net) {
+    return net->size;
 }
 
-Net *net_create(const int size, Layer *layers[])
-{
-    if ((size < 1) || (size > NET_LAYER_MAX_SIZE) || (layers == NULL)) {
+Layer *net_layers(Net *net) {
+    return net->layers;
+}
+
+Layer *net_input(const Net *net) {
+    return &net->layers[0];
+}
+ 
+Layer *net_output(const Net *net) {
+    if (net->size == 0) {
+        return NULL;
+    }
+    return &net->layers[net->size - 1];
+}
+
+Net *net_alloc_layers(
+    Net *net, LayerParams *param_list
+) {
+    if ((net == NULL) || (param_list == NULL)) {
         return NULL;
     }
 
-    Net *net = net_alloc();
-    if (net == NULL) {
+    int num_layers = 0;
+    while (param_list[num_layers].type != LAYER_TYPE_NONE) {
+        num_layers++;
+    }
+
+    if (num_layers == 0) {
         return NULL;
     }
 
+    Layer *layers = malloc(sizeof(Layer) * num_layers);
+    if (layers == NULL) {
+        return NULL;
+    }
+
+    net->layers = layers;
+
+    // Initialize new layers
     net->size = 0;
+    for (int i = 0; i < num_layers; i++) {
+        Layer *layer = &layers[i];
 
-    for (int i = 0; i < size; i++) {
-        if (net_append(net, layers[i]) == NULL) {
-            goto NET_FREE;
+        layer->params = param_list[i];
+
+        // Connect layers
+        if (i > 0) {
+            layer_connect(&layers[i - 1], &layers[i]);
         }
+
+        // Initialize pointers
+        layer->x = NULL;
+        layer->y = NULL;
+        layer->w = NULL;
+        layer->b = NULL;
+
+        layer->dx = NULL;
+        layer->dw = NULL;
+        layer->db = NULL;
+
+        if (layer_alloc_params(layer) == NULL) {
+            goto FREE_LAYERS;
+        }
+
+        net->size++;
     }
 
     return net;
 
-NET_FREE:
-    net_free(&net);
+FREE_LAYERS:
+    net_free_layers(net);
 
     return NULL;
 }
 
-Net *net_append(Net *net, Layer *layer)
-{
-    if ((net == NULL) || (layer == NULL)) {
-        return NULL;
-    }
-
-    int id = net->size;
-
-    layer->id      = id;
-    layer->next_id = -1;
-
-    // append layer to tail of the network layers
-    if (id == 0) {
-        // first layer
-        layer->x       = NULL;
-        layer->prev_id = -1;
-    } else {
-        Layer *prev_layer = net->layers[id - 1];
-
-        layer->x       = prev_layer->y;
-        layer->prev_id = prev_layer->id;
-
-        prev_layer->next_id = id;
-    }
-    net->layers[id] = layer;
-
-    net->input_layer  = net->layers[0];
-    net->output_layer = net->layers[id];
-
-    net->size++;
-
-    return net;
-}
-
-void net_init_layer_params(Net *net)
-{
-    for (int i = 0; i < net->size; i++) {
-        net->layers[i]->init_params(net->layers[i]);
-    }
-}
-
-void net_forward(Net *net, const float *x)
-{
-    Layer *layer = net->layers[0];
-
-    layer->x = x;
-
-    while (true) {
-        layer->forward(layer, layer->x);
-        int next_id = layer->next_id;
-        if (next_id < 0) {
-            break;
-        }
-        layer = net->layers[next_id];
-    }
-}
-
-void net_backward(Net *net, const float *t)
-{
-    // calculate diff at the last layer
-    float *dy = malloc(sizeof(float) * net->output_layer->y_size);
-
-    mat_sub(net->output_layer->y, t, dy, 1, net->output_layer->y_size);
-
-    net->output_layer->backward(net->output_layer, dy);
-
-    Layer *next_layer = net->output_layer;
-    Layer *layer = net->layers[next_layer->prev_id];
-
-    // backwarding
-    while (true) {
-        layer->backward(layer, next_layer->dx);
-        int prev_id = layer->prev_id;
-        if (prev_id < 0) {
-            break;
-        }
-        next_layer = layer;
-        layer = net->layers[prev_id];
-    }
-
-    FREE_WITH_NULL(&dy);
-}
-
-void net_free(Net **net)
-{
-    if (*net == NULL) {
+void net_free_layers(Net *net) {
+    if ((net == NULL) || (net->layers == NULL)) {
         return;
     }
 
-    Layer *layer = (*net)->layers[0];
-    if (layer == NULL) {
-        goto NET_FREE;
+    for (int i = 0; i < net->size; i++) {
+        layer_free_params(&net->layers[i]);
     }
 
-    while (true) {
-        int next_id = layer->next_id;
-        layer_free(&layer);
-        if (next_id < 0) {
-            break;
+    free(net->layers);
+    net->layers = NULL;
+}
+
+void net_init_params(Net *net) {
+    srand(time(NULL));
+
+    for (int i = 0; i < net->size; i++) {
+        Layer *layer = &net_layers(net)[i];
+        LayerParams *params = &layer->params;
+
+        // Initialize weights by Xavier initialization
+        const float n = (float)params->in;
+        if (layer->w != NULL) {
+            for (int j = 0; j < (params->in * params->out); j++) {
+                layer->w[j] = rand_norm(0, (1 / sqrtf(n)));
+            }
         }
-        layer = (*net)->layers[next_id];
+
+        // Initialize biases by 0
+        if (layer->b != NULL) {
+            for (int j = 0; j < params->out; j++) {
+                layer->b[j] = 0;
+            }
+        }
+    }
+}
+
+float *net_forward(Net *net, const float *x) {
+    if ((net == NULL) || (x == NULL)) {
+        return NULL;
     }
 
-NET_FREE:
-    FREE_WITH_NULL(net);
+    float *in = (float*)x;
+    float *out = NULL;
+    for (int i = 0; i < net->size; i++) {
+        out = layer_forward(&net->layers[i], in);
+        in = out;
+    }
+
+    return out;
+}
+
+float *net_backward(Net *net, const float *dy) {
+    if ((net == NULL) || (dy == NULL)) {
+        return NULL;
+    }
+
+    float *din = (float*)dy;
+    float *dout = NULL;
+    for (int i = (net->size - 1); i >= 0; i--) {
+        dout = layer_backward(&net->layers[i], din);
+        din = dout;
+    }
+
+    return dout;
+}
+
+void net_clear_grad(Net *net) {
+    for (int i = 0; i < net->size; i++) {
+        layer_clear_grad(&net->layers[i]);
+    }
 }

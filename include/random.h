@@ -1,41 +1,26 @@
 /**
  * @file random.h
- * @brief pseudorandom number generators
- * 
- */
+ * @brief Simple PRNG
+*/
 #ifndef RANDOM_H
 #define RANDOM_H
 
-#include <stdint.h>
-
 /**
- * @brief set seed value of Xorshift PRNG
+ * @brief Get a random value from a uniform distribution
  * 
- * @param seed seed value
- */
-void rand_seed(uint32_t seed);
-
-/**
- * @brief get pseudorandom number by Xorshift PRNG
- * 
- * @return uint32_t pseudorandom number
- */
-uint32_t rand_xorshift(void);
-
-/**
- * @brief get pseudorandom number from uniform distribution [0, 1]
- * 
- * @return float pseudorandom number with [0, 1]
+ * @return float Random value within [0, 1)
+ * @note Need to initialize by srand in stdlib.h beforehand
  */
 float rand_uniform(void);
 
 /**
- * @brief get pseudorandom number from normal distribution with specified mean and std. dev.
+ * @brief Get a random value from a normal distribution
  * 
- * @param[in] mean mean of normal distribution
- * @param[in] std standard deviation of normal distribution
- * @return float pseudorandom number with normal distribution
+ * @param[in] mean Mean of the distribution
+ * @param[in] stddev Std. dev. for the distribution
+ * @return float Random value
+ * @note Need to initialize by srand in stdlib.h beforehand
  */
-float rand_norm(const float mean, const float std);
+float rand_norm(const float mean, const float stddev);
 
 #endif // RANDOM_H

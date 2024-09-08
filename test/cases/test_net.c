@@ -1,252 +1,351 @@
 /**
  * @file test_net.c
- * @brief unit test of net.c
- * 
+ * @brief Unit tests of net.c
+ *
  */
-#include "data.h"
 #include "net.h"
-#include "layers.h"
-#include "mat.h"
-#include "random.h"
-#include "util.h"
 
-#include "unity_fixture.h"
+#include "mock_layer.h"
+#include "mock_random.h"
+#include "unity.h"
+#include "test_utils.h"
 
-TEST_GROUP(net);
+// Dummy layer type
+#define LAYER_TYPE_DUMMY 1
 
-TEST_SETUP(net)
-{}
+void setUp(void) {}
 
-TEST_TEAR_DOWN(net)
-{}
+void tearDown(void) {}
 
-TEST(net, net_alloc_and_free)
-{
-    Net *net = net_alloc();
+void test_allocate_and_free_layer(void) {
+    Net net;
 
-    TEST_ASSERT_NOT_NULL(net);
+    // Function `layer_alloc` call isn't fully tested
+    // arguments are not verified because of using malloc internally
+    Layer dummy_layer;
+    layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
+    LayerParams params = {
+        .type=LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2
+    };
+    TEST_ASSERT_EQUAL_PTR(
+        &net,
+        net_alloc_layers(
+            &net,
+            (LayerParams[]){
+                params,
+                { LAYER_TYPE_NONE } // Empty struct is bad in C99
+            }
+        )
+    );
 
-    TEST_ASSERT_EQUAL(0, net->size);
+    TEST_ASSERT_EQUAL_INT(1, net_size(&net));
 
-    for (int i = 0; i < NET_LAYER_MAX_SIZE; i++) {
-        TEST_ASSERT_NULL(net->layers[i]);
+    TEST_ASSERT_NOT_NULL(net_layers(&net));
+
+    Layer *layer = &net_layers(&net)[0];
+    TEST_ASSERT_EQUAL_PTR(layer, net_input(&net));
+    TEST_ASSERT_EQUAL_PTR(layer, net_output(&net));
+
+    TEST_ASSERT_EQUAL_MEMORY(&params, &layer->params, sizeof(LayerParams));
+
+    // Same with `layer_alloc_params`,
+    // `layer_free_params` is not fully tested
+    layer_free_params_ExpectAnyArgs();
+    net_free_layers(&net);
+    TEST_ASSERT_NULL(net.layers);
+}
+
+void test_allocate_and_free_3layers(void) {
+    Net net;
+
+    LayerParams layer_params[] = {
+        { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+        { LAYER_TYPE_DUMMY },
+        { LAYER_TYPE_DUMMY },
+        { LAYER_TYPE_NONE }
+    };
+
+    Layer dummy_layer;
+    layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
+    layer_connect_ExpectAnyArgsAndReturn(true);
+    layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
+    layer_connect_ExpectAnyArgsAndReturn(true);
+    layer_alloc_params_ExpectAnyArgsAndReturn(&dummy_layer);
+    TEST_ASSERT_EQUAL_PTR(&net, net_alloc_layers(&net, layer_params));
+
+    TEST_ASSERT_EQUAL_INT(3, net_size(&net));
+
+    TEST_ASSERT_EQUAL_PTR(&net_layers(&net)[0], net_input(&net));
+    TEST_ASSERT_EQUAL_PTR(&net_layers(&net)[2], net_output(&net));
+
+    for (int i = 0; i < 3; i++) {
+        Layer *layer = &net_layers(&net)[i];
+        TEST_ASSERT_EQUAL_MEMORY(
+            &layer_params[i], &layer->params, sizeof(LayerParams)
+        );
     }
 
-    TEST_ASSERT_NULL(net->input_layer);
-    TEST_ASSERT_NULL(net->output_layer);
-
-    net_free(&net);
-
-    TEST_ASSERT_NULL(net);
+    layer_free_params_ExpectAnyArgs();
+    layer_free_params_ExpectAnyArgs();
+    layer_free_params_ExpectAnyArgs();
+    net_free_layers(&net);
+    TEST_ASSERT_NULL(net.layers);
 }
 
-TEST(net, net_create_and_free)
-{
-    Net *net = net_create(
-        3,
-        (Layer*[]){
-            fc_layer((LayerParameter){ .in=2, .out=10 }),
-            sigmoid_layer((LayerParameter){ .in=10 }),
-            softmax_layer((LayerParameter){ .in=10 })
-        }
+void test_allocation_fail_if_net_is_NULL(void) {
+    TEST_ASSERT_NULL(
+        net_alloc_layers(
+            NULL,
+            (LayerParams[]){
+                { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+                { LAYER_TYPE_NONE }
+            }
+        )
     );
-
-    TEST_ASSERT_NOT_NULL(net);
-
-    TEST_ASSERT_NOT_NULL(net->layers);
-
-    TEST_ASSERT_EQUAL_INT(3, net->size);
-
-    TEST_ASSERT_EQUAL_INT(2, net->layers[0]->x_size);
-    TEST_ASSERT_EQUAL_INT(10, net->layers[0]->y_size);
-    TEST_ASSERT_EQUAL_INT((2 * 10), net->layers[0]->w_size);
-    TEST_ASSERT_EQUAL_INT(10, net->layers[0]->b_size);
-    TEST_ASSERT_NULL(net->layers[0]->x);
-    TEST_ASSERT_NOT_NULL(net->layers[0]->y);
-    TEST_ASSERT_NOT_NULL(net->layers[0]->w);
-    TEST_ASSERT_NOT_NULL(net->layers[0]->b);
-    TEST_ASSERT_EQUAL_INT(-1, net->layers[0]->prev_id);
-    TEST_ASSERT_EQUAL_INT(net->layers[1]->id, net->layers[0]->next_id);
-
-    TEST_ASSERT_EQUAL_INT(10, net->layers[1]->x_size);
-    TEST_ASSERT_EQUAL_INT(10, net->layers[1]->y_size);
-    TEST_ASSERT_EQUAL_PTR(net->layers[0]->y, net->layers[1]->x);
-    TEST_ASSERT_NOT_NULL(net->layers[1]->y);
-    TEST_ASSERT_EQUAL_INT(net->layers[0]->id, net->layers[1]->prev_id);
-    TEST_ASSERT_EQUAL_INT(net->layers[2]->id, net->layers[1]->next_id);
-
-    TEST_ASSERT_EQUAL_INT(10, net->layers[2]->x_size);
-    TEST_ASSERT_EQUAL_INT(10, net->layers[2]->y_size);
-    TEST_ASSERT_EQUAL_PTR(net->layers[1]->y, net->layers[2]->x);
-    TEST_ASSERT_NOT_NULL(net->layers[2]->y);
-    TEST_ASSERT_EQUAL_INT(net->layers[1]->id, net->layers[2]->prev_id);
-    TEST_ASSERT_EQUAL_INT(-1, net->layers[2]->next_id);
-
-    TEST_ASSERT_EQUAL_PTR(net->layers[0], net->input_layer);
-    TEST_ASSERT_EQUAL_PTR(net->layers[2], net->output_layer);
-
-    net_free(&net);
-
-    TEST_ASSERT_NULL(net);
 }
 
-TEST(net, net_create_over_size)
-{
-    Net *net = net_create(
-        257,
-        (Layer*[]){
-            fc_layer((LayerParameter){ .in=2, .out=10 }),
-            sigmoid_layer((LayerParameter){ .in=10 }),
-            softmax_layer((LayerParameter){ .in=10 })
+void test_allocation_fail_if_param_list_is_NULL(void) {
+    Net net;
+    TEST_ASSERT_NULL(net_alloc_layers(&net, NULL));
+}
+
+void test_allocation_fail_if_layer_parameter_is_empty(void) {
+    Net net;
+    TEST_ASSERT_NULL(net_alloc_layers(&net, (LayerParams[]){ {} }));
+}
+
+void test_free_layers_for_NULL(void) {
+    Net *net = NULL;
+    net_free_layers(net);
+}
+
+void test_free_layers_when_layers_are_NULL(void) {
+    Net net = { .layers=NULL };
+    net_free_layers(&net);
+}
+
+void test_init(void) {
+    Net net = {
+        .size = 3,
+        .layers = (Layer[]){
+            {
+                .params={ .in=2, .out=3 },
+                .w=TEST_UTIL_FLOAT_ZEROS(3 * 2),
+                .b=TEST_UTIL_FLOAT_ZEROS(3)
+            },
+            { .w=NULL, .b=NULL },
+            {
+                .params={ .in=3, .out=1 },
+                .w=TEST_UTIL_FLOAT_ZEROS(1 * 3),
+                .b=TEST_UTIL_FLOAT_ZEROS(1)
+            }
         }
-    );
+    };
 
-    TEST_ASSERT_NULL(net);
-}
-
-TEST(net, net_append)
-{
-    Net *net = net_alloc();
-
-    Layer *fc1 = fc_layer((LayerParameter){ .in=2, .out=10 });
-    Layer *fc2 = fc_layer((LayerParameter){ .in=10, .out=2 });
-
-    TEST_ASSERT_EQUAL(net, net_append(net, fc1));
-    TEST_ASSERT_EQUAL(net, net_append(net, fc2));
-
-    TEST_ASSERT_EQUAL(2, net->size);
-
-    TEST_ASSERT_EQUAL_PTR(fc1, net->layers[0]);
-    TEST_ASSERT_EQUAL_PTR(fc2, net->layers[1]);
-
-    TEST_ASSERT_EQUAL_PTR(fc1, net->input_layer);
-    TEST_ASSERT_EQUAL_PTR(fc2, net->output_layer);
-
-    net_free(&net);
-}
-
-TEST(net, net_append_null)
-{
-    Net *net = net_alloc();
-
-    TEST_ASSERT_NULL(net_append(net, NULL));
-}
-
-TEST(net, net_init_layer_params)
-{
-#define IN_SIZE 2
-#define MID_SIZE 3
-
-    Net *net = net_create(
-        3,
-        (Layer*[]){
-            fc_layer((LayerParameter){ .in=IN_SIZE, .out=MID_SIZE }),
-            sigmoid_layer((LayerParameter){ .in=MID_SIZE }),
-            softmax_layer((LayerParameter){ .in=MID_SIZE })
-        }
-    );
-
-    Layer *fc = net->layers[0];
-
-    rand_seed(0);
-
-    float rand_vals[IN_SIZE * MID_SIZE];
-    float scale = 1.0f / sqrt(1.0f / fc->x_size);
-    for (int i = 0; i < fc->w_size; i++) {
-        rand_vals[i] = rand_norm(0, 1) * scale;
+    for (int i = 0; i < (3 * 2); i++) {
+        rand_norm_ExpectAndReturn(0, (1 / sqrtf(2)), 1);
+    }
+    for (int i = 0; i < 3; i++) {
+        rand_norm_ExpectAndReturn(0, (1 / sqrtf(3)), 1);
     }
 
-    rand_seed(0);
+    net_init_params(&net);
 
-    net_init_layer_params(net);
-
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(rand_vals, fc->w, fc->w_size);
-
-    TEST_ASSERT_EACH_EQUAL_FLOAT(0, fc->b, fc->b_size);
-
-    net_free(&net);
-
-#undef IN_SIZE
-#undef MID_SIZE
+    // Confirm values are set
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ARRAY(1, 1, 1, 1, 1, 1), net.layers[0].w, (3 * 2)
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ARRAY(1, 1, 1), net.layers[2].w, 3
+    );
+    // Confirm biases are all zero
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(TEST_UTIL_FLOAT_ZEROS(3), net.layers[0].b, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(TEST_UTIL_FLOAT_ZEROS(1), net.layers[2].b, 1);
 }
 
-TEST(net, net_forward)
-{
-    Net *net = net_create(
-        3,
-        (Layer*[]){
-            fc_layer((LayerParameter){ .in=2, .out=2 }),
-            sigmoid_layer((LayerParameter){ .in=2 }),
-            softmax_layer((LayerParameter){ .in=2 })
+void test_forward_layer(void) {
+    Net net;
+
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_NONE }
         }
     );
 
-    float w[] = {
-        1, 2,
-        3, 4
-    };
-    fdata_copy(w, net->layers[0]->w_size, net->layers[0]->w);
+    float dummy_x, dummy_y;
+    layer_forward_ExpectAndReturn(
+        &net_layers(&net)[0], &dummy_x, &dummy_y
+    );
+    TEST_ASSERT_EQUAL_PTR(&dummy_y, net_forward(&net, &dummy_x));
 
-    float b[] = { 0, 1 };
-    fdata_copy(b, net->layers[0]->b_size, net->layers[0]->b);
-
-    float x[] = { 0.1, 0.2 };
-
-    net_forward(net, x);
-
-    float y_fc[] = { 0.7, 2 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_fc, net->layers[0]->y, 2);
-
-    float y_sigmoid[] = { 0.66818777, 0.88079708 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_sigmoid, net->layers[1]->y, 2);
-
-    float y_softmax[] = { 0.44704699, 0.55295301 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(y_softmax, net->layers[2]->y, 2);
-
-    net_free(&net);
+    layer_free_params_Ignore();
+    net_free_layers(&net);
 }
 
-TEST(net, net_backward)
-{
-    Net *net = net_create(
-        3,
-        (Layer*[]){
-            fc_layer((LayerParameter){ .in=2, .out=2 }),
-            sigmoid_layer((LayerParameter){ .in=2 }),
-            softmax_layer((LayerParameter){ .in=2 })
+void test_forward_3layers(void) {
+    Net net;
+
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_NONE }
         }
     );
 
-    float w[] = {
-        1, 2,
-        3, 4
-    };
-    fdata_copy(w, net->layers[0]->w_size, net->layers[0]->w);
+    float dummy_x, dummy_y[3];
+    layer_forward_ExpectAndReturn(
+        &net_layers(&net)[0], &dummy_x, &dummy_y[0]
+    );
+    layer_forward_ExpectAndReturn(
+        &net_layers(&net)[1], &dummy_y[0], &dummy_y[1]
+    );
+    layer_forward_ExpectAndReturn(
+        &net_layers(&net)[2], &dummy_y[1], &dummy_y[2]
+    );
+    TEST_ASSERT_EQUAL_PTR(&dummy_y[2], net_forward(&net, &dummy_x));
 
-    float b[] = { 0, 1 };
-    fdata_copy(b, net->layers[0]->b_size, net->layers[0]->b);
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
 
-    float x[] = { 0.1, 0.2 };
+void test_forward_fail_if_net_is_NULL(void) {
+    float dummy_x;
+    TEST_ASSERT_NULL(net_forward(NULL, &dummy_x));
+}
 
-    net_forward(net, x);
+void test_forward_fail_if_x_is_NULL(void) {
+    Net net;
 
-    float t[] = { 0, 1 };
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_NONE }
+        }
+    );
 
-    net_backward(net, t);
+    TEST_ASSERT_NULL(net_forward(&net, NULL));
 
-    TEST_ASSERT_NOT_NULL(net->layers[2]->dx);
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
 
-    TEST_ASSERT_NOT_NULL(net->layers[1]->dx);
+void test_backward_layer(void) {
+    Net net;
 
-    TEST_ASSERT_NOT_NULL(net->layers[0]->dx);
-    TEST_ASSERT_NOT_NULL(net->layers[0]->dw);
-    TEST_ASSERT_NOT_NULL(net->layers[0]->db);
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_NONE }
+        }
+    );
 
-    float dx_ans[] = {
-        0.00524194, 0.10959995
-    };
+    float dummy_dy, dummy_dx;
+    layer_backward_ExpectAndReturn(
+        &net_layers(&net)[0], &dummy_dy, &dummy_dx
+    );
+    TEST_ASSERT_EQUAL_PTR(&dummy_dx, net_backward(&net, &dummy_dy));
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dx_ans, net->layers[0]->dx, (1 * 2));
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
 
-    net_free(&net);
+void test_backward_3layer(void) {
+    Net net;
+
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_NONE }
+        }
+    );
+
+    float dummy_dy, dummy_dx[3];
+    layer_backward_ExpectAndReturn(
+        &net_layers(&net)[2], &dummy_dy, &dummy_dx[2]
+    );
+    layer_backward_ExpectAndReturn(
+        &net_layers(&net)[1], &dummy_dx[2], &dummy_dx[1]
+    );
+    layer_backward_ExpectAndReturn(
+        &net_layers(&net)[0], &dummy_dx[1], &dummy_dx[0]
+    );
+    TEST_ASSERT_EQUAL_PTR(&dummy_dx[0], net_backward(&net, &dummy_dy));
+
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
+
+void test_backward_fail_if_net_is_NULL(void) {
+    float dummy_dy;
+    TEST_ASSERT_NULL(net_backward(NULL, &dummy_dy));
+}
+
+void test_backward_fail_if_dy_is_NULL(void) {
+    Net net;
+
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_NONE }
+        }
+    );
+
+    TEST_ASSERT_NULL(net_backward(&net, NULL));
+
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
+
+void test_clear_grad(void) {
+    Net net;
+
+    layer_connect_IgnoreAndReturn(true);
+    Layer dummy_layer;
+    layer_alloc_params_IgnoreAndReturn(&dummy_layer);
+    net_alloc_layers(
+        &net,
+        (LayerParams[]){
+            { LAYER_TYPE_DUMMY, .batch_size=1, .in=2, .out=2 },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_DUMMY },
+            { LAYER_TYPE_NONE }
+        }
+    );
+
+    layer_clear_grad_Expect(&net_layers(&net)[0]);
+    layer_clear_grad_Expect(&net_layers(&net)[1]);
+    layer_clear_grad_Expect(&net_layers(&net)[2]);
+    net_clear_grad(&net);
+
+    layer_free_params_Ignore();
+    net_free_layers(&net);
 }
