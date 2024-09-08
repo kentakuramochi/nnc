@@ -6,7 +6,9 @@
 #include "nn_net.h"
 
 #include "mock_nn_layer.h"
+#include "mock_random.h"
 #include "unity.h"
+#include "test_utils.h"
 
 // Dummy layer type
 #define NN_LAYER_TYPE_DUMMY 1
@@ -120,6 +122,45 @@ void test_free_layers_for_NULL(void) {
 void test_free_layers_when_layers_are_NULL(void) {
     NnNet net = { .layers=NULL };
     nn_net_free_layers(&net);
+}
+
+void test_init(void) {
+    NnNet net = {
+        .size = 3,
+        .layers = (NnLayer[]){
+            {
+                .params={ .in=2, .out=3 },
+                .w=TEST_UTIL_FLOAT_ZEROS(3 * 2),
+                .b=TEST_UTIL_FLOAT_ZEROS(3)
+            },
+            { .w=NULL, .b=NULL },
+            {
+                .params={ .in=3, .out=1 },
+                .w=TEST_UTIL_FLOAT_ZEROS(1 * 3),
+                .b=TEST_UTIL_FLOAT_ZEROS(1)
+            }
+        }
+    };
+
+    for (int i = 0; i < (3 * 2); i++) {
+        rand_norm_ExpectAndReturn(0, (1 / sqrtf(2)), 1);
+    }
+    for (int i = 0; i < 3; i++) {
+        rand_norm_ExpectAndReturn(0, (1 / sqrtf(3)), 1);
+    }
+
+    net_init_params(&net);
+
+    // Confirm values are set
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ARRAY(1, 1, 1, 1, 1, 1), net.layers[0].w, (3 * 2)
+    );
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        TEST_UTIL_FLOAT_ARRAY(1, 1, 1), net.layers[2].w, 3
+    );
+    // Confirm biases are all zero
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(TEST_UTIL_FLOAT_ZEROS(3), net.layers[0].b, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(TEST_UTIL_FLOAT_ZEROS(1), net.layers[2].b, 1);
 }
 
 void test_forward_layer(void) {

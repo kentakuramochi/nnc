@@ -5,8 +5,12 @@
  */
 #include "nn_net.h"
 
+#include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
+
+#include "random.h"
 
 int nn_net_size(const NnNet *net) {
     return net->size;
@@ -98,6 +102,30 @@ void nn_net_free_layers(NnNet *net) {
 
     free(net->layers);
     net->layers = NULL;
+}
+
+void net_init_params(NnNet *net) {
+    srand(time(NULL));
+
+    for (int i = 0; i < net->size; i++) {
+        NnLayer *layer = &nn_net_layers(net)[i];
+        NnLayerParams *params = &layer->params;
+
+        // Initialize weights by Xavier initialization
+        const float n = (float)params->in;
+        if (layer->w != NULL) {
+            for (int j = 0; j < (params->in * params->out); j++) {
+                layer->w[j] = rand_norm(0, (1 / sqrtf(n)));
+            }
+        }
+
+        // Initialize biases by 0
+        if (layer->b != NULL) {
+            for (int j = 0; j < params->out; j++) {
+                layer->b[j] = 0;
+            }
+        }
+    }
 }
 
 float *nn_net_forward(NnNet *net, const float *x) {

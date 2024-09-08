@@ -72,6 +72,13 @@ NnNet *nn_net_alloc_layers(NnNet *net, NnLayerParams *param_list);
 void nn_net_free_layers(NnNet *net);
 
 /**
+ * @brief Initialize network parameters
+ *
+ * @param[in,out] net Network
+*/
+void net_init_params(NnNet *net);
+
+/**
  * @brief Forward propagation of network
  *
  * @param[in,out] net Network
