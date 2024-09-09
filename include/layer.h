@@ -15,7 +15,8 @@
 typedef enum LayerType {
     LAYER_TYPE_NONE, //!< None
     LAYER_TYPE_FC, //!< Fully connected layer
-    LAYER_TYPE_SIGMOID //!< Sigmoid layer
+    LAYER_TYPE_SIGMOID, //!< Sigmoid layer
+    LAYER_TYPE_SOFTMAX //!< Softmax layer
 } LayerType;
 
 /**
