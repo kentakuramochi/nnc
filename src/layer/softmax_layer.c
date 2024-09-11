@@ -17,7 +17,33 @@
  * @return Pointer to the layer output
  */
 static float *softmax_forward(Layer *layer, const float *x) {
-    // TODO: implement
+    LayerParams *params = &layer->params;
+
+    for (int i = 0; i < (params->batch_size * params->in); i++) {
+        layer->x[i] = x[i];
+    }
+
+    for (int i = 0; i < params->batch_size; i++) {
+        int batch_idx = params->in * i;
+
+        // Get a max. of the input to avoid overflow of exp(x)
+        float c = -FLT_MAX;
+        for (int j = 0; j < params->in; j++) {
+            float a = layer->x[batch_idx + j];
+            c = (a > c) ? a : c;
+        }
+
+        float sum = 0.0f;
+        for (int j = 0; j < params->in; j++) {
+            sum += expf(layer->x[batch_idx + j] - c);
+        }
+
+        for (int j = 0; j < params->in; j++) {
+            layer->y[batch_idx + j] = expf(layer->x[batch_idx + j] - c) / sum;
+        }
+    }
+
+    return layer->y;
 }
 
 /**
