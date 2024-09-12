@@ -64,3 +64,36 @@ void test_forward(void) {
 
     free_memories(&layer);
 }
+
+void test_backward(void) {
+    Layer layer = {
+        .params={ LAYER_TYPE_SOFTMAX, .batch_size=2, .in=3 }
+    };
+
+    softmax_layer_init(&layer);
+
+    test_util_copy_array(
+        layer.y,
+        TEST_UTIL_FLOAT_ARRAY(
+            0.488903, 0.268315, 0.242782,
+            0.415565, 0.125166, 0.459270
+        ),
+        (sizeof(float) * (2 * 3))
+    );
+
+    float dy[] = {
+        -0.5110970, 0.2683150, 0.2427820,
+        0.4155650, 0.1251660, -0.5407300
+    };
+
+    float dx[] = {
+        -0.1917263, 0.1039066, 0.0878197,
+        0.1976198, 0.0231740, -0.2207938
+    };
+
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(
+        dx, layer.backward(&layer, dy), (2 * 3)
+    );
+
+    free_memories(&layer);
+}
