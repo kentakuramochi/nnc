@@ -54,7 +54,13 @@ static float *softmax_forward(Layer *layer, const float *x) {
  * @return Pointer to differential of an input of the layer
  */
 static float *softmax_backward(Layer *layer, const float *dy) {
-    // TODO: implement
+    LayerParams *params = &layer->params;
+
+    for (int i = 0; i < (params->batch_size * params->out); i++) {
+        layer->dx[i] = layer->y[i] * (1 - layer->y[i]) * dy[i];
+    }
+
+    return layer->dx;
 }
 
 Layer *softmax_layer_init(Layer *layer) {
