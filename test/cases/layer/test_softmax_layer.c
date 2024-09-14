@@ -91,6 +91,7 @@ void test_backward(void) {
         0.1976198, 0.0231740, -0.2207938
     };
 
+    // Checking a result with considering about accuracy is difficult...
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
         dx, layer.backward(&layer, dy), (2 * 3)
     );

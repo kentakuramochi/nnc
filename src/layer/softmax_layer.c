@@ -56,9 +56,35 @@ static float *softmax_forward(Layer *layer, const float *x) {
 static float *softmax_backward(Layer *layer, const float *dy) {
     LayerParams *params = &layer->params;
 
-    for (int i = 0; i < (params->batch_size * params->out); i++) {
-        layer->dx[i] = layer->y[i] * (1 - layer->y[i]) * dy[i];
+    // Jacobian
+    float *jacobian = malloc(params->in * params->out * sizeof(float));
+
+    for (int i = 0; i < params->batch_size; i++) {
+        int batch_idx = params->in * i;
+
+        // Calculate a Jacobian
+        for (int j = 0; j < params->out; j++) {
+            for (int k = 0; k < params->in; k++) {
+                if (j == k) {
+                    jacobian[j * params->in + k] = layer->y[batch_idx + j] * (1 - layer->y[batch_idx + j]);
+                } else {
+                    jacobian[j * params->in + k] = -layer->y[batch_idx + j] * layer->y[batch_idx + k];
+                }
+            }
+        }
+
+        // Grad is calculated as a matrix multiplication of
+        // the Jacobian and gradient of the next layer
+        for (int j = 0; j < params->out; j++) {
+            float acc = 0;
+            for (int k = 0; k < params->in; k++) {
+                acc += jacobian[j * params->in + k] * dy[batch_idx + k];
+            }
+            layer->dx[batch_idx + j] = acc;
+        }
     }
+
+    free(jacobian);
 
     return layer->dx;
 }
