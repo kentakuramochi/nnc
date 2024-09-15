@@ -11,5 +11,6 @@
 #include "loss.h"
 
 #include "loss/bce_loss.h"
+#include "loss/ce_loss.h"
 
 #endif // LOSSES_H
