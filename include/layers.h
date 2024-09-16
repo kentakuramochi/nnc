@@ -12,6 +12,7 @@
 
 #include "layer/fc_layer.h"
 #include "layer/sigmoid_layer.h"
+#include "layer/softmax_layer.h"
 
 /**
  * @brief Initialization functions for each layer
@@ -19,7 +20,8 @@
 Layer* (*layer_init_funcs[])(Layer*) = {
     NULL,
     fc_layer_init,
-    sigmoid_layer_init
+    sigmoid_layer_init,
+    softmax_layer_init
 };
 
 #endif // LAYERS_H
