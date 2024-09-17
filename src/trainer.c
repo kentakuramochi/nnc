@@ -14,12 +14,12 @@ void train_step(Net *net, const float learning_rate) {
 
         if (layer->w != NULL) {
             for (int j = 0; j < (params->in * params->out); j++) {
-                layer->w[j] -= learning_rate * layer->dw[j];
+                layer->w[j] -= learning_rate * layer->gw[j];
             }
         }
         if (layer->b != NULL) {
             for (int j = 0; j < params->out; j++) {
-                layer->b[j] -= learning_rate * layer->db[j];
+                layer->b[j] -= learning_rate * layer->gb[j];
             }
         }
     }

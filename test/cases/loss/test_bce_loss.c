@@ -26,9 +26,9 @@ void test_bce_loss_backward(void) {
     float y[] = { 0.7, 0.2, 0.1 };
     float t[] = { 1, 0, 0 };
 
-    float diff[3];
-    loss_func.backward(diff, y, t, 3, 1);
+    float grad[3];
+    loss_func.backward(grad, y, t, 3, 1);
 
     float answer[] = { -0.4761905, 0.4166666, 0.3703704 };
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, diff, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, grad, 3);
 }

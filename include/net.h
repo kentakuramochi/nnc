@@ -91,8 +91,8 @@ float *net_forward(Net *net, const float *x);
  * @brief Backward propagation of network
  *
  * @param[in,out] net Network
- * @param[in] dy Differential of network output
- * @return Pointer to differential of an input of the network, NULL if failed
+ * @param[in] dy Gradient of network output
+ * @return Pointer to gradient of an input of the network, NULL if failed
  */
 float *net_backward(Net *net, const float *dy);
 

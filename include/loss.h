@@ -26,7 +26,7 @@ typedef struct LossFunc {
     /**
      * @brief Backward of the loss
      *
-     * @param[out] diff Difference of loss function by the output
+     * @param[out] grad Gradient of loss function by the output
      * @param[in] y Predicted data
      * @param[in] t Expected data
      * @param[in] batch_size Batch size of data

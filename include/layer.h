@@ -41,9 +41,9 @@ typedef struct Layer {
     float *w; //!< Weight matrix
     float *b; //!< Bias matrix
 
-    float *dx; //!< Difference of input matrix
-    float *dw; //!< Difference of weight matrix
-    float *db; //!< Difference of bias matrix
+    float *gx; //!< Gradient of input matrix
+    float *gw; //!< Gradient of weight matrix
+    float *gb; //!< Gradient of bias matrix
 
     float* (*forward)(struct Layer*, const float*);   //!< Forward
     float* (*backward)(struct Layer*, const float*);  //!< Backward
@@ -86,10 +86,10 @@ float *layer_forward(Layer *layer, const float *x);
  * @brief Backward propagation of a layer
  *
  * @param[in,out] layer Layer
- * @param[in] dy A differential of previous layer
- * @return Pointer to differential of an input of the layer
+ * @param[in] gy A gradient of the next layer
+ * @return Pointer to gradient of the input of the layer
  */
-float *layer_backward(Layer *layer, const float *dy);
+float *layer_backward(Layer *layer, const float *gy);
 
 /**
  * @brief Clear current gradients of layer

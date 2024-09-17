@@ -33,19 +33,19 @@ static float forward(const float *y, const float *t, const size_t batch_size, co
 /**
  * @brief Backward of the BCE loss
  *
- * @param[out] diff Difference of loss function by the output
+ * @param[out] grad Gradient of loss function by the output
  * @param[in] y Predicted data
  * @param[in] t Expected data
  * @param[in] batch_size Batch size of data
  * @param[in] size Size of data
 */
-static void backward(float *diff, const float *y, const float *t, const size_t batch_size, const size_t size) {
+static void backward(float *grad, const float *y, const float *t, const size_t batch_size, const size_t size) {
     for (size_t i = 0; i < batch_size; i++) {
         const float *b_y = &y[i * size];
         const float *b_t = &t[i * size];
-        float *p_diff = &diff[i * size];
+        float *b_grad = &grad[i * size];
         for (size_t j = 0; j < size; j++) {
-            p_diff[j] = -(b_t[j] / b_y[j] - (1.0f - b_t[j]) / (1.0f - b_y[j])) / (float)batch_size;
+            b_grad[j] = -(b_t[j] / b_y[j] - (1.0f - b_t[j]) / (1.0f - b_y[j])) / (float)batch_size;
         }
     }
 }

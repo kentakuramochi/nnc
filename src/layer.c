@@ -32,9 +32,9 @@ void layer_free_params(Layer *layer) {
     FREE_AND_NULL(layer->y);
     FREE_AND_NULL(layer->w);
     FREE_AND_NULL(layer->b);
-    FREE_AND_NULL(layer->dx);
-    FREE_AND_NULL(layer->dw);
-    FREE_AND_NULL(layer->db);
+    FREE_AND_NULL(layer->gx);
+    FREE_AND_NULL(layer->gw);
+    FREE_AND_NULL(layer->gb);
 
     layer->forward = NULL;
     layer->backward = NULL;
@@ -70,23 +70,23 @@ float *layer_backward(Layer *layer, const float *dy) {
 }
 
 void layer_clear_grad(Layer *layer) {
-    if (layer->dx != NULL) {
+    if (layer->gx != NULL) {
         const int x_size = layer->params.batch_size * layer->params.in;
         for (int i = 0; i < x_size; i++) {
-            layer->dx[i] = 0;
+            layer->gx[i] = 0;
         }
     }
 
-    if (layer->dw != NULL) {
+    if (layer->gw != NULL) {
         const int w_size = layer->params.in * layer->params.out;
         for (int i = 0; i < w_size; i++) {
-            layer->dw[i] = 0;
+            layer->gw[i] = 0;
         }
     }
 
-    if (layer->db != NULL) {
+    if (layer->gb != NULL) {
         for (int i = 0; i < layer->params.out; i++) {
-            layer->db[i] = 0;
+            layer->gb[i] = 0;
         }
     }
 }

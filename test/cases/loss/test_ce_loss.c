@@ -41,8 +41,8 @@ void test_ce_loss_backward(void) {
         0, 0, 1
     };
 
-    float diff[2 * 3];
-    loss_func.backward(diff, y, t, 2, 3);
+    float grad[2 * 3];
+    loss_func.backward(grad, y, t, 2, 3);
 
     // Result is based on PyTorch.torch.nn.NLLLoss()
     float answer[] = {
@@ -50,5 +50,5 @@ void test_ce_loss_backward(void) {
         0, 0, -2.5000000
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, diff, (2 * 3));
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(answer, grad, (2 * 3));
 }

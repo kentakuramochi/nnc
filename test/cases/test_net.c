@@ -258,11 +258,11 @@ void test_backward_layer(void) {
         }
     );
 
-    float dummy_dy, dummy_dx;
+    float dummy_gy, dummy_gx;
     layer_backward_ExpectAndReturn(
-        &net_layers(&net)[0], &dummy_dy, &dummy_dx
+        &net_layers(&net)[0], &dummy_gy, &dummy_gx
     );
-    TEST_ASSERT_EQUAL_PTR(&dummy_dx, net_backward(&net, &dummy_dy));
+    TEST_ASSERT_EQUAL_PTR(&dummy_gx, net_backward(&net, &dummy_gy));
 
     layer_free_params_Ignore();
     net_free_layers(&net);
@@ -284,25 +284,25 @@ void test_backward_3layer(void) {
         }
     );
 
-    float dummy_dy, dummy_dx[3];
+    float dummy_gy, dummy_gx[3];
     layer_backward_ExpectAndReturn(
-        &net_layers(&net)[2], &dummy_dy, &dummy_dx[2]
+        &net_layers(&net)[2], &dummy_gy, &dummy_gx[2]
     );
     layer_backward_ExpectAndReturn(
-        &net_layers(&net)[1], &dummy_dx[2], &dummy_dx[1]
+        &net_layers(&net)[1], &dummy_gx[2], &dummy_gx[1]
     );
     layer_backward_ExpectAndReturn(
-        &net_layers(&net)[0], &dummy_dx[1], &dummy_dx[0]
+        &net_layers(&net)[0], &dummy_gx[1], &dummy_gx[0]
     );
-    TEST_ASSERT_EQUAL_PTR(&dummy_dx[0], net_backward(&net, &dummy_dy));
+    TEST_ASSERT_EQUAL_PTR(&dummy_gx[0], net_backward(&net, &dummy_gy));
 
     layer_free_params_Ignore();
     net_free_layers(&net);
 }
 
 void test_backward_fail_if_net_is_NULL(void) {
-    float dummy_dy;
-    TEST_ASSERT_NULL(net_backward(NULL, &dummy_dy));
+    float dummy_gy;
+    TEST_ASSERT_NULL(net_backward(NULL, &dummy_gy));
 }
 
 void test_backward_fail_if_dy_is_NULL(void) {

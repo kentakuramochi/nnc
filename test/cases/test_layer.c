@@ -21,17 +21,17 @@ static float *dummy_forward(Layer *layer, const float *x) {
     return layer->y;
 }
 
-static float *dummy_backward(Layer *layer, const float *dy) {
+static float *dummy_backward(Layer *layer, const float *gy) {
     for (int i = 0 ; i < (layer->params.batch_size * layer->params.out); i++) {
-        layer->dx[i] = dy[i] / 2;
+        layer->gx[i] = gy[i] / 2;
     }
-    return layer->dx;
+    return layer->gx;
 }
 
 static Layer *dummy_init(Layer *layer) {
     layer->x = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
     layer->y = malloc(sizeof(float) * layer->params.batch_size * layer->params.out);
-    layer->dx = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
+    layer->gx = malloc(sizeof(float) * layer->params.batch_size * layer->params.in);
 
     layer->forward = dummy_forward;
     layer->backward = dummy_backward;
@@ -56,9 +56,9 @@ void test_allocate_and_free(void) {
     TEST_ASSERT_NOT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
     TEST_ASSERT_NULL(layer.b);
-    TEST_ASSERT_NOT_NULL(layer.dx);
-    TEST_ASSERT_NULL(layer.dw);
-    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NOT_NULL(layer.gx);
+    TEST_ASSERT_NULL(layer.gw);
+    TEST_ASSERT_NULL(layer.gb);
     TEST_ASSERT_EQUAL_PTR(dummy_forward, layer.forward);
     TEST_ASSERT_EQUAL_PTR(dummy_backward, layer.backward);
 
@@ -67,9 +67,9 @@ void test_allocate_and_free(void) {
     TEST_ASSERT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
     TEST_ASSERT_NULL(layer.b);
-    TEST_ASSERT_NULL(layer.dx);
-    TEST_ASSERT_NULL(layer.dw);
-    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NULL(layer.gx);
+    TEST_ASSERT_NULL(layer.gw);
+    TEST_ASSERT_NULL(layer.gb);
     TEST_ASSERT_NULL(layer.forward);
     TEST_ASSERT_NULL(layer.backward);
 }
@@ -86,9 +86,9 @@ void test_allocation_fail_if_layer_type_is_not_specified(void) {
     TEST_ASSERT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
     TEST_ASSERT_NULL(layer.b);
-    TEST_ASSERT_NULL(layer.dx);
-    TEST_ASSERT_NULL(layer.dw);
-    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NULL(layer.gx);
+    TEST_ASSERT_NULL(layer.gw);
+    TEST_ASSERT_NULL(layer.gb);
     TEST_ASSERT_NULL(layer.forward);
     TEST_ASSERT_NULL(layer.backward);
 }
@@ -148,7 +148,7 @@ void test_forward_fail_if_x_is_NULL(void) {
 void test_backward(void) {
     Layer layer = {
         .params = { .batch_size=1, .in=3, .out=3 },
-        .dx = TEST_UTIL_FLOAT_ZEROS(3),
+        .gx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
 
@@ -166,7 +166,7 @@ void test_backward_fail_if_layer_is_NULL(void) {
 void test_backward_fail_if_dy_is_NULL(void) {
     Layer layer = {
         .params = { .batch_size=1, .in=3, .out=3 },
-        .dx = TEST_UTIL_FLOAT_ZEROS(3),
+        .gx = TEST_UTIL_FLOAT_ZEROS(3),
         .backward = dummy_backward
     };
 
@@ -177,9 +177,9 @@ void test_clear_grad(void) {
     Layer layers[] = {
         {
             .params = { .batch_size=4, .in=2, .out=3 },
-            .dx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
-            .dw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
-            .db = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
+            .gx = TEST_UTIL_FLOAT_ARRAY(-1, 1, -2, 2, -3, 3, -4, 4),
+            .gw = TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+            .gb = TEST_UTIL_FLOAT_ARRAY(-1, -2, -3),
         },
         { .params = { .batch_size=4, .in=3, .out=1 } }
     };
@@ -187,13 +187,13 @@ void test_clear_grad(void) {
     layer_clear_grad(&layers[0]);
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(2), layers[0].dx, 2
+        TEST_UTIL_FLOAT_ZEROS(2), layers[0].gx, 2
     );
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(3 * 2), layers[0].dw, (3 * 2)
+        TEST_UTIL_FLOAT_ZEROS(3 * 2), layers[0].gw, (3 * 2)
     );
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        TEST_UTIL_FLOAT_ZEROS(3), layers[0].db, 3
+        TEST_UTIL_FLOAT_ZEROS(3), layers[0].gb, 3
     );
 
     // Skip unallocated grads

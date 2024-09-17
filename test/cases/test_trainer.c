@@ -19,17 +19,17 @@ void test_train_step(void) {
             .params={ .batch_size=1, .in=2, .out=3 },
             // 3x2, kind of fully connected layer
             .w=TEST_UTIL_FLOAT_ARRAY(1, 1, 1, 1, 1, 1),
-            .dw=TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
+            .gw=TEST_UTIL_FLOAT_ARRAY(1, 2, 3, 4, 5, 6),
             .b=TEST_UTIL_FLOAT_ARRAY(1, 1, 1),
-            .db=TEST_UTIL_FLOAT_ARRAY(0, 1, 2)
+            .gb=TEST_UTIL_FLOAT_ARRAY(0, 1, 2)
         },
         {
             .params={ .batch_size=1, .in=3, .out=1 },
             // 1x3, the same one with the previous
             .w=TEST_UTIL_FLOAT_ARRAY(1, 1, 1),
-            .dw=TEST_UTIL_FLOAT_ARRAY(-2, -1, 0),
+            .gw=TEST_UTIL_FLOAT_ARRAY(-2, -1, 0),
             .b=TEST_UTIL_FLOAT_ARRAY(1),
-            .db=TEST_UTIL_FLOAT_ARRAY(-1)
+            .gb=TEST_UTIL_FLOAT_ARRAY(-1)
         },
         {
             // No weights and biases, kind of activation

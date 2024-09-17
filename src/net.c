@@ -72,9 +72,9 @@ Net *net_alloc_layers(
         layer->w = NULL;
         layer->b = NULL;
 
-        layer->dx = NULL;
-        layer->dw = NULL;
-        layer->db = NULL;
+        layer->gx = NULL;
+        layer->gw = NULL;
+        layer->gb = NULL;
 
         if (layer_alloc_params(layer) == NULL) {
             goto FREE_LAYERS;

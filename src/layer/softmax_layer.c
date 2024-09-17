@@ -50,10 +50,10 @@ static float *softmax_forward(Layer *layer, const float *x) {
  * @brief Backward of the softmax layer
  *
  * @param[in,out] layer Layer
- * @param[in] dy A differential of previous layer
- * @return Pointer to differential of an input of the layer
+ * @param[in] gy Gradient of the next layer
+ * @return Pointer to gradient of the layer input
  */
-static float *softmax_backward(Layer *layer, const float *dy) {
+static float *softmax_backward(Layer *layer, const float *gy) {
     LayerParams *params = &layer->params;
 
     // Jacobian
@@ -78,15 +78,15 @@ static float *softmax_backward(Layer *layer, const float *dy) {
         for (int j = 0; j < params->out; j++) {
             float acc = 0;
             for (int k = 0; k < params->in; k++) {
-                acc += jacobian[j * params->in + k] * dy[batch_idx + k];
+                acc += jacobian[j * params->in + k] * gy[batch_idx + k];
             }
-            layer->dx[batch_idx + j] = acc;
+            layer->gx[batch_idx + j] = acc;
         }
     }
 
     free(jacobian);
 
-    return layer->dx;
+    return layer->gx;
 }
 
 Layer *softmax_layer_init(Layer *layer) {
@@ -113,8 +113,8 @@ Layer *softmax_layer_init(Layer *layer) {
     layer->w = NULL;
     layer->b = NULL;
 
-    layer->dx = malloc(params->batch_size * x_byte_size);
-    if (layer->dx == NULL) {
+    layer->gx = malloc(params->batch_size * x_byte_size);
+    if (layer->gx == NULL) {
         layer_free_params(layer);
         return NULL;
     }
@@ -122,8 +122,8 @@ Layer *softmax_layer_init(Layer *layer) {
     // Set in = out if the allocation succeeded
     params->out = params->in;
 
-    layer->dw = NULL;
-    layer->db = NULL;
+    layer->gw = NULL;
+    layer->gb = NULL;
 
     layer->forward = softmax_forward;
     layer->backward = softmax_backward;

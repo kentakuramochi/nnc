@@ -20,9 +20,9 @@ static void free_memories(Layer *layer) {
     free(layer->y);
     free(layer->w);
     free(layer->b);
-    free(layer->dx);
-    free(layer->dw);
-    free(layer->db);
+    free(layer->gx);
+    free(layer->gw);
+    free(layer->gb);
 }
 
 void test_alloc_and_free(void) {
@@ -35,9 +35,9 @@ void test_alloc_and_free(void) {
     TEST_ASSERT_NOT_NULL(layer.y);
     TEST_ASSERT_NOT_NULL(layer.w);
     TEST_ASSERT_NOT_NULL(layer.b);
-    TEST_ASSERT_NOT_NULL(layer.dx);
-    TEST_ASSERT_NOT_NULL(layer.dw);
-    TEST_ASSERT_NOT_NULL(layer.db);
+    TEST_ASSERT_NOT_NULL(layer.gx);
+    TEST_ASSERT_NOT_NULL(layer.gw);
+    TEST_ASSERT_NOT_NULL(layer.gb);
     TEST_ASSERT_NOT_NULL(layer.forward);
     TEST_ASSERT_NOT_NULL(layer.backward);
 
@@ -110,15 +110,15 @@ void test_backward(void) {
 
     // Clear gradients
     test_util_copy_array(
-        layer.dx, TEST_UTIL_FLOAT_ZEROS(2 * 2), (sizeof(float) * (2 * 2))
+        layer.gx, TEST_UTIL_FLOAT_ZEROS(2 * 2), (sizeof(float) * (2 * 2))
     );
 
     test_util_copy_array(
-        layer.dw, TEST_UTIL_FLOAT_ZEROS(3 * 2), (sizeof(float) * (3 * 2))
+        layer.gw, TEST_UTIL_FLOAT_ZEROS(3 * 2), (sizeof(float) * (3 * 2))
     );
 
     test_util_copy_array(
-        layer.db, TEST_UTIL_FLOAT_ZEROS(3), (sizeof(float) * 3)
+        layer.gb, TEST_UTIL_FLOAT_ZEROS(3), (sizeof(float) * 3)
     );
 
     float dy[] = {
@@ -126,28 +126,28 @@ void test_backward(void) {
         2, -1, 1
     };
 
-    float dx[] = {
+    float gx[] = {
         -3, -4,
         1, 4
     };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        dx, layer.backward(&layer, dy), (2 * 2)
+        gx, layer.backward(&layer, dy), (2 * 2)
     );
 
-    float dw[] = {
+    float gw[] = {
         -2, -2,
         2, 2,
         -4, -4
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(dw, layer.dw, (3 * 2));
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(gw, layer.gw, (3 * 2));
 
-    float db[] = {
+    float gb[] = {
         2, 0, -2
     };
 
-    TEST_ASSERT_EQUAL_FLOAT_ARRAY(db, layer.db, 3);
+    TEST_ASSERT_EQUAL_FLOAT_ARRAY(gb, layer.gb, 3);
 
     free_memories(&layer);
 }
