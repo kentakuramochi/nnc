@@ -1,7 +1,6 @@
 /**
  * @file net.h
  * @brief Network structure
- *
  */
 #ifndef NET_H
 #define NET_H
@@ -12,7 +11,7 @@
  * @brief Sequential list of layer parameters
  * @note Terminated with NONE layer for network initialization
  *
-*/
+ */
 #define LAYER_PARAMS_LIST(...) (LayerParams[]){ __VA_ARGS__, (LayerParams){ .type=LAYER_TYPE_NONE } }
 
 /**
@@ -75,7 +74,7 @@ void net_free_layers(Net *net);
  * @brief Initialize network parameters
  *
  * @param[in,out] net Network
-*/
+ */
 void net_init_params(Net *net);
 
 /**

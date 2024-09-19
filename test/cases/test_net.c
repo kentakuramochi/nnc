@@ -1,7 +1,6 @@
 /**
  * @file test_net.c
  * @brief Unit tests of net.c
- *
  */
 #include "net.h"
 

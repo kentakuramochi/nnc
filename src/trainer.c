@@ -1,7 +1,6 @@
 /**
  * @file trainer.c
  * @brief Train a network
- *
  */
 #include "trainer.h"
 

@@ -1,7 +1,6 @@
 /**
  * @file layer.c
  * @brief Layer structure
- *
  */
 #include "layer.h"
 

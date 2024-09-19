@@ -1,7 +1,6 @@
 /**
  * @file softmax_layer.h
  * @brief Softmax layer
- *
  */
 #include "layer/softmax_layer.h"
 

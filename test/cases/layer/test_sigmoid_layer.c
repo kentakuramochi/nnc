@@ -1,7 +1,6 @@
 /**
  * @file test_sigmoid_layer.c
  * @brief Unit tests of sigmoid_layer.c
- *
  */
 #include "sigmoid_layer.h"
 

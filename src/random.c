@@ -1,7 +1,7 @@
 /**
  * @file random.c
  * @brief Simple PRNG
-*/
+ */
 #include "random.h"
 
 #include <math.h>
@@ -10,7 +10,7 @@
 
 /**
  * @brief Pi value
-*/
+ */
 #define PI 3.14159265
 
 float rand_uniform(void) {

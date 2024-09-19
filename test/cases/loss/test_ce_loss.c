@@ -1,7 +1,6 @@
 /**
  * @file test_ce_loss.c
  * @brief Unit tests of ce_loss.c
- *
  */
 #include "ce_loss.h"
 

@@ -1,7 +1,6 @@
 /**
  * @file test_fc_layer.c
  * @brief Unit tests of fc_layer.c
- *
  */
 #include "fc_layer.h"
 

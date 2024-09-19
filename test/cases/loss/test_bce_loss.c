@@ -1,7 +1,6 @@
 /**
  * @file test_bce_loss.c
  * @brief Unit tests of bce_loss.c
- *
  */
 #include "bce_loss.h"
 

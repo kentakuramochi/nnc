@@ -1,7 +1,6 @@
 /**
  * @file layers.h
  * @brief Interface to network layers
- *
  */
 #ifndef LAYERS_H
 #define LAYERS_H

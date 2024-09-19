@@ -1,7 +1,6 @@
 /**
  * @file test_softmax_layer.c
  * @brief Unit tests of softmax_layer.c
- *
  */
 #include "softmax_layer.h"
 

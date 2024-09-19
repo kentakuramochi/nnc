@@ -1,7 +1,7 @@
 /**
  * @file random.h
  * @brief Simple PRNG
-*/
+ */
 #ifndef RANDOM_H
 #define RANDOM_H
 

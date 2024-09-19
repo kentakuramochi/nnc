@@ -1,7 +1,6 @@
 /**
  * @file test_trainer.c
  * @brief Unit tests of trainer.c
- *
  */
 #include "trainer.h"
 

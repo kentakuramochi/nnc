@@ -1,7 +1,6 @@
 /**
  * @file layer.h
  * @brief Layer structure
- *
  */
 #ifndef LAYER_H
 #define LAYER_H
@@ -10,8 +9,8 @@
 #include <stddef.h>
 
 /**
- * @brief Type of layers
-*/
+ * @brief Type of network layers
+ */
 typedef enum LayerType {
     LAYER_TYPE_NONE, //!< None
     LAYER_TYPE_FC, //!< Fully connected layer
@@ -20,8 +19,7 @@ typedef enum LayerType {
 } LayerType;
 
 /**
- * @brief Layer parameters
- *
+ * @brief Parameters of a network layer
  */
 typedef struct LayerParams {
     LayerType type; //!< Layer type
@@ -31,8 +29,8 @@ typedef struct LayerParams {
 } LayerParams;
 
 /**
- * @brief Layer structure
-*/
+ * @brief Network layer
+ */
 typedef struct Layer {
     LayerParams params;  //!< Layer parameters
 
@@ -45,7 +43,22 @@ typedef struct Layer {
     float *gw; //!< Gradient of weight matrix
     float *gb; //!< Gradient of bias matrix
 
+    /**
+     * @brief Forward of the layer
+     *
+     * @param[in,out] layer Layer
+     * @param[in] x An input of the layer
+     * @return Pointer to the layer output
+     */
     float* (*forward)(struct Layer*, const float*);   //!< Forward
+
+    /**
+     * @brief Backward of the layer
+     *
+     * @param[in,out] layer Layer
+     * @param[in] gy Gradient of the next layer
+     * @return Pointer to gradient of the layer input
+     */
     float* (*backward)(struct Layer*, const float*);  //!< Backward
 } Layer;
 

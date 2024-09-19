@@ -1,7 +1,6 @@
 /**
  * @file sigmoid_layer.c
  * @brief Sigmoid layer
- *
  */
 #include "layer/sigmoid_layer.h"
 

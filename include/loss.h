@@ -1,7 +1,6 @@
 /**
  * @file loss.h
  * @brief Loss function
- *
  */
 #ifndef LOSS_H
 #define LOSS_H
@@ -10,7 +9,7 @@
 
 /**
  * @brief Loss funcion interface
-*/
+ */
 typedef struct LossFunc {
     /**
      * @brief Loss function

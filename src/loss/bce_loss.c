@@ -1,7 +1,6 @@
 /**
  * @file bce_loss.c
  * @brief Binary cross entropy loss
- *
  */
 #include "loss/bce_loss.h"
 
@@ -15,7 +14,7 @@
  * @param[in] batch_size Batch size of data
  * @param[in] size Size of data
  * @return float Loss
-*/
+ */
 static float forward(const float *y, const float *t, const size_t batch_size, const size_t size) {
     float loss = 0.0f;
 
@@ -38,7 +37,7 @@ static float forward(const float *y, const float *t, const size_t batch_size, co
  * @param[in] t Expected data
  * @param[in] batch_size Batch size of data
  * @param[in] size Size of data
-*/
+ */
 static void backward(float *grad, const float *y, const float *t, const size_t batch_size, const size_t size) {
     for (size_t i = 0; i < batch_size; i++) {
         const float *b_y = &y[i * size];

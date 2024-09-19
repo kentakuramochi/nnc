@@ -1,7 +1,6 @@
 /**
  * @file test_layer.c
  * @brief Unit tests of layer.c
- *
  */
 #include "layer.h"
 

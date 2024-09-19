@@ -1,7 +1,6 @@
 /**
  * @file fc_layer.c
  * @brief Fully connected layer
- *
  */
 #include "layer/fc_layer.h"
 
