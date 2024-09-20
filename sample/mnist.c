@@ -7,6 +7,7 @@
 #include "layers.h"
 #include "losses.h"
 #include "trainer.h"
+#include "util.h"
 
 // The number of data
 #define TRAIN_DATA_NUM 60000
@@ -17,42 +18,6 @@
 
 // The number of classes
 #define CLASS_NUM 10
-
-// Allocate memory for a dataset
-static float **alloc_dataset(const int data_num, const int data_size) {
-    float **dataset = malloc(sizeof(float*) * data_num);
-    if (dataset == NULL) {
-        return NULL;
-    }
-
-    for (int i = 0; i < data_num; i++) {
-        dataset[i] = malloc(sizeof(float) * data_size);
-        if (dataset[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(dataset[i]);
-                dataset[i] = NULL;
-            }
-            free(dataset);
-            dataset = NULL;
-            return NULL;
-        }
-    }
-
-    return dataset;
-}
-
-// Free a memory allocated for a dataset
-static void free_dataset(float **dataset, const int data_num) {
-    if (dataset == NULL) {
-        return;
-    }
-
-    for (int i = 0; i < data_num; i++) {
-        free(dataset[i]);
-    }
-    
-    free(dataset);
-}
 
 // Load MNIST label data: "***-labels-idx1-ubyte"
 static bool load_mnist_labels(
