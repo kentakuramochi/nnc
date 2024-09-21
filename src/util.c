@@ -6,16 +6,20 @@
 
 #include <stdlib.h>
 
-float **alloc_dataset(const int data_num, const int data_size) {
-    float **dataset = malloc(sizeof(float*) * data_num);
+float **alloc_dataset(const size_t size, const int elem_size) {
+    if ((size == 0) || (elem_size == 0)) {
+        return NULL;
+    }
+
+    float **dataset = malloc(sizeof(float*) * size);
     if (dataset == NULL) {
         return NULL;
     }
 
-    for (int i = 0; i < data_num; i++) {
-        dataset[i] = malloc(sizeof(float) * data_size);
+    for (size_t i = 0; i < size; i++) {
+        dataset[i] = malloc(sizeof(float) * elem_size);
         if (dataset[i] == NULL) {
-            for (int j = 0; j < i; j++) {
+            for (size_t j = 0; j < i; j++) {
                 free(dataset[i]);
                 dataset[i] = NULL;
             }
@@ -28,15 +32,16 @@ float **alloc_dataset(const int data_num, const int data_size) {
     return dataset;
 }
 
-void free_dataset(float **dataset, const int data_num) {
-    if (dataset == NULL) {
+void free_dataset(float ***dataset, const size_t size) {
+    if ((dataset == NULL) || (*dataset == NULL)) {
         return;
     }
 
-    for (int i = 0; i < data_num; i++) {
-        free(dataset[i]);
-        dataset[i] = NULL;
+    for (size_t i = 0; i < size; i++) {
+        free((*dataset)[i]);
+        (*dataset)[i] = NULL;
     }
     
-    free(dataset);
+    free(*dataset);
+    *dataset = NULL;
 }

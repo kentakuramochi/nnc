@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a training dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -222,8 +222,8 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a test dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -232,43 +232,43 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a test dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
 
     // Load the dataset
     if (!load_mnist_labels(argv[1], train_labels, TRAIN_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a training dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_images(argv[2], train_images, TRAIN_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a training dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_labels(argv[3], test_labels, TEST_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a test dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_images(argv[4], test_images, TEST_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a test dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -356,10 +356,10 @@ int main(int argc, char *argv[]) {
 
     net_free_layers(&net);
 
-    free_dataset(train_labels, TRAIN_DATA_NUM);
-    free_dataset(train_images, TRAIN_DATA_NUM);
-    free_dataset(test_labels, TEST_DATA_NUM);
-    free_dataset(test_images, TEST_DATA_NUM);
+    free_dataset(&train_labels, TRAIN_DATA_NUM);
+    free_dataset(&train_images, TRAIN_DATA_NUM);
+    free_dataset(&test_labels, TEST_DATA_NUM);
+    free_dataset(&test_images, TEST_DATA_NUM);
 
     return EXIT_SUCCESS;
 }

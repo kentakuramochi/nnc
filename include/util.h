@@ -5,21 +5,23 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-/**
- * @brief Allocate a memory for the dataset
- *
- * @param[in] data_num Number of data in a dataset
- * @param[in] data_size Data size in bytes
- * @return Pointer to the allocated memory, NULL if failed
- */
-float **alloc_dataset(const int data_num, const int data_size);
+#include <stddef.h>
 
 /**
- * @brief Free a memory for a dataset
+ * @brief Allocate a 2-D float memory for a dataset
  *
- * @param[in,out] dataset Memory for a dataset
- * @param[in] data_num Number of data in a dataset
+ * @param[in] size Number of samples in a dataset
+ * @param[in] elem_size Number of elements in one sample
+ * @return Pointer to the allocated memory, NULL if failed
  */
-void free_dataset(float **dataset, const int data_num);
+float **alloc_dataset(const size_t size, const int elem_size);
+
+/**
+ * @brief Free a 2-D float memory for a dataset
+ *
+ * @param[in,out] dataset Pointer to a memory for a dataset
+ * @param[in] size Number of samples in a dataset
+ */
+void free_dataset(float ***dataset, const size_t size);
 
 #endif // UTIL_H
