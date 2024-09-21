@@ -1,5 +1,3 @@
-#include <float.h>
-#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -168,21 +166,6 @@ static bool load_mnist_images(
     }
 
     return true;
-}
-
-// Get the max argument from a one-hot vector
-static int argmax(const float* one_hot_vector, const size_t size) {
-    float max = -FLT_MAX;
-    int index = -INT_MAX;
-
-    for (size_t i = 0; i < size; i++) {
-        if (one_hot_vector[i] > max) {
-            max = one_hot_vector[i];
-            index = i;
-        }
-    }
-
-    return index;
 }
 
 int main(int argc, char *argv[]) {

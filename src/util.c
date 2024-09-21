@@ -4,6 +4,8 @@
  */
 #include "util.h"
 
+#include <float.h>
+#include <limits.h>
 #include <stdlib.h>
 
 float **alloc_dataset(const size_t size, const int elem_size) {
@@ -44,4 +46,22 @@ void free_dataset(float ***dataset, const size_t size) {
     
     free(*dataset);
     *dataset = NULL;
+}
+
+int argmax(const float* vector, const int size) {
+    if ((vector == NULL) || (size < 1)) {
+        return -1;
+    }
+
+    float max = -FLT_MAX;
+    int index = -INT_MAX;
+
+    for (int i = 0; i < size; i++) {
+        if (vector[i] > max) {
+            max = vector[i];
+            index = i;
+        }
+    }
+
+    return index;
 }

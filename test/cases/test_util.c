@@ -36,3 +36,17 @@ void test_free_null_dataset(void) {
     float **dataset = NULL;
     free_dataset(&dataset, 1);
 }
+
+void test_argmax(void) {
+    float vector[] = { 1, 3, -1 };
+
+    TEST_ASSERT_EQUAL(1, argmax(vector, 3));
+}
+
+void test_fail_argmax(void) {
+    TEST_ASSERT_EQUAL(-1, argmax(NULL, 3));
+
+    float vector[] = { 1, 3, -1 };
+
+    TEST_ASSERT_EQUAL(-1, argmax(vector, 0));
+}

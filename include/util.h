@@ -24,4 +24,13 @@ float **alloc_dataset(const size_t size, const int elem_size);
  */
 void free_dataset(float ***dataset, const size_t size);
 
+/**
+ * @brief Get an index of the max. element in a vector
+ * 
+ * @param[in] vector 1-D float array
+ * @param[in] size Number of elements of the vector
+ * @return Index of the max. element, -1 if failed
+ */
+int argmax(const float* vector, const int size);
+
 #endif // UTIL_H
