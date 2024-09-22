@@ -10,13 +10,11 @@
 /**
  * @brief Sequential list of layer parameters
  * @note Terminated with NONE layer for network initialization
- *
  */
 #define LAYER_PARAMS_LIST(...) (LayerParams[]){ __VA_ARGS__, (LayerParams){ .type=LAYER_TYPE_NONE } }
 
 /**
  * @brief Network structure
- *
  */
 typedef struct Net {
     int size; //!< The number of layers

@@ -19,7 +19,7 @@ typedef struct LossFunc {
      * @param[in] batch_size Batch size of data
      * @param[in] size Size of data
      * @return float Loss
-    */
+     */
     float (*forward)(const float*, const float*, const size_t, const size_t);
 
     /**
@@ -30,7 +30,7 @@ typedef struct LossFunc {
      * @param[in] t Expected data
      * @param[in] batch_size Batch size of data
      * @param[in] size Size of data
-    */
+     */
     void (*backward)(float*, const float*, const float*, const size_t, const size_t);
 } LossFunc;
 

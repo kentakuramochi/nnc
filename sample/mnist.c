@@ -1,3 +1,7 @@
+/**
+ * @file mnist.c
+ * @brief Train and predict MNIST
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

@@ -1,3 +1,7 @@
+/**
+ * @file xor.c
+ * @brief Train and predict XOR
+ */
 #include <stdio.h>
 
 #include "layers.h"

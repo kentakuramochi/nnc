@@ -1,7 +1,6 @@
 /**
  * @file net.c
  * @brief Network structure
- *
  */
 #include "net.h"
 
