@@ -1,13 +1,28 @@
 # nn-with-c
 
-Simple implementation of the neural network in C language, w/o third party libraries
+Implementation of the neural network for study.
 
 ## Description
 
-- Supported layers:
-  - Fully conncted
-  - Sigmoid
-  - Softmax
+Build a library `libnn` for the neural network implementation in C.
+
+### Features
+
+- Create a sequential network with single-input/single-output.
+- Train the network by the backpropagation.
+- No third-party libraries.
+  - Only for the library implementation. OSS test framework is used for unit tests.
+
+### Supported layers
+
+- Fully connected
+- Sigmoid
+- Softmax
+
+### Supported loss functions
+
+- Binary cross entropy loss
+- Cross entropy loss
 
 ## Directories and files
 
