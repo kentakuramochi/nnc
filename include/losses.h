@@ -1,7 +1,6 @@
 /**
  * @file losses.h
  * @brief Interface to loss functions
- *
  */
 #ifndef LOSSES_H
 #define LOSSES_H

@@ -1,7 +1,6 @@
 /**
  * @file sigmoid_layer.c
  * @brief Sigmoid layer
- *
  */
 #include "layer/sigmoid_layer.h"
 
@@ -34,17 +33,17 @@ static float *sigmoid_forward(Layer *layer, const float *x) {
  * @brief Backward of the sigmoid layer
  *
  * @param[in,out] layer Layer
- * @param[in] dy A differential of previous layer
- * @return Pointer to differential of an input of the layer
+ * @param[in] gy Gradient of the next layer
+ * @return Pointer to gradient of the layer input
  */
-static float *sigmoid_backward(Layer *layer, const float *dy) {
+static float *sigmoid_backward(Layer *layer, const float *gy) {
     LayerParams *params = &layer->params;
 
     for (int i = 0; i < (params->batch_size * params->in); i++) {
-        layer->dx[i] = dy[i] * layer->y[i] * (1 - layer->y[i]);
+        layer->gx[i] = gy[i] * layer->y[i] * (1 - layer->y[i]);
     }
 
-    return layer->dx;
+    return layer->gx;
 }
 
 Layer *sigmoid_layer_init(Layer *layer) {
@@ -71,8 +70,8 @@ Layer *sigmoid_layer_init(Layer *layer) {
     layer->w = NULL;
     layer->b = NULL;
 
-    layer->dx = malloc(params->batch_size * x_byte_size);
-    if (layer->dx == NULL) {
+    layer->gx = malloc(params->batch_size * x_byte_size);
+    if (layer->gx == NULL) {
         layer_free_params(layer);
         return NULL;
     }
@@ -80,8 +79,8 @@ Layer *sigmoid_layer_init(Layer *layer) {
     // Set in = out if the allocation succeeded
     params->out = params->in;
 
-    layer->dw = NULL;
-    layer->db = NULL;
+    layer->gw = NULL;
+    layer->gb = NULL;
 
     layer->forward = sigmoid_forward;
     layer->backward = sigmoid_backward;

@@ -1,7 +1,6 @@
 /**
  * @file fc_layer.c
  * @brief Fully connected layer
- *
  */
 #include "layer/fc_layer.h"
 
@@ -41,10 +40,10 @@ static float *fc_forward(Layer *layer, const float *x) {
  * @brief Backward of the FC layer
  *
  * @param[in,out] layer Layer
- * @param[in] dy A differential of previous layer
- * @return Pointer to differential of an input of the layer
+ * @param[in] gy Gradient of the next layer
+ * @return Pointer to gradient of the layer input
  */
-static float *fc_backward(Layer *layer, const float *dy) {
+static float *fc_backward(Layer *layer, const float *gy) {
     LayerParams *params = &layer->params;
 
     for (int i = 0; i < params->batch_size; i++) {
@@ -52,10 +51,10 @@ static float *fc_backward(Layer *layer, const float *dy) {
             float mac = 0;
 
             for (int k = 0; k < params->out; k++) {
-                mac += dy[i * params->out + k] * layer->w[k * params->in + j];
+                mac += gy[i * params->out + k] * layer->w[k * params->in + j];
             }
 
-            layer->dx[i * params->in + j] += mac;
+            layer->gx[i * params->in + j] += mac;
         }
     }
 
@@ -64,20 +63,20 @@ static float *fc_backward(Layer *layer, const float *dy) {
             float mac = 0;
 
             for (int k = 0; k < params->batch_size; k++) {
-                mac += layer->x[k * params->in + i] * dy[k * params->out + j];
+                mac += layer->x[k * params->in + i] * gy[k * params->out + j];
             }
 
-            layer->dw[j * params->in + i] += mac;
+            layer->gw[j * params->in + i] += mac;
         }
     }
 
     for (int i = 0; i < params->out; i++) {
         for (int j = 0; j < params->batch_size; j++) {
-            layer->db[i] += dy[j * params->out + i];
+            layer->gb[i] += gy[j * params->out + i];
         }
     }
 
-    return layer->dx;
+    return layer->gx;
 }
 
 Layer *fc_layer_init(Layer *layer) {
@@ -116,20 +115,20 @@ Layer *fc_layer_init(Layer *layer) {
         return NULL;
     }
 
-    layer->dx = malloc(params->batch_size * x_byte_size);
-    if (layer->dx == NULL) {
+    layer->gx = malloc(params->batch_size * x_byte_size);
+    if (layer->gx == NULL) {
         layer_free_params(layer);
         return NULL;
     }
 
-    layer->dw = malloc(params->batch_size * w_byte_size);
-    if (layer->dw == NULL) {
+    layer->gw = malloc(params->batch_size * w_byte_size);
+    if (layer->gw == NULL) {
         layer_free_params(layer);
         return NULL;
     }
 
-    layer->db = malloc(params->batch_size * y_byte_size);
-    if (layer->db == NULL) {
+    layer->gb = malloc(params->batch_size * y_byte_size);
+    if (layer->gb == NULL) {
         layer_free_params(layer);
         return NULL;
     }

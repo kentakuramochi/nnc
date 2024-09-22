@@ -1,7 +1,6 @@
 /**
  * @file fc_layer.h
  * @brief Fully connected layer
- *
  */
 #ifndef FC_LAYER_H
 #define FC_LAYER_H
@@ -13,7 +12,7 @@
  * 
  * @param[in,out] layer Pointer to a layer
  * @return Pointer to the layer, NULL if failed
-*/
+ */
 Layer *fc_layer_init(Layer *layer);
 
 #endif // FC_LAYER_H

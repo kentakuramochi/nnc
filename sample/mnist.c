@@ -1,5 +1,7 @@
-#include <float.h>
-#include <limits.h>
+/**
+ * @file mnist.c
+ * @brief Train and predict MNIST
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -7,6 +9,7 @@
 #include "layers.h"
 #include "losses.h"
 #include "trainer.h"
+#include "util.h"
 
 // The number of data
 #define TRAIN_DATA_NUM 60000
@@ -17,42 +20,6 @@
 
 // The number of classes
 #define CLASS_NUM 10
-
-// Allocate memory for a dataset
-static float **alloc_dataset(const int data_num, const int data_size) {
-    float **dataset = malloc(sizeof(float*) * data_num);
-    if (dataset == NULL) {
-        return NULL;
-    }
-
-    for (int i = 0; i < data_num; i++) {
-        dataset[i] = malloc(sizeof(float) * data_size);
-        if (dataset[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(dataset[i]);
-                dataset[i] = NULL;
-            }
-            free(dataset);
-            dataset = NULL;
-            return NULL;
-        }
-    }
-
-    return dataset;
-}
-
-// Free a memory allocated for a dataset
-static void free_dataset(float **dataset, const int data_num) {
-    if (dataset == NULL) {
-        return;
-    }
-
-    for (int i = 0; i < data_num; i++) {
-        free(dataset[i]);
-    }
-    
-    free(dataset);
-}
 
 // Load MNIST label data: "***-labels-idx1-ubyte"
 static bool load_mnist_labels(
@@ -205,21 +172,6 @@ static bool load_mnist_images(
     return true;
 }
 
-// Get the max argument from a one-hot vector
-static int argmax(const float* one_hot_vector, const size_t size) {
-    float max = -FLT_MAX;
-    int index = -INT_MAX;
-
-    for (size_t i = 0; i < size; i++) {
-        if (one_hot_vector[i] > max) {
-            max = one_hot_vector[i];
-            index = i;
-        }
-    }
-
-    return index;
-}
-
 int main(int argc, char *argv[]) {
     // Check arguments: path to the MNIST data files
     if (argc < 5) {
@@ -248,7 +200,7 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a training dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -257,8 +209,8 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a test dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -267,43 +219,43 @@ int main(int argc, char *argv[]) {
         fprintf(
             stderr, "Error: failed to allocate memory for a test dataset\n"
         );
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
 
     // Load the dataset
     if (!load_mnist_labels(argv[1], train_labels, TRAIN_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a training dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_images(argv[2], train_images, TRAIN_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a training dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_labels(argv[3], test_labels, TEST_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a test dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
     if (!load_mnist_images(argv[4], test_images, TEST_DATA_NUM)) {
         fprintf(stderr, "Error: failed to load a test dataset\n");
-        free_dataset(train_labels, TRAIN_DATA_NUM);
-        free_dataset(train_images, TRAIN_DATA_NUM);
-        free_dataset(test_labels, TEST_DATA_NUM);
-        free_dataset(test_images, TEST_DATA_NUM);
+        free_dataset(&train_labels, TRAIN_DATA_NUM);
+        free_dataset(&train_images, TRAIN_DATA_NUM);
+        free_dataset(&test_labels, TEST_DATA_NUM);
+        free_dataset(&test_images, TEST_DATA_NUM);
         return EXIT_FAILURE;
     }
 
@@ -391,10 +343,10 @@ int main(int argc, char *argv[]) {
 
     net_free_layers(&net);
 
-    free_dataset(train_labels, TRAIN_DATA_NUM);
-    free_dataset(train_images, TRAIN_DATA_NUM);
-    free_dataset(test_labels, TEST_DATA_NUM);
-    free_dataset(test_images, TEST_DATA_NUM);
+    free_dataset(&train_labels, TRAIN_DATA_NUM);
+    free_dataset(&train_images, TRAIN_DATA_NUM);
+    free_dataset(&test_labels, TEST_DATA_NUM);
+    free_dataset(&test_images, TEST_DATA_NUM);
 
     return EXIT_SUCCESS;
 }

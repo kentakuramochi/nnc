@@ -1,7 +1,6 @@
 /**
  * @file test_sigmoid_layer.c
  * @brief Unit tests of sigmoid_layer.c
- *
  */
 #include "sigmoid_layer.h"
 
@@ -18,7 +17,7 @@ void tearDown(void) {}
 static void free_memories(Layer *layer) {
     free(layer->x);
     free(layer->y);
-    free(layer->dx);
+    free(layer->gx);
 }
 
 void test_alloc_and_free(void) {
@@ -32,9 +31,9 @@ void test_alloc_and_free(void) {
     TEST_ASSERT_NOT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
     TEST_ASSERT_NULL(layer.b);
-    TEST_ASSERT_NOT_NULL(layer.dx);
-    TEST_ASSERT_NULL(layer.dw);
-    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NOT_NULL(layer.gx);
+    TEST_ASSERT_NULL(layer.gw);
+    TEST_ASSERT_NULL(layer.gb);
     TEST_ASSERT_NOT_NULL(layer.forward);
     TEST_ASSERT_NOT_NULL(layer.backward);
 
@@ -86,13 +85,13 @@ void test_backward(void) {
         1, 2, 3
     };
 
-    float dx[] = {
+    float gx[] = {
         -0.589836, -0.470008, -0.246134,
         0.246134, 0.470008, 0.589836
     };
 
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        dx, layer.backward(&layer, dy), (2 * 3)
+        gx, layer.backward(&layer, dy), (2 * 3)
     );
 
     free_memories(&layer);

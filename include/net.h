@@ -1,7 +1,6 @@
 /**
  * @file net.h
  * @brief Network structure
- *
  */
 #ifndef NET_H
 #define NET_H
@@ -11,13 +10,11 @@
 /**
  * @brief Sequential list of layer parameters
  * @note Terminated with NONE layer for network initialization
- *
-*/
+ */
 #define LAYER_PARAMS_LIST(...) (LayerParams[]){ __VA_ARGS__, (LayerParams){ .type=LAYER_TYPE_NONE } }
 
 /**
  * @brief Network structure
- *
  */
 typedef struct Net {
     int size; //!< The number of layers
@@ -75,7 +72,7 @@ void net_free_layers(Net *net);
  * @brief Initialize network parameters
  *
  * @param[in,out] net Network
-*/
+ */
 void net_init_params(Net *net);
 
 /**
@@ -91,8 +88,8 @@ float *net_forward(Net *net, const float *x);
  * @brief Backward propagation of network
  *
  * @param[in,out] net Network
- * @param[in] dy Differential of network output
- * @return Pointer to differential of an input of the network, NULL if failed
+ * @param[in] dy Gradient of network output
+ * @return Pointer to gradient of an input of the network, NULL if failed
  */
 float *net_backward(Net *net, const float *dy);
 

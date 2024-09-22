@@ -1,7 +1,6 @@
 /**
  * @file test_softmax_layer.c
  * @brief Unit tests of softmax_layer.c
- *
  */
 #include "softmax_layer.h"
 
@@ -18,7 +17,7 @@ void tearDown(void) {}
 static void free_memories(Layer *layer) {
     free(layer->x);
     free(layer->y);
-    free(layer->dx);
+    free(layer->gx);
 }
 
 void test_alloc_and_free(void) {
@@ -32,9 +31,9 @@ void test_alloc_and_free(void) {
     TEST_ASSERT_NOT_NULL(layer.y);
     TEST_ASSERT_NULL(layer.w);
     TEST_ASSERT_NULL(layer.b);
-    TEST_ASSERT_NOT_NULL(layer.dx);
-    TEST_ASSERT_NULL(layer.dw);
-    TEST_ASSERT_NULL(layer.db);
+    TEST_ASSERT_NOT_NULL(layer.gx);
+    TEST_ASSERT_NULL(layer.gw);
+    TEST_ASSERT_NULL(layer.gb);
     TEST_ASSERT_NOT_NULL(layer.forward);
     TEST_ASSERT_NOT_NULL(layer.backward);
 
@@ -86,14 +85,14 @@ void test_backward(void) {
         0.4155650, 0.1251660, -0.5407300
     };
 
-    float dx[] = {
+    float gx[] = {
         -0.1917263, 0.1039066, 0.0878197,
         0.1976198, 0.0231740, -0.2207938
     };
 
     // Checking a result with considering about accuracy is difficult...
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(
-        dx, layer.backward(&layer, dy), (2 * 3)
+        gx, layer.backward(&layer, dy), (2 * 3)
     );
 
     free_memories(&layer);

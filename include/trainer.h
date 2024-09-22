@@ -1,7 +1,6 @@
 /**
  * @file trainer.h
  * @brief Train a network
- *
  */
 #ifndef TRAINER_H
 #define TRAINER_H
