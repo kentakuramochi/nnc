@@ -162,3 +162,18 @@ void net_clear_grad(Net *net) {
         layer_clear_grad(&net->layers[i]);
     }
 }
+
+void net_load_from_file(Net *net, const char *config_file) {
+    (void)config_file;
+
+    // Dummy
+    net_alloc_layers(
+        net,
+        LAYER_PARAMS_LIST(
+            { .type=LAYER_TYPE_FC, .batch_size=2, .in=3, .out=10 },
+            { .type=LAYER_TYPE_SIGMOID, .batch_size=2, .in=10, .out=10 },
+            { .type=LAYER_TYPE_FC, .batch_size=2, .in=10, .out=5 },
+            { .type=LAYER_TYPE_SOFTMAX, .batch_size=2, .in=5, .out=5 }
+        )
+    );
+}

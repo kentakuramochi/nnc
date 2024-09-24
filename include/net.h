@@ -100,4 +100,13 @@ float *net_backward(Net *net, const float *dy);
  */
 void net_clear_grad(Net *net);
 
+
+/**
+ * @brief Load a network data from a config file
+ * 
+ * @param[in,out] net Network
+ * @param[in] config_file Config file
+ */
+void net_load_from_file(Net *net, const char *config_file);
+
 #endif // NET_H

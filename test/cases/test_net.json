@@ -1,0 +1,37 @@
+{
+    "size": 4,
+    "layers": [
+        {
+            "params": {
+                "type": "LAYER_TYPE_FC",
+                "batch_size": 2,
+                "in": 3,
+                "out": 10
+            }
+        },
+        {
+            "params": {
+                "type": "LAYER_TYPE_SIGMOID",
+                "batch_size": 2,
+                "in": 10,
+                "out": 10
+            }
+        },
+        {
+            "params": {
+                "type": "LAYER_TYPE_FC",
+                "batch_size": 2,
+                "in": 10,
+                "out": 5
+            }
+        },
+        {
+            "params": {
+                "type": "LAYER_TYPE_SOFTMAX",
+                "batch_size": 2,
+                "in": 5,
+                "out": 5
+            }
+        }
+    ]
+}

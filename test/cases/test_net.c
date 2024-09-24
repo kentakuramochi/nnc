@@ -348,3 +348,39 @@ void test_clear_grad(void) {
     layer_free_params_Ignore();
     net_free_layers(&net);
 }
+
+void test_load_from_file(void) {
+    Net net;
+
+    Layer dummy;
+    layer_connect_IgnoreAndReturn(true);
+    layer_alloc_params_IgnoreAndReturn(&dummy);
+    net_load_from_file(
+        &net, "./test/cases/test_net.json"
+    );
+
+    TEST_ASSERT_EQUAL(4, net.size);
+
+    TEST_ASSERT_EQUAL(LAYER_TYPE_FC, net.layers[0].params.type);
+    TEST_ASSERT_EQUAL(2, net.layers[0].params.batch_size);
+    TEST_ASSERT_EQUAL(3, net.layers[0].params.in);
+    TEST_ASSERT_EQUAL(10, net.layers[0].params.out);
+
+    TEST_ASSERT_EQUAL(LAYER_TYPE_SIGMOID, net.layers[1].params.type);
+    TEST_ASSERT_EQUAL(2, net.layers[1].params.batch_size);
+    TEST_ASSERT_EQUAL(10, net.layers[1].params.in);
+    TEST_ASSERT_EQUAL(10, net.layers[1].params.out);
+
+    TEST_ASSERT_EQUAL(LAYER_TYPE_FC, net.layers[2].params.type);
+    TEST_ASSERT_EQUAL(2, net.layers[2].params.batch_size);
+    TEST_ASSERT_EQUAL(10, net.layers[2].params.in);
+    TEST_ASSERT_EQUAL(5, net.layers[2].params.out);
+
+    TEST_ASSERT_EQUAL(LAYER_TYPE_SOFTMAX, net.layers[3].params.type);
+    TEST_ASSERT_EQUAL(2, net.layers[3].params.batch_size);
+    TEST_ASSERT_EQUAL(5, net.layers[3].params.in);
+    TEST_ASSERT_EQUAL(5, net.layers[3].params.out);
+
+    layer_free_params_Ignore();
+    net_free_layers(&net);
+}
