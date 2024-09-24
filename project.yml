@@ -31,11 +31,9 @@
 :paths:
   :test:
     - +:test/cases/*
-    - -:test/support
   :source:
     - src/**
   :support:
-    - test/support
   :include:
     - include/**
   :libraries: []
