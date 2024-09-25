@@ -5,6 +5,7 @@
 #include "net.h"
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
@@ -164,7 +165,33 @@ void net_clear_grad(Net *net) {
 }
 
 void net_load_from_file(Net *net, const char *config_file) {
-    (void)config_file;
+    FILE *fp = fopen(config_file, "r");
+    if (fp == NULL) {
+        return;
+    }
+
+    char c;
+    char buf[256];
+    size_t size = 0;
+    char *p_buf = buf;
+    while ((c = fgetc(fp)) != EOF) {
+        if ((c == '{') || (c == '}') || (c == '[') || (c == ']') ||
+            (c == ' ')) {
+            // Skip
+        }
+        if ((c == ':') || (c == ',') || (c == '\n')) {
+            *p_buf = '\0';
+            if (size > 0) {
+                // printf("%s\n", buf);
+            }
+            p_buf = buf;
+            size = 0;
+        } else {
+            *p_buf = c;
+            p_buf++;
+            size++;
+        }
+    }
 
     // Dummy
     net_alloc_layers(
@@ -176,4 +203,6 @@ void net_load_from_file(Net *net, const char *config_file) {
             { .type=LAYER_TYPE_SOFTMAX, .batch_size=2, .in=5, .out=5 }
         )
     );
+
+    fclose(fp);
 }
