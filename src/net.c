@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <time.h>
 
 #include "random.h"
@@ -166,29 +167,39 @@ void net_clear_grad(Net *net) {
 
 void net_load_from_file(Net *net, const char *config_file) {
     FILE *fp = fopen(config_file, "r");
-    if (fp == NULL) {
-        return;
-    }
+    // if (fp == NULL) {
+    //     return;
+    // }
 
-    char c;
+    bool get_net_size = false;
+    size_t net_size = 0;
+
     char buf[256];
     size_t size = 0;
-    char *p_buf = buf;
+    char c;
     while ((c = fgetc(fp)) != EOF) {
         if ((c == '{') || (c == '}') || (c == '[') || (c == ']') ||
-            (c == ' ')) {
+            (c == ' ') || (c == '\t')) {
             // Skip
-        }
-        if ((c == ':') || (c == ',') || (c == '\n')) {
-            *p_buf = '\0';
+        } else if ((c == ':') || (c == ',') || (c == '\n')) {
+            buf[size] = '\0';
             if (size > 0) {
-                // printf("%s\n", buf);
+                if ((c == ':')) {
+                    // Key
+                    if (!strcmp(buf, "\"size\"")) {
+                        get_net_size = true;
+                    }
+                } else {
+                    // Value
+                    if (get_net_size) {
+                        net_size = strtoul(buf, NULL, 10);
+                        get_net_size = false;
+                    }
+                }
             }
-            p_buf = buf;
             size = 0;
         } else {
-            *p_buf = c;
-            p_buf++;
+            buf[size] = c;
             size++;
         }
     }
@@ -203,6 +214,8 @@ void net_load_from_file(Net *net, const char *config_file) {
             { .type=LAYER_TYPE_SOFTMAX, .batch_size=2, .in=5, .out=5 }
         )
     );
+
+    net->size = net_size;
 
     fclose(fp);
 }
