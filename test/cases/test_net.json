@@ -3,7 +3,7 @@
     "layers": [
         {
             "params": {
-                "type": "LAYER_TYPE_FC",
+                "type": 1,
                 "batch_size": 2,
                 "in": 3,
                 "out": 10
@@ -11,7 +11,7 @@
         },
         {
             "params": {
-                "type": "LAYER_TYPE_SIGMOID",
+                "type": 2,
                 "batch_size": 2,
                 "in": 10,
                 "out": 10
@@ -19,7 +19,7 @@
         },
         {
             "params": {
-                "type": "LAYER_TYPE_FC",
+                "type": 1,
                 "batch_size": 2,
                 "in": 10,
                 "out": 5
@@ -27,7 +27,7 @@
         },
         {
             "params": {
-                "type": "LAYER_TYPE_SOFTMAX",
+                "type": 3,
                 "batch_size": 2,
                 "in": 5,
                 "out": 5
