@@ -165,6 +165,17 @@ void net_clear_grad(Net *net) {
     }
 }
 
+/**
+ * @brief Check equality of 2 strings
+ *
+ * @param[in] s1 NULL-terminated string #1
+ * @param[in] s2 NULL-terminated string #2
+ * @return true if s1 == s2, otherwise false
+ */
+static inline bool str_equal(const char *s1, const char *s2) {
+    return !strcmp(s1, s2) ? true : false;
+}
+
 void net_load_from_file(Net *net, const char *config_file) {
     FILE *fp = fopen(config_file, "r");
     // if (fp == NULL) {
@@ -186,7 +197,7 @@ void net_load_from_file(Net *net, const char *config_file) {
             if (size > 0) {
                 if ((c == ':')) {
                     // Key
-                    if (!strcmp(buf, "\"size\"")) {
+                    if (str_equal(buf, "\"size\"")) {
                         get_net_size = true;
                     }
                 } else {
