@@ -4,6 +4,7 @@
  */
 #include "net.h"
 
+#include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -176,6 +177,41 @@ static inline bool str_equal(const char *s1, const char *s2) {
     return !strcmp(s1, s2) ? true : false;
 }
 
+static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
+    size_t tok_len = 0;
+
+    char c;
+    while ((c = fgetc(fp)) != EOF) {
+        if ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t')) {
+            // JSON whitespace
+            if (tok_len > 0) {
+                buffer[tok_len] = '\0';
+                break;
+            }
+            continue;
+        }
+
+        buffer[tok_len] = c;
+        tok_len++;
+
+        if (tok_len == (buf_size - 1)) {
+            buffer[tok_len] = '\0';
+            break;
+        }
+    }
+
+    return tok_len;
+}
+
+void trim_non_digit(char *buffer, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        if (!isdigit(buffer[i])) {
+            buffer[i] = '\0';
+            return;
+        }
+    }
+}
+
 void net_load_from_file(Net *net, const char *config_file) {
     FILE *fp = fopen(config_file, "r");
     // if (fp == NULL) {
@@ -185,33 +221,16 @@ void net_load_from_file(Net *net, const char *config_file) {
     bool get_net_size = false;
     size_t net_size = 0;
 
-    char buf[256];
-    size_t size = 0;
-    char c;
-    while ((c = fgetc(fp)) != EOF) {
-        if ((c == '{') || (c == '}') || (c == '[') || (c == ']') ||
-            (c == ' ') || (c == '\t')) {
-            // Skip
-        } else if ((c == ':') || (c == ',') || (c == '\n')) {
-            buf[size] = '\0';
-            if (size > 0) {
-                if ((c == ':')) {
-                    // Key
-                    if (str_equal(buf, "\"size\"")) {
-                        get_net_size = true;
-                    }
-                } else {
-                    // Value
-                    if (get_net_size) {
-                        net_size = strtoul(buf, NULL, 10);
-                        get_net_size = false;
-                    }
-                }
+    char buffer[256];
+    size_t size;
+    while ((size = get_token(buffer, fp, sizeof(buffer))) > 0) {
+        if (buffer[size - 1] == ':') {
+            // TODO: operate {}, []
+            if (str_equal(buffer, "\"size\":")) {
+                get_token(buffer, fp, sizeof(buffer));
+                trim_non_digit(buffer, sizeof(fp));
+                net_size = strtoul(buffer, NULL, 10);
             }
-            size = 0;
-        } else {
-            buf[size] = c;
-            size++;
         }
     }
 
