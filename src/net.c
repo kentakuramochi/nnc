@@ -180,15 +180,43 @@ static inline bool str_equal(const char *s1, const char *s2) {
 static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
     size_t tok_len = 0;
 
+    bool in_string = false;
     char c;
     while ((c = fgetc(fp)) != EOF) {
+        // JSON whitespace
         if ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t')) {
-            // JSON whitespace
-            if (tok_len > 0) {
+            if (!in_string) {
+                if (tok_len > 0) {
+                    buffer[tok_len] = '\0';
+                    break;
+                }
+
+                continue;
+            }
+        }
+
+        // Double quotation
+        if (c == '"') {
+            if (in_string) {
+                in_string = false;
                 buffer[tok_len] = '\0';
                 break;
             }
+
+            in_string = true;
             continue;
+        }
+
+        // Token separators
+        if ((c == ':') || (c == ',')) {
+            if (!in_string) {
+                if (tok_len > 0) {
+                    buffer[tok_len] = '\0';
+                    break;
+                }
+
+                continue;
+            }
         }
 
         buffer[tok_len] = c;
@@ -203,49 +231,56 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
     return tok_len;
 }
 
-void trim_non_digit(char *buffer, size_t size) {
-    for (size_t i = 0; i < size; i++) {
-        if (!isdigit(buffer[i])) {
-            buffer[i] = '\0';
-            return;
-        }
-    }
-}
-
 void net_load_from_file(Net *net, const char *config_file) {
     FILE *fp = fopen(config_file, "r");
     // if (fp == NULL) {
     //     return;
     // }
 
-    bool get_net_size = false;
-    size_t net_size = 0;
+    size_t net_size;
+    int params_index = 0;
+    bool in_params;
+    LayerParams *layer_params_list;
 
-    char buffer[256];
+    char buffer[256]; // Temporal buffer for a token
     size_t size;
     while ((size = get_token(buffer, fp, sizeof(buffer))) > 0) {
-        if (buffer[size - 1] == ':') {
-            // TODO: operate {}, []
-            if (str_equal(buffer, "\"size\":")) {
-                get_token(buffer, fp, sizeof(buffer));
-                trim_non_digit(buffer, sizeof(fp));
-                net_size = strtoul(buffer, NULL, 10);
+        if (str_equal(buffer, "size")) {
+            get_token(buffer, fp, sizeof(buffer));
+            size_t size = strtoul(buffer, NULL, 10);
+            net_size = size;
+            layer_params_list = malloc(sizeof(LayerParams) * (size + 1));
+        } else if (str_equal(buffer, "params")) {
+            in_params = true;
+        } else if (str_equal(buffer, "type")) {
+            get_token(buffer, fp, sizeof(buffer));
+            layer_params_list[params_index].type = strtoul(buffer, NULL, 10);
+        } else if (str_equal(buffer, "batch_size")) {
+            get_token(buffer, fp, sizeof(buffer));
+            layer_params_list[params_index].batch_size =
+                strtoul(buffer, NULL, 10);
+        } else if (str_equal(buffer, "in")) {
+            get_token(buffer, fp, sizeof(buffer));
+            layer_params_list[params_index].in =
+                strtoul(buffer, NULL, 10);
+        } else if (str_equal(buffer, "out")) {
+            get_token(buffer, fp, sizeof(buffer));
+            layer_params_list[params_index].out =
+                strtoul(buffer, NULL, 10);
+        } else if (str_equal(buffer, "}")) {
+            if (in_params) {
+                in_params = false;
+                params_index++;
             }
         }
     }
 
-    // Dummy
-    net_alloc_layers(
-        net,
-        LAYER_PARAMS_LIST(
-            { .type=LAYER_TYPE_FC, .batch_size=2, .in=3, .out=10 },
-            { .type=LAYER_TYPE_SIGMOID, .batch_size=2, .in=10, .out=10 },
-            { .type=LAYER_TYPE_FC, .batch_size=2, .in=10, .out=5 },
-            { .type=LAYER_TYPE_SOFTMAX, .batch_size=2, .in=5, .out=5 }
-        )
-    );
+    // Terminate the parameter list
+    layer_params_list[params_index].type = LAYER_TYPE_NONE;
 
-    net->size = net_size;
+    net_alloc_layers(net, layer_params_list);
+
+    free(layer_params_list);
 
     fclose(fp);
 }
