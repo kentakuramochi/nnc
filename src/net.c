@@ -177,58 +177,65 @@ static inline bool str_equal(const char *s1, const char *s2) {
     return !strcmp(s1, s2) ? true : false;
 }
 
-static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
-    size_t tok_len = 0;
+/**
+ * @brief Get a JSON token from a stream
+ *
+ * @param[out] buffer Buffer to store a NULL-terminated token
+ * @param[in] fp Input stream
+ * @param[in] buf_size Size of the buffer
+ * @return Length of the token string
+ * @note Implementation is incomplete, DOES NOT conform to the JSON specification
+ */
+static size_t get_json_token(char *buffer, FILE *fp, const size_t buf_size) {
+    size_t token_length = 0;
 
     bool in_string = false;
     char c;
     while ((c = fgetc(fp)) != EOF) {
-        // JSON whitespace
-        if ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t')) {
-            if (!in_string) {
-                if (tok_len > 0) {
-                    buffer[tok_len] = '\0';
-                    break;
-                }
-
-                continue;
-            }
-        }
-
-        // Double quotation
-        if (c == '"') {
-            if (in_string) {
+        if (in_string) {
+            // In string
+            if (c == '"') {
                 in_string = false;
-                buffer[tok_len] = '\0';
+                buffer[token_length] = '\0';
                 break;
             }
-
-            in_string = true;
-            continue;
-        }
-
-        // Token separators
-        if ((c == ':') || (c == ',')) {
-            if (!in_string) {
-                if (tok_len > 0) {
-                    buffer[tok_len] = '\0';
+        } else {
+            // Whitespace
+            if ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t')) {
+                if (token_length > 0) {
+                    buffer[token_length] = '\0';
                     break;
                 }
+                continue;
+            }
 
+            // Start string
+            if (c == '"') {
+                in_string = true;
+                continue;
+            }
+
+            // Separate token
+            if ((c == ':') || (c == ',')) {
+                if (token_length > 0) {
+                    buffer[token_length] = '\0';
+                    break;
+                }
                 continue;
             }
         }
 
-        buffer[tok_len] = c;
-        tok_len++;
+        buffer[token_length] = c;
+        token_length++;
 
-        if (tok_len == (buf_size - 1)) {
-            buffer[tok_len] = '\0';
+        // Reach to a max length
+        if (token_length == (buf_size - 1)) {
+            buffer[token_length] = '\0';
             break;
         }
     }
 
-    return tok_len;
+    return token_length;
 }
 
 void net_load_from_file(Net *net, const char *config_file) {
@@ -237,34 +244,32 @@ void net_load_from_file(Net *net, const char *config_file) {
     //     return;
     // }
 
-    size_t net_size;
     int params_index = 0;
-    bool in_params;
-    LayerParams *layer_params_list;
+    bool in_params = false;
+    LayerParams *layer_params_list = NULL;
 
     char buffer[256]; // Temporal buffer for a token
     size_t size;
-    while ((size = get_token(buffer, fp, sizeof(buffer))) > 0) {
+    while ((size = get_json_token(buffer, fp, sizeof(buffer))) > 0) {
         if (str_equal(buffer, "size")) {
-            get_token(buffer, fp, sizeof(buffer));
+            get_json_token(buffer, fp, sizeof(buffer));
             size_t size = strtoul(buffer, NULL, 10);
-            net_size = size;
             layer_params_list = malloc(sizeof(LayerParams) * (size + 1));
         } else if (str_equal(buffer, "params")) {
             in_params = true;
         } else if (str_equal(buffer, "type")) {
-            get_token(buffer, fp, sizeof(buffer));
+            get_json_token(buffer, fp, sizeof(buffer));
             layer_params_list[params_index].type = strtoul(buffer, NULL, 10);
         } else if (str_equal(buffer, "batch_size")) {
-            get_token(buffer, fp, sizeof(buffer));
+            get_json_token(buffer, fp, sizeof(buffer));
             layer_params_list[params_index].batch_size =
                 strtoul(buffer, NULL, 10);
         } else if (str_equal(buffer, "in")) {
-            get_token(buffer, fp, sizeof(buffer));
+            get_json_token(buffer, fp, sizeof(buffer));
             layer_params_list[params_index].in =
                 strtoul(buffer, NULL, 10);
         } else if (str_equal(buffer, "out")) {
-            get_token(buffer, fp, sizeof(buffer));
+            get_json_token(buffer, fp, sizeof(buffer));
             layer_params_list[params_index].out =
                 strtoul(buffer, NULL, 10);
         } else if (str_equal(buffer, "}")) {
