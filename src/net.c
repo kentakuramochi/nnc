@@ -239,10 +239,14 @@ static size_t get_json_token(char *buffer, FILE *fp, const size_t buf_size) {
 }
 
 void net_load_from_file(Net *net, const char *config_file) {
+    if ((net == NULL) || (config_file == NULL)) {
+        return;
+    }
+
     FILE *fp = fopen(config_file, "r");
-    // if (fp == NULL) {
-    //     return;
-    // }
+    if (fp == NULL) {
+        return;
+    }
 
     int params_index = 0;
     bool in_params = false;

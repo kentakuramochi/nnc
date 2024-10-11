@@ -384,3 +384,18 @@ void test_load_from_file(void) {
     layer_free_params_Ignore();
     net_free_layers(&net);
 }
+
+void test_load_from_file_fail_when_NULL_input(void) {
+    Net *net = NULL;
+    net_load_from_file(net, NULL);
+    TEST_ASSERT_NULL(net);
+
+    // Just return, nothing occured
+    net_load_from_file(NULL, "./test/cases/test_net.json");
+}
+
+void test_load_from_file_fail_when_file_is_missing(void) {
+    // Just return, nothing occured
+    Net *net;
+    net_load_from_file(net, "./non/exsiting/file.json");
+}
