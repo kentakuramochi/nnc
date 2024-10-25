@@ -142,16 +142,16 @@ JsonObject *json_read_file(const char *json_file) {
 void json_get_integer_value(
     int *value, JsonObject *json_object, const char *key
 ) {
-    // TODO: find and parse a value
-    // JsonObject *obj = json_object;
+    JsonObject *obj = json_object;
 
-    // while (obj->next != NULL) {
-    //     if (str_equal(key, obj->key)) {
-    //         *value = strtol(obj->value, NULL, 10);
-    //         return;
-    //     }
-    //     obj = obj->next;
-    // }
+    while (obj != NULL) {
+        if (str_equal(key, obj->key)) {
+            *value = strtol(obj->value, NULL, 10);
+            return;
+        }
+
+        obj = obj->next;
+    }
 }
 
 void json_free_object(JsonObject **json_object) {

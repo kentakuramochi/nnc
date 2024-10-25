@@ -18,9 +18,9 @@ typedef struct JsonObject {
 
 JsonObject *json_read_file(const char *json_file);
 
-// void json_get_integer_value(
-//     int *value, JsonObject *json_object, const char *key
-// );
+void json_get_integer_value(
+    int *value, JsonObject *json_object, const char *key
+);
 
 void json_free_object(JsonObject **json_object);
 
