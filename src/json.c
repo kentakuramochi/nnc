@@ -36,14 +36,15 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
     char c;
     while ((c = fgetc(fp)) != EOF) {
         if (in_string) {
-            // In string
+            // In string, terminate the token by double quote
+            // Escape sequense is not considered
             if (c == '"') {
                 in_string = false;
                 buffer[token_length] = '\0';
                 break;
             }
         } else {
-            // Whitespace
+            // Terminate the token by JSON whitespace
             if ((c == ' ') || (c == '\n') || (c == '\r') || (c == '\t')) {
                 if (token_length > 0) {
                     buffer[token_length] = '\0';
@@ -52,18 +53,20 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
                 continue;
             }
 
-            // Start string
-            if (c == '"') {
-                in_string = true;
-                continue;
-            }
-
-            // Separate token
             if ((c == ':') || (c == ',')) {
+                // Terminate the token by colon or comma
+                // Escape sequense is not considered
                 if (token_length > 0) {
                     buffer[token_length] = '\0';
                     break;
                 }
+                // Skip if token string hasn't get
+                continue;
+            }
+
+            // Start string by double quote
+            if (c == '"') {
+                in_string = true;
                 continue;
             }
         }
@@ -71,7 +74,7 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
         buffer[token_length] = c;
         token_length++;
 
-        // Reach to a max length
+        // Terminate the toke if the length reaches to the max length
         if (token_length == (buf_size - 1)) {
             buffer[token_length] = '\0';
             break;
@@ -93,8 +96,8 @@ JsonObject *json_read_file(const char *json_file) {
 
     char buffer[BUFFER_SIZE];
     size_t size;
-    int depth = 0;
-    JsonObject *cur_obj = NULL;
+    int depth = 0; // Object's depth
+    JsonObject *cur_obj = NULL; // Current object
     while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
         if (str_equal("{", buffer)) {
             // Start object
@@ -107,9 +110,10 @@ JsonObject *json_read_file(const char *json_file) {
             obj->value = NULL;
 
             if (cur_obj == NULL) {
+                // If there's no current object, set it to the root
                 root_obj = obj;
             } else {
-                // Append a new object
+                // Otherwise, append a new object to the next
                 cur_obj->next = obj;
                 obj->prev = cur_obj;
             }
@@ -122,11 +126,12 @@ JsonObject *json_read_file(const char *json_file) {
         } else if (str_equal("]", buffer)) {
             // End array
         } else {
-            // Get a key
+            // Thought as JSON file is written correctly
+            // Get a key string
             cur_obj->key = malloc(sizeof(char) * (size + 1));
             strncpy(cur_obj->key, buffer, (size + 1));
 
-            // Get a value
+            // Get a value string
             size = get_token(buffer, fp, BUFFER_SIZE);
             cur_obj->value = malloc(sizeof(char) * (size + 1));
             strncpy(cur_obj->value, buffer, (size + 1));
@@ -156,6 +161,8 @@ void json_get_integer_value(
 
 void json_free_object(JsonObject **json_object) {
     JsonObject *cur_obj = *json_object;
+
+    // Free memories recursively
     while (cur_obj != NULL) {
         free(cur_obj->key);
         cur_obj->key = NULL;

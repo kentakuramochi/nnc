@@ -23,7 +23,7 @@ static void create_test_json(const char *string) {
     fclose(fp);
 }
 
-void test_config(void) {
+void test_read_file(void) {
     create_test_json(
         "{ \"foo\": 1 }"
     );
