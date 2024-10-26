@@ -47,6 +47,18 @@ void json_get_integer_value(
 );
 
 /**
+ * @brief Get a string from the JSON object
+ *
+ * @param[out] string String
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @note value doesn't be changed if the key is not found
+ */
+void json_get_string_value(
+    char *string, JsonObject *json_object, const char *key
+);
+
+/**
  * @brief Free JSON object
  * @param[out] json_object JSON object
  */
