@@ -25,7 +25,7 @@ static void create_test_json(const char *string) {
 
 void test_read_file(void) {
     create_test_json(
-        "{ \"foo\": 1, \"baz\": \"foobar\" }"
+        "{ \"foo\": 1, \"baz\": \"foobar\", \"pi\": 3.14 }"
     );
 
     JsonObject *root_object = json_read_file(TEST_JSON_FILE);
@@ -38,6 +38,10 @@ void test_read_file(void) {
     char string[6 + 1] = { 0 };
     json_get_string_value(string, root_object, "baz");
     TEST_ASSERT_EQUAL_STRING("foobar", string);
+
+    float flt = 0.0;
+    json_get_float_value(&flt, root_object, "pi");
+    TEST_ASSERT_EQUAL_FLOAT(3.14, flt);
 
     json_free_object(&root_object);
     TEST_ASSERT_NULL(root_object);

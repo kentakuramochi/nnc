@@ -174,6 +174,20 @@ void json_get_string_value(
     }
 }
 
+void json_get_float_value(
+    float *value, JsonObject *json_object, const char *key
+) {
+    KeyValuePair *kvp = json_object->kvps;
+
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            *value = strtof(kvp->value, NULL);
+            return;
+        }
+        kvp = kvp->next;
+    }
+}
+
 void json_free_object(JsonObject **json_object) {
     KeyValuePair *kvp = (*json_object)->kvps;
 

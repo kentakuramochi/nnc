@@ -59,6 +59,18 @@ void json_get_string_value(
 );
 
 /**
+ * @brief Get a floating-point value from the JSON object
+ *
+ * @param[out] value Floating-point value
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @note value doesn't be changed if the key is not found
+ */
+void json_get_float_value(
+    float *value, JsonObject *json_object, const char *key
+);
+
+/**
  * @brief Free JSON object
  * @param[out] json_object JSON object
  */
