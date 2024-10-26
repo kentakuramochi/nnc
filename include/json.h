@@ -8,16 +8,22 @@
 #include <stddef.h>
 
 /**
+ * @brief Key-value pair in the JSON object
+ * @note Implemented as the doubly linked list
+ */
+typedef struct KeyValuePair {
+    struct KeyValuePair *prev; //!< Previous pair
+    struct KeyValuePair *next; //!< Next pair
+    char *key;  //!< Key string
+    char *value; //!< Value string
+} KeyValuePair;
+
+/**
  * @brief JSON object
  * @note Implemented as the doubly linked list
  */
 typedef struct JsonObject {
-    struct JsonObject *prev; //!< Previous object
-    struct JsonObject *next; //!< Next object
-    struct JsonObject *child; //!< Child object
-    struct JsonObject *parent; //!< Parent object
-    char *key; //!< Key string
-    char *value; //!< Value string
+    struct KeyValuePair *kvps; //!< Key-value pair
 } JsonObject;
 
 /**

@@ -84,6 +84,7 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
     return token_length;
 }
 
+//!< Size of the temporal buffer
 #define BUFFER_SIZE 256
 
 JsonObject *json_read_file(const char *json_file) {
@@ -92,90 +93,90 @@ JsonObject *json_read_file(const char *json_file) {
         return NULL;
     }
 
-    JsonObject *root_obj = NULL;
+    JsonObject *cur_obj = NULL;
+    KeyValuePair *cur_kvp = NULL;
 
     char buffer[BUFFER_SIZE];
     size_t size;
-    int depth = 0; // Object's depth
-    JsonObject *cur_obj = NULL; // Current object
     while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
         if (str_equal("{", buffer)) {
             // Start object
             JsonObject *obj = malloc(sizeof(JsonObject));
-            obj->prev = NULL;
-            obj->next = NULL;
-            obj->child = NULL;
-            obj->parent = NULL;
-            obj->key = NULL;
-            obj->value = NULL;
+            obj->kvps = NULL;
 
+            // If there's no current object, set it to the root
             if (cur_obj == NULL) {
-                // If there's no current object, set it to the root
-                root_obj = obj;
-            } else {
-                // Otherwise, append a new object to the next
-                cur_obj->next = obj;
-                obj->prev = cur_obj;
+                cur_obj = obj;
             }
-
-            cur_obj = obj;
         } else if (str_equal("}", buffer)) {
             // End object
-        } else if (str_equal("[", buffer)) {
-            // Start array
-        } else if (str_equal("]", buffer)) {
-            // End array
         } else {
+            KeyValuePair *kvp = malloc(sizeof(KeyValuePair));
+            kvp->prev = NULL;
+            kvp->next = NULL;
+            kvp->key = NULL;
+            kvp->value = NULL;
+
+            // Append the kvp to the current one
+            if (cur_kvp != NULL) {
+                cur_kvp->next = kvp;
+                kvp->prev = cur_kvp;
+            }
+            cur_kvp = kvp;
+
+            // Set the kvp to the object if not set
+            if (cur_obj->kvps == NULL) {
+                cur_obj->kvps = cur_kvp;
+            }
+
             // Thought as JSON file is written correctly
             // Get a key string
-            cur_obj->key = malloc(sizeof(char) * (size + 1));
-            strncpy(cur_obj->key, buffer, (size + 1));
+            cur_kvp->key = malloc(sizeof(char) * (size + 1));
+            strncpy(cur_kvp->key, buffer, (size + 1));
 
             // Get a value string
             size = get_token(buffer, fp, BUFFER_SIZE);
-            cur_obj->value = malloc(sizeof(char) * (size + 1));
-            strncpy(cur_obj->value, buffer, (size + 1));
+            cur_kvp->value = malloc(sizeof(char) * (size + 1));
+            strncpy(cur_kvp->value, buffer, (size + 1));
         }
     }
 
     fclose(fp);
 
-    // Return the root object
-    return root_obj;
+    return cur_obj;
 }
 
 void json_get_integer_value(
     int *value, JsonObject *json_object, const char *key
 ) {
-    JsonObject *obj = json_object;
+    KeyValuePair *kvp = json_object->kvps;
 
-    while (obj != NULL) {
-        if (str_equal(key, obj->key)) {
-            *value = strtol(obj->value, NULL, 10);
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            *value = strtol(kvp->value, NULL, 10);
             return;
         }
-
-        obj = obj->next;
+        kvp = kvp->next;
     }
 }
 
 void json_free_object(JsonObject **json_object) {
-    JsonObject *cur_obj = *json_object;
+    KeyValuePair *kvp = (*json_object)->kvps;
 
-    // Free memories recursively
-    while (cur_obj != NULL) {
-        free(cur_obj->key);
-        cur_obj->key = NULL;
-        free(cur_obj->value);
-        cur_obj->value = NULL;
+    // Free memories sequentially
+    while (kvp != NULL) {
+        free(kvp->key);
+        kvp->key = NULL;
+        free(kvp->value);
+        kvp->value = NULL;
 
-        JsonObject *next_obj = cur_obj->next;
-        free(cur_obj);
-        cur_obj = NULL;
+        KeyValuePair *next_kvp = kvp->next;
+        free(kvp);
+        kvp = NULL;
 
-        cur_obj = next_obj;
+        kvp = next_kvp;
     }
 
-    // Need to set NULL again?
+    free(*json_object);
     *json_object = NULL;
 }

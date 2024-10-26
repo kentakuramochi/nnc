@@ -31,9 +31,9 @@ void test_read_file(void) {
     JsonObject *root_object = json_read_file(TEST_JSON_FILE);
     TEST_ASSERT_NOT_NULL(root_object);
 
-    int value = 0;
-    json_get_integer_value(&value, root_object, "foo");
-    TEST_ASSERT_EQUAL(1, value);
+    int integer = 0;
+    json_get_integer_value(&integer, root_object, "foo");
+    TEST_ASSERT_EQUAL(1, integer);
 
     json_free_object(&root_object);
     TEST_ASSERT_NULL(root_object);
