@@ -94,7 +94,7 @@ JsonObject *json_read_file(const char *json_file) {
     }
 
     JsonObject *cur_obj = NULL;
-    KeyValuePair *cur_kvp = NULL;
+    JsonKeyValuePair *cur_kvp = NULL;
 
     char buffer[BUFFER_SIZE];
     size_t size;
@@ -111,7 +111,7 @@ JsonObject *json_read_file(const char *json_file) {
         } else if (str_equal("}", buffer)) {
             // End object
         } else {
-            KeyValuePair *kvp = malloc(sizeof(KeyValuePair));
+            JsonKeyValuePair *kvp = malloc(sizeof(JsonKeyValuePair));
             kvp->prev = NULL;
             kvp->next = NULL;
             kvp->key = NULL;
@@ -134,10 +134,12 @@ JsonObject *json_read_file(const char *json_file) {
             cur_kvp->key = malloc(sizeof(char) * (size + 1));
             strncpy(cur_kvp->key, buffer, (size + 1));
 
-            // Get a value string
+            // Get a value
             size = get_token(buffer, fp, BUFFER_SIZE);
-            cur_kvp->value = malloc(sizeof(char) * (size + 1));
-            strncpy(cur_kvp->value, buffer, (size + 1));
+            JsonValue *value = malloc(sizeof(JsonValue));
+            value->string = malloc(sizeof(char) * (size + 1));
+            strncpy(value->string, buffer, (size + 1));
+            cur_kvp->value = value;
         }
     }
 
@@ -149,11 +151,11 @@ JsonObject *json_read_file(const char *json_file) {
 void json_get_integer_value(
     int *value, JsonObject *json_object, const char *key
 ) {
-    KeyValuePair *kvp = json_object->kvps;
+    JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            *value = strtol(kvp->value, NULL, 10);
+            *value = strtol(kvp->value->string, NULL, 10);
             return;
         }
         kvp = kvp->next;
@@ -163,11 +165,11 @@ void json_get_integer_value(
 void json_get_string_value(
     char *string, JsonObject *json_object, const char *key
 ) {
-    KeyValuePair *kvp = json_object->kvps;
+    JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            strncpy(string, kvp->value, strlen(kvp->value));
+            strncpy(string, kvp->value->string, strlen(kvp->value->string));
             return;
         }
         kvp = kvp->next;
@@ -177,11 +179,11 @@ void json_get_string_value(
 void json_get_float_value(
     float *value, JsonObject *json_object, const char *key
 ) {
-    KeyValuePair *kvp = json_object->kvps;
+    JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            *value = strtof(kvp->value, NULL);
+            *value = strtof(kvp->value->string, NULL);
             return;
         }
         kvp = kvp->next;
@@ -191,13 +193,13 @@ void json_get_float_value(
 void json_get_boolean_value(
     bool *boolean, JsonObject *json_object, const char *key
 ) {
-    KeyValuePair *kvp = json_object->kvps;
+    JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            if (str_equal("true", kvp->value)) {
+            if (str_equal("true", kvp->value->string)) {
                 *boolean = true;
-            } else if (str_equal("false", kvp->value)) {
+            } else if (str_equal("false", kvp->value->string)) {
                 *boolean = false;
             }
             return;
@@ -207,16 +209,20 @@ void json_get_boolean_value(
 }
 
 void json_free_object(JsonObject **json_object) {
-    KeyValuePair *kvp = (*json_object)->kvps;
+    JsonKeyValuePair *kvp = (*json_object)->kvps;
 
     // Free memories sequentially
     while (kvp != NULL) {
         free(kvp->key);
         kvp->key = NULL;
+
+        free(kvp->value->string);
+        kvp->value->string = NULL;
+
         free(kvp->value);
         kvp->value = NULL;
 
-        KeyValuePair *next_kvp = kvp->next;
+        JsonKeyValuePair *next_kvp = kvp->next;
         free(kvp);
         kvp = NULL;
 

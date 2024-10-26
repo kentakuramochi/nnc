@@ -9,22 +9,29 @@
 #include <stddef.h>
 
 /**
- * @brief Key-value pair in the JSON object
- * @note Implemented as the doubly linked list
+ * @brief Wrapper of values in the JSON object
  */
-typedef struct KeyValuePair {
-    struct KeyValuePair *prev; //!< Previous pair
-    struct KeyValuePair *next; //!< Next pair
+typedef struct JsonValue {
+    // struct Value *prev;
+    // struct Value *next;
+    char *string; //!< Value string
+} JsonValue;
+
+/**
+ * @brief Key-value pair in the JSON object
+ */
+typedef struct JsonKeyValuePair {
+    struct JsonKeyValuePair *prev; //!< Previous pair
+    struct JsonKeyValuePair *next; //!< Next pair
     char *key;  //!< Key string
-    char *value; //!< Value string
-} KeyValuePair;
+    JsonValue *value; //!< Value
+} JsonKeyValuePair;
 
 /**
  * @brief JSON object
- * @note Implemented as the doubly linked list
  */
 typedef struct JsonObject {
-    struct KeyValuePair *kvps; //!< Key-value pair
+    JsonKeyValuePair *kvps; //!< Key-value pair
 } JsonObject;
 
 /**
