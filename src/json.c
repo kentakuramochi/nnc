@@ -188,6 +188,24 @@ void json_get_float_value(
     }
 }
 
+void json_get_boolean_value(
+    bool *boolean, JsonObject *json_object, const char *key
+) {
+    KeyValuePair *kvp = json_object->kvps;
+
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            if (str_equal("true", kvp->value)) {
+                *boolean = true;
+            } else if (str_equal("false", kvp->value)) {
+                *boolean = false;
+            }
+            return;
+        }
+        kvp = kvp->next;
+    }
+}
+
 void json_free_object(JsonObject **json_object) {
     KeyValuePair *kvp = (*json_object)->kvps;
 

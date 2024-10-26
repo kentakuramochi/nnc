@@ -5,6 +5,7 @@
 #ifndef JSON_H
 #define JSON_H
 
+#include <stdbool.h>
 #include <stddef.h>
 
 /**
@@ -68,6 +69,18 @@ void json_get_string_value(
  */
 void json_get_float_value(
     float *value, JsonObject *json_object, const char *key
+);
+
+/**
+ * @brief Get a boolean value from the JSON object
+ *
+ * @param[out] boolean Boolean value
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @note value doesn't be changed if the key is not found
+ */
+void json_get_boolean_value(
+    bool *boolean, JsonObject *json_object, const char *key
 );
 
 /**
