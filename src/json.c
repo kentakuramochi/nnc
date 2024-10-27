@@ -136,10 +136,39 @@ JsonObject *json_read_file(const char *json_file) {
 
             // Get a value
             size = get_token(buffer, fp, BUFFER_SIZE);
-            JsonValue *value = malloc(sizeof(JsonValue));
-            value->string = malloc(sizeof(char) * (size + 1));
-            strncpy(value->string, buffer, (size + 1));
-            cur_kvp->value = value;
+            if (str_equal(buffer, "[")) {
+                // If '[' is read, get as an array
+                JsonValue *cur_value = NULL;
+                while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
+                    if (str_equal(buffer, "]")) {
+                        break;
+                    } else {
+                        JsonValue *value = malloc(sizeof(JsonValue));
+                        value->prev = NULL;
+                        value->next = NULL;
+                        value->string = malloc(sizeof(char) * (size + 1));
+                        strncpy(value->string, buffer, (size + 1));
+
+                        if (cur_value == NULL) {
+                            cur_kvp->value = value;
+                        } else {
+                            cur_value->next = value;
+                            value->prev = cur_value;
+                        }
+
+                        cur_value = value;
+                    }
+                }
+            } else {
+                // Otherwise, get as a single value
+                JsonValue *value = malloc(sizeof(JsonValue));
+                value->prev = NULL;
+                value->next = NULL;
+                value->string = malloc(sizeof(char) * (size + 1));
+                strncpy(value->string, buffer, (size + 1));
+
+                cur_kvp->value = value;
+            }
         }
     }
 
@@ -212,16 +241,24 @@ void json_get_boolean_value(
 void json_free_object(JsonObject **json_object) {
     JsonKeyValuePair *kvp = (*json_object)->kvps;
 
-    // Free memories sequentially
+    // Free key-value pairs sequentially
     while (kvp != NULL) {
         free(kvp->key);
         kvp->key = NULL;
 
-        free(kvp->value->string);
-        kvp->value->string = NULL;
+        // Free values sequentially
+        JsonValue *value = kvp->value;
+        while (value != NULL) {
+            free(value->string);
+            kvp->value->string = NULL;
 
-        free(kvp->value);
-        kvp->value = NULL;
+            JsonValue *next = value->next;
+
+            free(value);
+            value = NULL;
+
+            value = next;
+        }
 
         JsonKeyValuePair *next_kvp = kvp->next;
         free(kvp);

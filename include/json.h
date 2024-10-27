@@ -12,8 +12,8 @@
  * @brief Wrapper of values in the JSON object
  */
 typedef struct JsonValue {
-    // struct Value *prev;
-    // struct Value *next;
+    struct JsonValue *prev; //!< Previous value
+    struct JsonValue *next; //!< Next value
     char *string; //!< Value string
 } JsonValue;
 
