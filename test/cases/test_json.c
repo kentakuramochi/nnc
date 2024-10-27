@@ -23,7 +23,7 @@ static void create_test_json(const char *string) {
     fclose(fp);
 }
 
-void test_read_file(void) {
+void test_read_file_for_basic_types(void) {
     create_test_json(
         "{\n"
             "\"foo\": 1,\n"
@@ -41,7 +41,7 @@ void test_read_file(void) {
     json_get_integer_value(&integer, root_object, "foo");
     TEST_ASSERT_EQUAL(1, integer);
 
-    char string[6 + 1] = { 0 };
+    char string[6 + 1] = { 'x','x','x','x','x','x','x' };
     json_get_string_value(string, root_object, "baz");
     TEST_ASSERT_EQUAL_STRING("foobar", string);
 

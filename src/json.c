@@ -169,7 +169,8 @@ void json_get_string_value(
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            strncpy(string, kvp->value->string, strlen(kvp->value->string));
+            // Copy +1 length to terminate with NULL
+            strncpy(string, kvp->value->string, (strlen(kvp->value->string) + 1));
             return;
         }
         kvp = kvp->next;
