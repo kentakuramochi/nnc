@@ -177,7 +177,7 @@ JsonObject *json_read_file(const char *json_file) {
     return cur_obj;
 }
 
-void json_get_integer_value(
+bool json_get_integer_value(
     int *value, JsonObject *json_object, const char *key
 ) {
     JsonKeyValuePair *kvp = json_object->kvps;
@@ -185,13 +185,15 @@ void json_get_integer_value(
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
             *value = strtol(kvp->value->string, NULL, 10);
-            return;
+            return true;
         }
         kvp = kvp->next;
     }
+
+    return false;
 }
 
-void json_get_string_value(
+bool json_get_string_value(
     char *string, JsonObject *json_object, const char *key
 ) {
     JsonKeyValuePair *kvp = json_object->kvps;
@@ -200,13 +202,15 @@ void json_get_string_value(
         if (str_equal(key, kvp->key)) {
             // Copy +1 length to terminate with NULL
             strncpy(string, kvp->value->string, (strlen(kvp->value->string) + 1));
-            return;
+            return true;
         }
         kvp = kvp->next;
     }
+
+    return false;
 }
 
-void json_get_float_value(
+bool json_get_float_value(
     float *value, JsonObject *json_object, const char *key
 ) {
     JsonKeyValuePair *kvp = json_object->kvps;
@@ -214,13 +218,15 @@ void json_get_float_value(
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
             *value = strtof(kvp->value->string, NULL);
-            return;
+            return true;
         }
         kvp = kvp->next;
     }
+
+    return false;
 }
 
-void json_get_boolean_value(
+bool json_get_boolean_value(
     bool *boolean, JsonObject *json_object, const char *key
 ) {
     JsonKeyValuePair *kvp = json_object->kvps;
@@ -232,10 +238,12 @@ void json_get_boolean_value(
             } else if (str_equal("false", kvp->value->string)) {
                 *boolean = false;
             }
-            return;
+            return true;
         }
         kvp = kvp->next;
     }
+
+    return false;
 }
 
 void json_free_object(JsonObject **json_object) {

@@ -38,22 +38,22 @@ void test_read_file_for_basic_types(void) {
     TEST_ASSERT_NOT_NULL(root_object);
 
     int integer = 0;
-    json_get_integer_value(&integer, root_object, "foo");
+    TEST_ASSERT_TRUE(json_get_integer_value(&integer, root_object, "foo"));
     TEST_ASSERT_EQUAL(1, integer);
 
     char string[6 + 1] = { 'x','x','x','x','x','x','x' };
-    json_get_string_value(string, root_object, "baz");
+    TEST_ASSERT_TRUE(json_get_string_value(string, root_object, "baz"));
     TEST_ASSERT_EQUAL_STRING("foobar", string);
 
     float flt = 0.0;
-    json_get_float_value(&flt, root_object, "pi");
+    TEST_ASSERT_TRUE(json_get_float_value(&flt, root_object, "pi"));
     TEST_ASSERT_EQUAL_FLOAT(3.14, flt);
 
     bool flag = false;
-    json_get_boolean_value(&flag, root_object, "true_flag");
+    TEST_ASSERT_TRUE(json_get_boolean_value(&flag, root_object, "true_flag"));
     TEST_ASSERT_EQUAL(true, flag);
 
-    json_get_boolean_value(&flag, root_object, "false_flag");
+    TEST_ASSERT_TRUE(json_get_boolean_value(&flag, root_object, "false_flag"));
     TEST_ASSERT_EQUAL(false, flag);
 
     json_free_object(&root_object);

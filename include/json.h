@@ -48,9 +48,11 @@ JsonObject *json_read_file(const char *json_file);
  * @param[out] value Integer
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
+ * @return true Suceed to get the value
+ * @return false Fail to get the value
  * @note value doesn't be changed if the key is not found
  */
-void json_get_integer_value(
+bool json_get_integer_value(
     int *value, JsonObject *json_object, const char *key
 );
 
@@ -60,9 +62,11 @@ void json_get_integer_value(
  * @param[out] string String
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
+ * @return true Suceed to get the value
+ * @return false Fail to get the value
  * @note value doesn't be changed if the key is not found
  */
-void json_get_string_value(
+bool json_get_string_value(
     char *string, JsonObject *json_object, const char *key
 );
 
@@ -72,9 +76,11 @@ void json_get_string_value(
  * @param[out] value Floating-point value
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
+ * @return true Suceed to get the value
+ * @return false Fail to get the value
  * @note value doesn't be changed if the key is not found
  */
-void json_get_float_value(
+bool json_get_float_value(
     float *value, JsonObject *json_object, const char *key
 );
 
@@ -84,9 +90,11 @@ void json_get_float_value(
  * @param[out] boolean Boolean value
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
+ * @return true Suceed to get the value
+ * @return false Fail to get the value
  * @note value doesn't be changed if the key is not found
  */
-void json_get_boolean_value(
+bool json_get_boolean_value(
     bool *boolean, JsonObject *json_object, const char *key
 );
 
