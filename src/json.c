@@ -196,6 +196,25 @@ bool json_get_integer_value(
     return false;
 }
 
+bool json_get_float_value(
+    float *value, JsonObject *json_object, const char *key
+) {
+    JsonKeyValuePair *kvp = json_object->kvps;
+
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            if (str_equal("null", kvp->value->string)) {
+                return false;
+            }
+            *value = strtof(kvp->value->string, NULL);
+            return true;
+        }
+        kvp = kvp->next;
+    }
+
+    return false;
+}
+
 bool json_get_string_value(
     char *string, JsonObject *json_object, const char *key
 ) {
@@ -208,25 +227,6 @@ bool json_get_string_value(
             }
             // Copy +1 length to terminate with NULL
             strncpy(string, kvp->value->string, (strlen(kvp->value->string) + 1));
-            return true;
-        }
-        kvp = kvp->next;
-    }
-
-    return false;
-}
-
-bool json_get_float_value(
-    float *value, JsonObject *json_object, const char *key
-) {
-    JsonKeyValuePair *kvp = json_object->kvps;
-
-    while (kvp != NULL) {
-        if (str_equal(key, kvp->key)) {
-            if (str_equal("null", kvp->value->string)) {
-                return false;
-            }
-            *value = strtof(kvp->value->string, NULL);
             return true;
         }
         kvp = kvp->next;
