@@ -184,6 +184,9 @@ bool json_get_integer_value(
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
+            if (str_equal("null", kvp->value->string)) {
+                return false;
+            }
             *value = strtol(kvp->value->string, NULL, 10);
             return true;
         }
@@ -200,6 +203,9 @@ bool json_get_string_value(
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
+            if (str_equal("null", kvp->value->string)) {
+                return false;
+            }
             // Copy +1 length to terminate with NULL
             strncpy(string, kvp->value->string, (strlen(kvp->value->string) + 1));
             return true;
@@ -217,6 +223,9 @@ bool json_get_float_value(
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
+            if (str_equal("null", kvp->value->string)) {
+                return false;
+            }
             *value = strtof(kvp->value->string, NULL);
             return true;
         }
@@ -233,6 +242,9 @@ bool json_get_boolean_value(
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
+            if (str_equal("null", kvp->value->string)) {
+                return false;
+            }
             if (str_equal("true", kvp->value->string)) {
                 *boolean = true;
             } else if (str_equal("false", kvp->value->string)) {

@@ -30,7 +30,8 @@ void test_read_file_for_basic_types(void) {
             "\"baz\": \"foobar\",\n"
             "\"pi\": 3.14,\n"
             "\"true_flag\": true,\n"
-            "\"false_flag\": false\n"
+            "\"false_flag\": false,\n"
+            "\"null_value\": null\n"
         "}"
     );
 
@@ -55,6 +56,11 @@ void test_read_file_for_basic_types(void) {
 
     TEST_ASSERT_TRUE(json_get_boolean_value(&flag, root_object, "false_flag"));
     TEST_ASSERT_EQUAL(false, flag);
+
+    TEST_ASSERT_FALSE(json_get_integer_value(&integer, root_object, "null_value"));
+    TEST_ASSERT_FALSE(json_get_string_value(string, root_object, "null_value"));
+    TEST_ASSERT_FALSE(json_get_float_value(&flt, root_object, "null_value"));
+    TEST_ASSERT_FALSE(json_get_boolean_value(&flag, root_object, "null_value"));
 
     json_free_object(&root_object);
     TEST_ASSERT_NULL(root_object);
