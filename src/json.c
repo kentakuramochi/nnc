@@ -258,6 +258,46 @@ bool json_get_boolean_value(
     return false;
 }
 
+JsonObject *json_get_object(JsonObject *root_object, const char *key) {
+    (void)root_object;
+
+    static JsonValue val1 = {
+        .prev=NULL, .next=NULL, .string="1"
+    };
+    static JsonKeyValuePair obj1_kvp = {
+        .prev=NULL, .next=NULL, .key="val1", .value=&val1
+    };
+    static JsonObject obj1 = {
+        .kvps=&obj1_kvp
+    };
+
+    static JsonObject obj2 = {
+        .kvps=NULL
+    };
+
+    static JsonValue val2 = {
+        .prev=NULL, .next=NULL, .string="2"
+    };
+    static JsonKeyValuePair obj21_kvp = {
+        .prev=NULL, .next=NULL, .key="val2", .value=&val2
+    };
+    static JsonObject obj21 = {
+        .kvps=&obj21_kvp
+    };
+
+    if (str_equal("obj1", key)) {
+        return &obj1;
+    }
+    if (str_equal("obj2", key)) {
+        return &obj2;
+    }
+    if (str_equal("obj21", key)) {
+        return &obj21;
+    }
+
+    return NULL;
+}
+
 void json_free_object(JsonObject **json_object) {
     JsonKeyValuePair *kvp = (*json_object)->kvps;
 

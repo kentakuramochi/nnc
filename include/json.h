@@ -99,6 +99,15 @@ bool json_get_boolean_value(
 );
 
 /**
+ * @brief Get a JSON object from the root JSON object
+ *
+ * @param[in] root_object Root JSON object
+ * @param[in] key Key of the object
+ * @return Pointer to the object, NULL if failed
+ */
+JsonObject *json_get_object(JsonObject *root_object, const char *key);
+
+/**
  * @brief Free JSON object
  * @param[out] json_object JSON object
  */
