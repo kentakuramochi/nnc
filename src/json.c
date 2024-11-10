@@ -74,7 +74,7 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
         buffer[token_length] = c;
         token_length++;
 
-        // Terminate the toke if the length reaches to the max length
+        // Terminate the token if the length reaches to the max length
         if (token_length == (buf_size - 1)) {
             buffer[token_length] = '\0';
             break;
@@ -82,6 +82,150 @@ static size_t get_token(char *buffer, FILE *fp, const size_t buf_size) {
     }
 
     return token_length;
+}
+
+/**
+ * @brief Allocate a JSON key-value pair
+ *
+ * @return Pointer to the allocated JSON key-value pair
+ */
+static JsonKeyValuePair *alloc_json_key_value_pair(void) {
+    JsonKeyValuePair *kvp = malloc(sizeof(JsonKeyValuePair));
+    kvp->prev = NULL;
+    kvp->next = NULL;
+    kvp->key = NULL;
+    kvp->value = NULL;
+
+    return kvp;
+}
+
+/**
+ * @brief Allocate a JSON key
+ *
+ * @param[in] buffer Bufer which stores a token in the JSON file
+ * @param[in] token_size Size of the token
+ * @return Pointer to the allocated JSON key
+ */
+static char *alloc_json_key(
+    const char *buffer, const size_t token_size
+) {
+    char *key = malloc(sizeof(char) * (token_size + 1));
+    strncpy(key, buffer, (token_size + 1));
+
+    return key;
+}
+
+/**
+ * @brief Allocate a JSON value
+ *
+ * @param[in] buffer Bufer which stores a token in the JSON file
+ * @param[in] token_size Size of the token
+ * @return Pointer to the allocated JSON value
+ */
+static JsonValue *alloc_json_value(
+    const char *buffer, const size_t token_size
+) {
+    JsonValue *value = malloc(sizeof(JsonValue));
+    value->prev = NULL;
+    value->next = NULL;
+    value->string = malloc(sizeof(char) * (token_size + 1));
+    strncpy(value->string, buffer, (token_size + 1));
+
+    return value;
+}
+
+/**
+ * @brief Allocate an array of JSON values
+ *
+ * @param[in] fp Input file stream
+ * @param[in] buffer Bufer which token in the JSON file will be stored in
+ * @param[in] buffer_size Size of the buffer
+ * @return Pointer to the allocated an array of JSON values
+ */
+static JsonValue *alloc_json_array(
+    FILE *fp, char *buffer, const size_t buffer_size
+) {
+    JsonValue *head = NULL;
+    JsonValue *value = NULL;
+    size_t size = 0;
+    while ((size = get_token(buffer, fp, buffer_size)) > 0) {
+        if (str_equal(buffer, "]")) {
+            // End of the array
+            break;
+        }
+
+        if (head == NULL) {
+            value = alloc_json_value(buffer, size);
+            head = value;
+        } else {
+            // Append a new value to the current one
+            JsonValue *new_value = alloc_json_value(buffer, size);
+            value->next = new_value;
+            new_value->prev = value;
+
+            value = new_value->next;
+        }
+    }
+
+    return head;
+}
+
+/**
+ * @brief Allocate a JSON object
+ *
+ * @param[in] fp Input file stream
+ * @param[in] buffer Bufer which token in the JSON file will be stored in
+ * @param[in] buffer_size Size of the buffer
+ * @return Pointer to the allocated JSON object
+ */
+static JsonObject *alloc_json_object(
+    FILE *fp, char *buffer, const size_t buffer_size
+) {
+    JsonObject *object = malloc(sizeof(JsonObject));
+
+    JsonKeyValuePair *kvp = NULL;
+    size_t size = 0;
+    while ((size = get_token(buffer, fp, buffer_size)) > 0) {
+        if (str_equal(buffer, "}")) {
+            // End of the object
+            break;
+        }
+
+        if (kvp == NULL) {
+            kvp = alloc_json_key_value_pair();
+            object->kvps = kvp;
+        } else {
+            // Append a new key-value pair to the current one
+            JsonKeyValuePair *new_kvp = alloc_json_key_value_pair();
+            kvp->next = new_kvp;
+            new_kvp->prev = kvp;
+
+            kvp = new_kvp;
+        }
+
+        // Get a key
+        kvp->key = alloc_json_key(buffer, size);
+
+        // Get a value/child object
+        size = get_token(buffer, fp, buffer_size);
+        if (str_equal(buffer, "{")) {
+            // If '{' is read, get succeeding tokens an object
+            while ((size = get_token(buffer, fp, buffer_size)) > 0) {
+                // End of the object
+                if (str_equal(buffer, "}")) {
+                    break;
+                }
+            }
+        } else if (str_equal(buffer, "[")) {
+            // If '[' is read, get succeeding tokens as an array
+            kvp->value = alloc_json_array(fp, buffer, buffer_size);
+        } else {
+            // Otherwise, get succeeding tokens as a single value
+            kvp->value = alloc_json_value(buffer, size);
+        }
+    }
+
+    return object;
 }
 
 //!< Size of the temporal buffer
@@ -93,88 +237,19 @@ JsonObject *json_read_file(const char *json_file) {
         return NULL;
     }
 
-    JsonObject *cur_obj = NULL;
-    JsonKeyValuePair *cur_kvp = NULL;
-
+    JsonObject *object = NULL;
     char buffer[BUFFER_SIZE];
-    size_t size;
+    size_t size = 0;
     while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
         if (str_equal("{", buffer)) {
-            // Start object
-            JsonObject *obj = malloc(sizeof(JsonObject));
-            obj->kvps = NULL;
-
-            // If there's no current object, set it to the root
-            if (cur_obj == NULL) {
-                cur_obj = obj;
-            }
-        } else if (str_equal("}", buffer)) {
-            // End object
-        } else {
-            JsonKeyValuePair *kvp = malloc(sizeof(JsonKeyValuePair));
-            kvp->prev = NULL;
-            kvp->next = NULL;
-            kvp->key = NULL;
-            kvp->value = NULL;
-
-            // Append the kvp to the current one
-            if (cur_kvp != NULL) {
-                cur_kvp->next = kvp;
-                kvp->prev = cur_kvp;
-            }
-            cur_kvp = kvp;
-
-            // Set the kvp to the object if not set
-            if (cur_obj->kvps == NULL) {
-                cur_obj->kvps = cur_kvp;
-            }
-
-            // Thought as JSON file is written correctly
-            // Get a key string
-            cur_kvp->key = malloc(sizeof(char) * (size + 1));
-            strncpy(cur_kvp->key, buffer, (size + 1));
-
-            // Get a value
-            size = get_token(buffer, fp, BUFFER_SIZE);
-            if (str_equal(buffer, "[")) {
-                // If '[' is read, get as an array
-                JsonValue *cur_value = NULL;
-                while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
-                    if (str_equal(buffer, "]")) {
-                        break;
-                    } else {
-                        JsonValue *value = malloc(sizeof(JsonValue));
-                        value->prev = NULL;
-                        value->next = NULL;
-                        value->string = malloc(sizeof(char) * (size + 1));
-                        strncpy(value->string, buffer, (size + 1));
-
-                        if (cur_value == NULL) {
-                            cur_kvp->value = value;
-                        } else {
-                            cur_value->next = value;
-                            value->prev = cur_value;
-                        }
-
-                        cur_value = value;
-                    }
-                }
-            } else {
-                // Otherwise, get as a single value
-                JsonValue *value = malloc(sizeof(JsonValue));
-                value->prev = NULL;
-                value->next = NULL;
-                value->string = malloc(sizeof(char) * (size + 1));
-                strncpy(value->string, buffer, (size + 1));
-
-                cur_kvp->value = value;
-            }
+            object = alloc_json_object(fp, buffer, BUFFER_SIZE);
         }
+        // Currently ignore non-object tokens in the root
     }
 
     fclose(fp);
 
-    return cur_obj;
+    return object;
 }
 
 bool json_get_integer_value(

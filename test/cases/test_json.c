@@ -95,5 +95,5 @@ void test_read_file_for_nested_object(void) {
     TEST_ASSERT_TRUE(json_get_integer_value(&val2, obj21, "val2"));
     TEST_ASSERT_EQUAL_INT(2, val2);
 
-    // json_free_object(&root_object);
+    json_free_object(&root_object);
 }
