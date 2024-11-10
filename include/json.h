@@ -17,14 +17,22 @@ typedef struct JsonValue {
     char *string; //!< Value string
 } JsonValue;
 
+// Prototype declaration for circular reference
+// between JsonKeyValuePair and JsonObject
+struct JsonObject;
+
 /**
  * @brief Key-value pair in the JSON object
  */
 typedef struct JsonKeyValuePair {
     struct JsonKeyValuePair *prev; //!< Previous pair
     struct JsonKeyValuePair *next; //!< Next pair
-    char *key;  //!< Key string
-    JsonValue *value; //!< Value
+    char *key; //!< Key string
+    bool has_child; //!< Flag for existence of child object
+    union {
+        JsonValue *value; //!< Value
+        struct JsonObject *child; //!< Child JSON object
+    };
 } JsonKeyValuePair;
 
 /**
@@ -99,13 +107,13 @@ bool json_get_boolean_value(
 );
 
 /**
- * @brief Get a JSON object from the root JSON object
+ * @brief Get a child JSON object from the parent JSON object
  *
- * @param[in] root_object Root JSON object
+ * @param[in] parent_object Parent JSON object
  * @param[in] key Key of the object
  * @return Pointer to the object, NULL if failed
  */
-JsonObject *json_get_object(JsonObject *root_object, const char *key);
+JsonObject *json_get_child_object(JsonObject *parent_object, const char *key);
 
 /**
  * @brief Free JSON object

@@ -94,6 +94,7 @@ static JsonKeyValuePair *alloc_json_key_value_pair(void) {
     kvp->prev = NULL;
     kvp->next = NULL;
     kvp->key = NULL;
+    kvp->has_child = false;
     kvp->value = NULL;
 
     return kvp;
@@ -210,12 +211,8 @@ static JsonObject *alloc_json_object(
         size = get_token(buffer, fp, buffer_size);
         if (str_equal(buffer, "{")) {
             // If '{' is read, get succeeding tokens an object
-            while ((size = get_token(buffer, fp, buffer_size)) > 0) {
-                // End of the object
-                if (str_equal(buffer, "}")) {
-                    break;
-                }
-            }
+            kvp->child = alloc_json_object(fp, buffer, buffer_size);
+            kvp->has_child = true;
         } else if (str_equal(buffer, "[")) {
             // If '[' is read, get succeeding tokens as an array
             kvp->value = alloc_json_array(fp, buffer, buffer_size);
@@ -333,41 +330,16 @@ bool json_get_boolean_value(
     return false;
 }
 
-JsonObject *json_get_object(JsonObject *root_object, const char *key) {
-    (void)root_object;
+JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
+    JsonKeyValuePair *kvp = parent_object->kvps;
 
-    static JsonValue val1 = {
-        .prev=NULL, .next=NULL, .string="1"
-    };
-    static JsonKeyValuePair obj1_kvp = {
-        .prev=NULL, .next=NULL, .key="val1", .value=&val1
-    };
-    static JsonObject obj1 = {
-        .kvps=&obj1_kvp
-    };
-
-    static JsonObject obj2 = {
-        .kvps=NULL
-    };
-
-    static JsonValue val2 = {
-        .prev=NULL, .next=NULL, .string="2"
-    };
-    static JsonKeyValuePair obj21_kvp = {
-        .prev=NULL, .next=NULL, .key="val2", .value=&val2
-    };
-    static JsonObject obj21 = {
-        .kvps=&obj21_kvp
-    };
-
-    if (str_equal("obj1", key)) {
-        return &obj1;
-    }
-    if (str_equal("obj2", key)) {
-        return &obj2;
-    }
-    if (str_equal("obj21", key)) {
-        return &obj21;
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            if (kvp->has_child) {
+                return kvp->child;
+            }
+        }
+        kvp = kvp->next;
     }
 
     return NULL;
@@ -381,18 +353,23 @@ void json_free_object(JsonObject **json_object) {
         free(kvp->key);
         kvp->key = NULL;
 
-        // Free values sequentially
-        JsonValue *value = kvp->value;
-        while (value != NULL) {
-            free(value->string);
-            kvp->value->string = NULL;
+        if (kvp->has_child) {
+            // If there's a child object, free recursively
+            json_free_object(&kvp->child);
+        } else {
+            // Free values sequentially
+            JsonValue *value = kvp->value;
+            while (value != NULL) {
+                free(value->string);
+                kvp->value->string = NULL;
 
-            JsonValue *next = value->next;
+                JsonValue *next = value->next;
 
-            free(value);
-            value = NULL;
+                free(value);
+                value = NULL;
 
-            value = next;
+                value = next;
+            }
         }
 
         JsonKeyValuePair *next_kvp = kvp->next;

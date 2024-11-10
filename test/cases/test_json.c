@@ -81,15 +81,15 @@ void test_read_file_for_nested_object(void) {
 
     JsonObject *root_object = json_read_file(TEST_JSON_FILE);
 
-    JsonObject *obj1 = json_get_object(root_object, "obj1");
+    JsonObject *obj1 = json_get_child_object(root_object, "obj1");
     TEST_ASSERT_NOT_NULL(obj1);
     int val1;
     TEST_ASSERT_TRUE(json_get_integer_value(&val1, obj1, "val1"));
     TEST_ASSERT_EQUAL_INT(1, val1);
 
-    JsonObject *obj2 = json_get_object(root_object, "obj2");
+    JsonObject *obj2 = json_get_child_object(root_object, "obj2");
     TEST_ASSERT_NOT_NULL(obj2);
-    JsonObject *obj21 = json_get_object(obj2, "obj21");
+    JsonObject *obj21 = json_get_child_object(obj2, "obj21");
     TEST_ASSERT_NOT_NULL(obj21);
     int val2;
     TEST_ASSERT_TRUE(json_get_integer_value(&val2, obj21, "val2"));
