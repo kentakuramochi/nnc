@@ -349,15 +349,64 @@ void test_clear_grad(void) {
     net_free_layers(&net);
 }
 
+#define TEST_JSON_FILE "/tmp/test.json"
+
+// Create a test file "/tmp/test.json"
+static void create_test_json(const char *string) {
+    FILE *fp = fopen(TEST_JSON_FILE, "w");
+
+    fprintf(fp, "%s\n", string);
+
+    fclose(fp);
+}
+
 void test_load_from_file(void) {
+    create_test_json(
+        "{\n"
+        "    \"size\": 4,\n"
+        "    \"layers\": [\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 1,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 3,\n"
+        "                \"out\": 10\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 2,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 10,\n"
+        "                \"out\": 10\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 1,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 10,\n"
+        "                \"out\": 5\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 3,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 5,\n"
+        "                \"out\": 5\n"
+        "            }\n"
+        "        }\n"
+        "    ]\n"
+        "}"
+    );
+
     Net net;
 
     Layer dummy;
     layer_connect_IgnoreAndReturn(true);
     layer_alloc_params_IgnoreAndReturn(&dummy);
-    net_load_from_file(
-        &net, "./test/cases/test_net.json"
-    );
+    net_load_from_file(&net, TEST_JSON_FILE);
 
     TEST_ASSERT_EQUAL(4, net.size);
 
@@ -386,16 +435,56 @@ void test_load_from_file(void) {
 }
 
 void test_load_from_file_fail_when_NULL_input(void) {
+    create_test_json(
+        "{\n"
+        "    \"size\": 4,\n"
+        "    \"layers\": [\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 1,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 3,\n"
+        "                \"out\": 10\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 2,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 10,\n"
+        "                \"out\": 10\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 1,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 10,\n"
+        "                \"out\": 5\n"
+        "            }\n"
+        "        },\n"
+        "        {\n"
+        "            \"params\": {\n"
+        "                \"type\": 3,\n"
+        "                \"batch_size\": 2,\n"
+        "                \"in\": 5,\n"
+        "                \"out\": 5\n"
+        "            }\n"
+        "        }\n"
+        "    ]\n"
+        "}"
+    );
+
     Net *net = NULL;
     net_load_from_file(net, NULL);
     TEST_ASSERT_NULL(net);
 
     // Just return, nothing occured
-    net_load_from_file(NULL, "./test/cases/test_net.json");
+    net_load_from_file(NULL, TEST_JSON_FILE);
 }
 
 void test_load_from_file_fail_when_file_is_missing(void) {
     // Just return, nothing occured
-    Net *net;
-    net_load_from_file(net, "./non/exsiting/file.json");
+    Net *net = NULL;
+    net_load_from_file(net, "/non/exsiting/file.json");
 }

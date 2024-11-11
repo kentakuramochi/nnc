@@ -26,12 +26,12 @@ static void create_test_json(const char *string) {
 void test_read_file_for_basic_types(void) {
     create_test_json(
         "{\n"
-            "\"int_val\": 1,\n"
-            "\"float_val\": 3.14,\n"
-            "\"string\": \"foobar\",\n"
-            "\"bool_true\": true,\n"
-            "\"bool_false\": false,\n"
-            "\"null_value\": null\n"
+        "    \"int_val\": 1,\n"
+        "    \"float_val\": 3.14,\n"
+        "    \"string\": \"foobar\",\n"
+        "    \"bool_true\": true,\n"
+        "    \"bool_false\": false,\n"
+        "    \"null_value\": null\n"
         "}"
     );
 
@@ -68,14 +68,14 @@ void test_read_file_for_basic_types(void) {
 void test_read_file_for_nested_object(void) {
     create_test_json(
         "{\n"
-            "\"obj1\": {\n"
-                "\"val1\": 1\n"
-            "},\n"
-            "\"obj2\": {\n"
-                "\"obj21\": {\n"
-                    "\"val2\": 2\n"
-                "}\n"
-            "}\n"
+        "    \"obj1\": {\n"
+        "        \"val1\": 1\n"
+        "    },\n"
+        "    \"obj2\": {\n"
+        "        \"obj21\": {\n"
+        "            \"val2\": 2\n"
+        "        }\n"
+        "    }\n"
         "}"
     );
 
