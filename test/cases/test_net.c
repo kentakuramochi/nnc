@@ -351,17 +351,9 @@ void test_clear_grad(void) {
 
 #define TEST_JSON_FILE "/tmp/test.json"
 
-// Create a test file "/tmp/test.json"
-static void create_test_json(const char *string) {
-    FILE *fp = fopen(TEST_JSON_FILE, "w");
-
-    fprintf(fp, "%s\n", string);
-
-    fclose(fp);
-}
-
 void test_load_from_file(void) {
-    create_test_json(
+    test_util_create_text_file(
+        TEST_JSON_FILE,
         "{\n"
         "    \"size\": 4,\n"
         "    \"layers\": [\n"
@@ -435,7 +427,8 @@ void test_load_from_file(void) {
 }
 
 void test_load_from_file_fail_when_NULL_input(void) {
-    create_test_json(
+    test_util_create_text_file(
+        TEST_JSON_FILE,
         "{\n"
         "    \"size\": 4,\n"
         "    \"layers\": [\n"
