@@ -249,85 +249,99 @@ JsonObject *json_read_file(const char *json_file) {
     return object;
 }
 
-bool json_get_integer_value(
-    int *value, JsonObject *json_object, const char *key
+/**
+ * @brief Get a value from the JSON object
+ *
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @return Pointer to the JSON value, NULL if failed
+ */
+JsonValue *json_get_value(
+    JsonObject *json_object, const char *key
 ) {
     JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            if (str_equal("null", kvp->value->string)) {
-                return false;
-            }
-            *value = strtol(kvp->value->string, NULL, 10);
-            return true;
+            return kvp->value;
         }
         kvp = kvp->next;
     }
 
-    return false;
+    return NULL;
+}
+
+bool json_get_integer_value(
+    int *value, JsonObject *json_object, const char *key
+) {
+    JsonValue *jsonValue;
+    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+        return false;
+    }
+
+    if (str_equal("null", jsonValue->string)) {
+        return false;
+    }
+
+    *value = strtol(jsonValue->string, NULL, 10);
+
+    return true;
 }
 
 bool json_get_float_value(
     float *value, JsonObject *json_object, const char *key
 ) {
-    JsonKeyValuePair *kvp = json_object->kvps;
-
-    while (kvp != NULL) {
-        if (str_equal(key, kvp->key)) {
-            if (str_equal("null", kvp->value->string)) {
-                return false;
-            }
-            *value = strtof(kvp->value->string, NULL);
-            return true;
-        }
-        kvp = kvp->next;
+    JsonValue *jsonValue;
+    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+        return false;
     }
 
-    return false;
+    if (str_equal("null", jsonValue->string)) {
+        return false;
+    }
+
+    *value = strtof(jsonValue->string, NULL);
+
+    return true;
 }
 
 bool json_get_string_value(
     char *string, JsonObject *json_object, const char *key
 ) {
-    JsonKeyValuePair *kvp = json_object->kvps;
-
-    while (kvp != NULL) {
-        if (str_equal(key, kvp->key)) {
-            if (str_equal("null", kvp->value->string)) {
-                return false;
-            }
-            // Copy +1 length to terminate with NULL
-            strncpy(string, kvp->value->string, (strlen(kvp->value->string) + 1));
-            return true;
-        }
-        kvp = kvp->next;
+    JsonValue *jsonValue;
+    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+        return false;
     }
 
-    return false;
+    if (str_equal("null", jsonValue->string)) {
+        return false;
+    }
+
+    // Copy +1 length to terminate with NULL
+    strncpy(string, jsonValue->string, (strlen(jsonValue->string) + 1));
+
+    return true;
 }
 
 bool json_get_boolean_value(
     bool *boolean, JsonObject *json_object, const char *key
 ) {
-    JsonKeyValuePair *kvp = json_object->kvps;
-
-    while (kvp != NULL) {
-        if (str_equal(key, kvp->key)) {
-            if (str_equal("null", kvp->value->string)) {
-                return false;
-            }
-            if (str_equal("true", kvp->value->string)) {
-                *boolean = true;
-            } else if (str_equal("false", kvp->value->string)) {
-                *boolean = false;
-            }
-            return true;
-        }
-        kvp = kvp->next;
+    JsonValue *jsonValue;
+    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+        return false;
     }
 
-    return false;
+    if (str_equal("null", jsonValue->string)) {
+        return false;
+    }
+
+    if (str_equal("true", jsonValue->string)) {
+        *boolean = true;
+    } else if (str_equal("false", jsonValue->string)) {
+        *boolean = false;
+    }
+
+    return true;
 }
 
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
