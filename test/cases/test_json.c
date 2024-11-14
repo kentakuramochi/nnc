@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "unity.h"
+#include "test_utils.h"
 
 void setUp(void) {}
 
@@ -14,17 +15,9 @@ void tearDown(void) {}
 
 #define TEST_JSON_FILE "/tmp/test.json"
 
-// Create a test file "/tmp/test.json"
-static void create_test_json(const char *string) {
-    FILE *fp = fopen(TEST_JSON_FILE, "w");
-
-    fprintf(fp, "%s\n", string);
-
-    fclose(fp);
-}
-
 void test_read_file_for_basic_types(void) {
-    create_test_json(
+    test_util_create_text_file(
+        TEST_JSON_FILE,
         "{\n"
         "    \"int_val\": 1,\n"
         "    \"float_val\": 3.14,\n"
@@ -66,7 +59,8 @@ void test_read_file_for_basic_types(void) {
 }
 
 void test_read_file_for_nested_object(void) {
-    create_test_json(
+    test_util_create_text_file(
+        TEST_JSON_FILE,
         "{\n"
         "    \"obj1\": {\n"
         "        \"val1\": 1\n"
