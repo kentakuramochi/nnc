@@ -51,6 +51,17 @@ typedef struct JsonObject {
 JsonObject *json_read_file(const char *json_file);
 
 /**
+ * @brief Get a value from the JSON object
+ *
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @return Pointer to the JSON value, NULL if failed
+ */
+JsonValue *json_get_value(
+    JsonObject *json_object, const char *key
+);
+
+/**
  * @brief Get an integer from the JSON object
  *
  * @param[out] value Integer

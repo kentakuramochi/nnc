@@ -58,6 +58,30 @@ void test_read_file_for_basic_types(void) {
     TEST_ASSERT_NULL(root_object);
 }
 
+void test_read_file_for_list(void) {
+    test_util_create_text_file(
+        TEST_JSON_FILE,
+        "{\n"
+        "    \"list\": [\n"
+        "        3.14, \"foobaz\", true, null\n"
+        "    ]\n"
+        "}"
+    );
+
+    JsonObject *root_object = json_read_file(TEST_JSON_FILE);
+
+    JsonValue *value = json_get_value(root_object, "list");
+
+    char *list[] = { "3.14", "foobaz", "true", "null" };
+    int i = 0;
+    for (int i = 0; i < 4; i++) {
+        TEST_ASSERT_EQUAL_STRING(list[i], value->string);
+        value = value->next;
+    }
+
+    json_free_object(&root_object);
+}
+
 void test_read_file_for_nested_object(void) {
     test_util_create_text_file(
         TEST_JSON_FILE,

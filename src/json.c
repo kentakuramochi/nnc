@@ -164,7 +164,7 @@ static JsonValue *alloc_json_array(
             value->next = new_value;
             new_value->prev = value;
 
-            value = new_value->next;
+            value = value->next;
         }
     }
 
@@ -249,13 +249,6 @@ JsonObject *json_read_file(const char *json_file) {
     return object;
 }
 
-/**
- * @brief Get a value from the JSON object
- *
- * @param[in] json_object JSON object
- * @param[in] key Key of the object
- * @return Pointer to the JSON value, NULL if failed
- */
 JsonValue *json_get_value(
     JsonObject *json_object, const char *key
 ) {
