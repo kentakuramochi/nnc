@@ -8,18 +8,22 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+// Prototype declaration for circular reference
+// between JsonKeyValuePair and JsonObject
+struct JsonObject;
+
 /**
- * @brief Wrapper of values in the JSON object
+ * @brief Wrapper of a value in the JSON object
  */
 typedef struct JsonValue {
     struct JsonValue *prev; //!< Previous value
     struct JsonValue *next; //!< Next value
-    char *string; //!< Value string
+    bool is_object; //!< Flag for object
+    union {
+        char *string; //!< Value string
+        struct JsonObject *object; //!< JSON object
+    };
 } JsonValue;
-
-// Prototype declaration for circular reference
-// between JsonKeyValuePair and JsonObject
-struct JsonObject;
 
 /**
  * @brief Key-value pair in the JSON object
@@ -28,11 +32,7 @@ typedef struct JsonKeyValuePair {
     struct JsonKeyValuePair *prev; //!< Previous pair
     struct JsonKeyValuePair *next; //!< Next pair
     char *key; //!< Key string
-    bool has_child; //!< Flag for existence of child object
-    union {
-        JsonValue *value; //!< Value
-        struct JsonObject *child; //!< Child JSON object
-    };
+    JsonValue *value;
 } JsonKeyValuePair;
 
 /**
