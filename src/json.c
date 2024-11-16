@@ -368,7 +368,7 @@ void json_free_object(JsonObject **json_object) {
             JsonValue *value = kvp->value;
             while (value != NULL) {
                 free(value->string);
-                kvp->value->string = NULL;
+                value->string = NULL;
 
                 JsonValue *next = value->next;
 
