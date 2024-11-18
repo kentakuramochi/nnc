@@ -63,7 +63,10 @@ void test_read_file_for_list(void) {
         TEST_JSON_FILE,
         "{\n"
         "    \"list\": [\n"
-        "        3.14, \"foobaz\", true, null\n"
+        "        3.14, \"foobaz\", true, null,\n"
+        "        {\n"
+        "            \"value\": 1\n"
+        "        }\n"
         "    ]\n"
         "}"
     );
@@ -78,6 +81,10 @@ void test_read_file_for_list(void) {
         TEST_ASSERT_EQUAL_STRING(list[i], value->string);
         value = value->next;
     }
+
+    JsonObject *obj = value->object;
+    JsonValue *val = json_get_value(obj, "value");
+    TEST_ASSERT_EQUAL_STRING("1", val->string);
 
     json_free_object(&root_object);
 }

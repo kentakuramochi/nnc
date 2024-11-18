@@ -135,6 +135,11 @@ static JsonValue *alloc_json_value(
     return value;
 }
 
+// Prototype declaration for circular reference
+static JsonObject *alloc_json_object(
+    FILE *fp, char *buffer, const size_t buffer_size
+);
+
 /**
  * @brief Allocate an array of JSON values
  *
@@ -159,8 +164,19 @@ static JsonValue *alloc_json_array(
             value = alloc_json_value(buffer, size);
             head = value;
         } else {
+            JsonValue *new_value = NULL;
+            if (str_equal(buffer, "{")) {
+                // If '{' is read, get succeeding tokens an object
+                new_value = malloc(sizeof(JsonValue));
+                new_value->prev = NULL;
+                new_value->next = NULL;
+                new_value->object = alloc_json_object(fp, buffer, buffer_size);
+                new_value->is_object = true;
+            } else {
+                new_value = alloc_json_value(buffer, size);
+            }
+
             // Append a new value to the current one
-            JsonValue *new_value = alloc_json_value(buffer, size);
             value->next = new_value;
             new_value->prev = value;
 
