@@ -283,8 +283,8 @@ JsonValue *json_get_value(
     return NULL;
 }
 
-bool json_get_integer_value(
-    int *value, JsonObject *json_object, const char *key
+bool json_get_number(
+    double *number, JsonObject *json_object, const char *key
 ) {
     JsonValue *jsonValue;
     if ((jsonValue = json_get_value(json_object, key)) == NULL) {
@@ -295,24 +295,7 @@ bool json_get_integer_value(
         return false;
     }
 
-    *value = strtol(jsonValue->string, NULL, 10);
-
-    return true;
-}
-
-bool json_get_float_value(
-    float *value, JsonObject *json_object, const char *key
-) {
-    JsonValue *jsonValue;
-    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
-        return false;
-    }
-
-    if (str_equal("null", jsonValue->string)) {
-        return false;
-    }
-
-    *value = strtof(jsonValue->string, NULL);
+    *number = strtod(jsonValue->string, NULL);
 
     return true;
 }

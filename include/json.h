@@ -62,31 +62,17 @@ JsonValue *json_get_value(
 );
 
 /**
- * @brief Get an integer from the JSON object
+ * @brief Get a number from the JSON object
  *
- * @param[out] value Integer
+ * @param[out] number Number
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
  * @return true Suceed to get the value
  * @return false Fail to get the value
  * @note value doesn't be changed if the key is not found
  */
-bool json_get_integer_value(
-    int *value, JsonObject *json_object, const char *key
-);
-
-/**
- * @brief Get a floating-point value from the JSON object
- *
- * @param[out] value Floating-point value
- * @param[in] json_object JSON object
- * @param[in] key Key of the object
- * @return true Suceed to get the value
- * @return false Fail to get the value
- * @note value doesn't be changed if the key is not found
- */
-bool json_get_float_value(
-    float *value, JsonObject *json_object, const char *key
+bool json_get_number(
+    double *number, JsonObject *json_object, const char *key
 );
 
 /**

@@ -19,8 +19,7 @@ void test_read_file_for_basic_types(void) {
     test_util_create_text_file(
         TEST_JSON_FILE,
         "{\n"
-        "    \"int_val\": 1,\n"
-        "    \"float_val\": 3.14,\n"
+        "    \"number\": 3.14,\n"
         "    \"string\": \"foobar\",\n"
         "    \"bool_true\": true,\n"
         "    \"bool_false\": false,\n"
@@ -31,13 +30,9 @@ void test_read_file_for_basic_types(void) {
     JsonObject *root_object = json_read_file(TEST_JSON_FILE);
     TEST_ASSERT_NOT_NULL(root_object);
 
-    int int_val = 0;
-    TEST_ASSERT_TRUE(json_get_integer_value(&int_val, root_object, "int_val"));
-    TEST_ASSERT_EQUAL(1, int_val);
-
-    float float_val = 0.0;
-    TEST_ASSERT_TRUE(json_get_float_value(&float_val, root_object, "float_val"));
-    TEST_ASSERT_EQUAL_FLOAT(3.14, float_val);
+    double number = 0.0;
+    TEST_ASSERT_TRUE(json_get_number(&number, root_object, "number"));
+    TEST_ASSERT_EQUAL_DOUBLE(3.14, number);
 
     char string[6 + 1] = { 'x','x','x','x','x','x','x' };
     TEST_ASSERT_TRUE(json_get_string_value(string, root_object, "string"));
@@ -49,8 +44,7 @@ void test_read_file_for_basic_types(void) {
     TEST_ASSERT_TRUE(json_get_boolean_value(&flag, root_object, "bool_false"));
     TEST_ASSERT_EQUAL(false, flag);
 
-    TEST_ASSERT_FALSE(json_get_integer_value(&int_val, root_object, "null_value"));
-    TEST_ASSERT_FALSE(json_get_float_value(&float_val, root_object, "null_value"));
+    TEST_ASSERT_FALSE(json_get_number(&number, root_object, "null_value"));
     TEST_ASSERT_FALSE(json_get_string_value(string, root_object, "null_value"));
     TEST_ASSERT_FALSE(json_get_boolean_value(&flag, root_object, "null_value"));
 
@@ -108,17 +102,16 @@ void test_read_file_for_nested_object(void) {
 
     JsonObject *obj1 = json_get_child_object(root_object, "obj1");
     TEST_ASSERT_NOT_NULL(obj1);
-    int val1;
-    TEST_ASSERT_TRUE(json_get_integer_value(&val1, obj1, "val1"));
-    TEST_ASSERT_EQUAL_INT(1, val1);
+    double value;
+    TEST_ASSERT_TRUE(json_get_number(&value, obj1, "val1"));
+    TEST_ASSERT_EQUAL_DOUBLE(1, value);
 
     JsonObject *obj2 = json_get_child_object(root_object, "obj2");
     TEST_ASSERT_NOT_NULL(obj2);
     JsonObject *obj21 = json_get_child_object(obj2, "obj21");
     TEST_ASSERT_NOT_NULL(obj21);
-    int val2;
-    TEST_ASSERT_TRUE(json_get_integer_value(&val2, obj21, "val2"));
-    TEST_ASSERT_EQUAL_INT(2, val2);
+    TEST_ASSERT_TRUE(json_get_number(&value, obj21, "val2"));
+    TEST_ASSERT_EQUAL_DOUBLE(2, value);
 
     json_free_object(&root_object);
 }
