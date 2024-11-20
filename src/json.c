@@ -4,6 +4,7 @@
  */
 #include "json.h"
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -268,9 +269,7 @@ JsonObject *json_read_file(const char *json_file) {
     return object;
 }
 
-JsonValue *json_get_value(
-    JsonObject *json_object, const char *key
-) {
+JsonValue *json_get_value(JsonObject *json_object, const char *key) {
     JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
@@ -283,44 +282,33 @@ JsonValue *json_get_value(
     return NULL;
 }
 
-bool json_get_number(
-    double *number, JsonObject *json_object, const char *key
-) {
+double json_get_number(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
     if ((jsonValue = json_get_value(json_object, key)) == NULL) {
-        return false;
+        return INFINITY;
     }
 
     if (str_equal("null", jsonValue->string)) {
-        return false;
+        return INFINITY;
     }
 
-    *number = strtod(jsonValue->string, NULL);
-
-    return true;
+    return strtod(jsonValue->string, NULL);
 }
 
-bool json_get_string_value(
-    char *string, JsonObject *json_object, const char *key
-) {
+char *json_get_string(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
     if ((jsonValue = json_get_value(json_object, key)) == NULL) {
-        return false;
+        return NULL;
     }
 
     if (str_equal("null", jsonValue->string)) {
-        return false;
+        return NULL;
     }
 
-    // Copy +1 length to terminate with NULL
-    strncpy(string, jsonValue->string, (strlen(jsonValue->string) + 1));
-
-    return true;
+    return jsonValue->string;
 }
 
-bool json_get_boolean_value(
-    bool *boolean, JsonObject *json_object, const char *key
-) {
+bool json_get_boolean(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
     if ((jsonValue = json_get_value(json_object, key)) == NULL) {
         return false;
@@ -331,12 +319,12 @@ bool json_get_boolean_value(
     }
 
     if (str_equal("true", jsonValue->string)) {
-        *boolean = true;
+        return true;
     } else if (str_equal("false", jsonValue->string)) {
-        *boolean = false;
+        return false;
     }
 
-    return true;
+    return false;
 }
 
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {

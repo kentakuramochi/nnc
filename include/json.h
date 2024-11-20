@@ -57,51 +57,37 @@ JsonObject *json_read_file(const char *json_file);
  * @param[in] key Key of the object
  * @return Pointer to the JSON value, NULL if failed
  */
-JsonValue *json_get_value(
-    JsonObject *json_object, const char *key
-);
+JsonValue *json_get_value(JsonObject *json_object, const char *key);
 
 /**
  * @brief Get a number from the JSON object
  *
- * @param[out] number Number
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
- * @return true Suceed to get the value
- * @return false Fail to get the value
- * @note value doesn't be changed if the key is not found
+ * @return Number
+ * @retval INFINITY Fail to get a number
  */
-bool json_get_number(
-    double *number, JsonObject *json_object, const char *key
-);
+double json_get_number(JsonObject *json_object, const char *key);
 
 /**
  * @brief Get a string from the JSON object
  *
- * @param[out] string String
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
- * @return true Suceed to get the value
- * @return false Fail to get the value
- * @note value doesn't be changed if the key is not found
+ * @return Pointer to NULL-terminated string
+ * @retval NULL Fail to get a string
  */
-bool json_get_string_value(
-    char *string, JsonObject *json_object, const char *key
-);
+char *json_get_string(JsonObject *json_object, const char *key);
 
 /**
- * @brief Get a boolean value from the JSON object
+ * @brief Get a boolean from the JSON object
  *
- * @param[out] boolean Boolean value
  * @param[in] json_object JSON object
  * @param[in] key Key of the object
- * @return true Suceed to get the value
- * @return false Fail to get the value
- * @note value doesn't be changed if the key is not found
+ * @return Boolean [true|false]
+ * @retval false Fail to get a boolean
  */
-bool json_get_boolean_value(
-    bool *boolean, JsonObject *json_object, const char *key
-);
+bool json_get_boolean(JsonObject *json_object, const char *key);
 
 /**
  * @brief Get a child JSON object from the parent JSON object
