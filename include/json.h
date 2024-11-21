@@ -13,12 +13,23 @@
 struct JsonObject;
 
 /**
+ * @brief Data type of the value
+ */
+typedef enum {
+    JSONDTYPE_NULL, //!< null
+    JSONDTYPE_NUMBER, //!< Number
+    JSONDTYPE_STRING, //!< String
+    JSONDTYPE_BOOLEAN, //!< Boolean
+    JSONDTYPE_OBJECT //!< Object
+} JsonDType;
+
+/**
  * @brief Wrapper of a value in the JSON object
  */
 typedef struct JsonValue {
     struct JsonValue *prev; //!< Previous value
     struct JsonValue *next; //!< Next value
-    bool is_object; //!< Flag for object
+    JsonDType dtype; //!< Data type
     union {
         char *string; //!< Value string
         struct JsonObject *object; //!< JSON object

@@ -129,7 +129,8 @@ static JsonValue *alloc_json_value(
     JsonValue *value = malloc(sizeof(JsonValue));
     value->prev = NULL;
     value->next = NULL;
-    value->is_object = false;
+    value->dtype = JSONDTYPE_NULL;
+
     value->string = malloc(sizeof(char) * (token_size + 1));
     strncpy(value->string, buffer, (token_size + 1));
 
@@ -172,7 +173,7 @@ static JsonValue *alloc_json_array(
                 new_value->prev = NULL;
                 new_value->next = NULL;
                 new_value->object = alloc_json_object(fp, buffer, buffer_size);
-                new_value->is_object = true;
+                new_value->dtype = JSONDTYPE_OBJECT;
             } else {
                 new_value = alloc_json_value(buffer, size);
             }
@@ -232,7 +233,7 @@ static JsonObject *alloc_json_object(
             kvp->value->prev = NULL;
             kvp->value->next = NULL;
             kvp->value->object = alloc_json_object(fp, buffer, buffer_size);
-            kvp->value->is_object = true;
+            kvp->value->dtype = JSONDTYPE_OBJECT;
         } else if (str_equal(buffer, "[")) {
             // If '[' is read, get succeeding tokens as an array
             kvp->value = alloc_json_array(fp, buffer, buffer_size);
@@ -330,13 +331,13 @@ bool json_get_boolean(JsonObject *json_object, const char *key) {
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
     JsonKeyValuePair *kvp = parent_object->kvps;
 
-    while (kvp != NULL) {
-        if (str_equal(key, kvp->key)) {
-            if (kvp->value->is_object) {
-                return kvp->value->object;
-            }
-        }
-        kvp = kvp->next;
+    JsonValue *jsonValue;
+    if ((jsonValue = json_get_value(parent_object, key)) == NULL) {
+        return NULL;
+    }
+
+    if (jsonValue->dtype == JSONDTYPE_OBJECT) {
+        return jsonValue->object;
     }
 
     return NULL;
@@ -353,7 +354,7 @@ void json_free_object(JsonObject **json_object) {
         // Free values sequentially
         JsonValue *value = kvp->value;
         while (value != NULL) {
-            if (value->is_object) {
+            if (value->dtype == JSONDTYPE_OBJECT) {
                 // If there's a child object, free recursively
                 json_free_object(&value->object);
             } else {
