@@ -31,7 +31,9 @@ typedef struct JsonValue {
     struct JsonValue *next; //!< Next value
     JsonDType dtype; //!< Data type
     union {
+        double number; //!< Number
         char *string; //!< Value string
+        bool boolean; //!< Boolean
         struct JsonObject *object; //!< JSON object
     };
 } JsonValue;

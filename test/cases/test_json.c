@@ -62,16 +62,18 @@ void test_read_file_for_list(void) {
 
     JsonValue *value = json_get_value(root_object, "list");
 
-    char *list[] = { "3.14", "foobaz", "true", "null" };
-    int i = 0;
-    for (int i = 0; i < 4; i++) {
-        TEST_ASSERT_EQUAL_STRING(list[i], value->string);
-        value = value->next;
-    }
+    TEST_ASSERT_EQUAL_DOUBLE(3.14, value->number);
+    value = value->next;
+    TEST_ASSERT_EQUAL_STRING("foobaz", value->string);
+    value = value->next;
+    TEST_ASSERT_EQUAL(true, value->boolean);
+    value = value->next;
+    TEST_ASSERT_NULL(value->string);
+    value = value->next;
 
     JsonObject *obj = value->object;
     JsonValue *val = json_get_value(obj, "value");
-    TEST_ASSERT_EQUAL_STRING("1", val->string);
+    TEST_ASSERT_EQUAL_DOUBLE(1, val->number);
 
     json_free_object(&root_object);
 }

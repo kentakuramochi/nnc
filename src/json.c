@@ -4,6 +4,7 @@
  */
 #include "json.h"
 
+#include <errno.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -131,8 +132,27 @@ static JsonValue *alloc_json_value(
     value->next = NULL;
     value->dtype = JSONDTYPE_NULL;
 
-    value->string = malloc(sizeof(char) * (token_size + 1));
-    strncpy(value->string, buffer, (token_size + 1));
+    char *endptr;
+    errno = 0;
+    double number = strtod(buffer, &endptr);
+    if ((errno == 0) && (*endptr == '\0')) {
+        value->number = number;
+        value->dtype = JSONDTYPE_NUMBER;
+    } else {
+        if (str_equal(buffer, "true")) {
+            value->boolean = true;
+            value->dtype = JSONDTYPE_BOOLEAN;
+        } else if (str_equal(buffer, "false")) {
+            value->boolean = false;
+            value->dtype = JSONDTYPE_BOOLEAN;
+        } else if (str_equal(buffer, "null")) {
+            value->string = NULL;
+        } else {
+            value->string = malloc(sizeof(char) * (token_size + 1));
+            strncpy(value->string, buffer, (token_size + 1));
+            value->dtype = JSONDTYPE_STRING;
+        }
+    }
 
     return value;
 }
@@ -289,11 +309,11 @@ double json_get_number(JsonObject *json_object, const char *key) {
         return INFINITY;
     }
 
-    if (str_equal("null", jsonValue->string)) {
+    if (jsonValue->dtype == JSONDTYPE_NULL) {
         return INFINITY;
     }
 
-    return strtod(jsonValue->string, NULL);
+    return jsonValue->number;
 }
 
 char *json_get_string(JsonObject *json_object, const char *key) {
@@ -302,7 +322,7 @@ char *json_get_string(JsonObject *json_object, const char *key) {
         return NULL;
     }
 
-    if (str_equal("null", jsonValue->string)) {
+    if (jsonValue->dtype == JSONDTYPE_NULL) {
         return NULL;
     }
 
@@ -315,17 +335,11 @@ bool json_get_boolean(JsonObject *json_object, const char *key) {
         return false;
     }
 
-    if (str_equal("null", jsonValue->string)) {
+    if (jsonValue->dtype == JSONDTYPE_NULL) {
         return false;
     }
 
-    if (str_equal("true", jsonValue->string)) {
-        return true;
-    } else if (str_equal("false", jsonValue->string)) {
-        return false;
-    }
-
-    return false;
+    return jsonValue->boolean;
 }
 
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
@@ -358,8 +372,10 @@ void json_free_object(JsonObject **json_object) {
                 // If there's a child object, free recursively
                 json_free_object(&value->object);
             } else {
-                free(value->string);
-                value->string = NULL;
+                if (value->dtype == JSONDTYPE_STRING) {
+                    free(value->string);
+                    value->string = NULL;
+                }
             }
 
             JsonValue *next = value->next;
