@@ -309,7 +309,7 @@ double json_get_number(JsonObject *json_object, const char *key) {
         return INFINITY;
     }
 
-    if (jsonValue->dtype == JSONDTYPE_NULL) {
+    if (jsonValue->dtype != JSONDTYPE_NUMBER) {
         return INFINITY;
     }
 
@@ -322,7 +322,7 @@ char *json_get_string(JsonObject *json_object, const char *key) {
         return NULL;
     }
 
-    if (jsonValue->dtype == JSONDTYPE_NULL) {
+    if (jsonValue->dtype != JSONDTYPE_STRING) {
         return NULL;
     }
 
@@ -335,7 +335,7 @@ bool json_get_boolean(JsonObject *json_object, const char *key) {
         return false;
     }
 
-    if (jsonValue->dtype == JSONDTYPE_NULL) {
+    if (jsonValue->dtype != JSONDTYPE_BOOLEAN) {
         return false;
     }
 
@@ -343,21 +343,23 @@ bool json_get_boolean(JsonObject *json_object, const char *key) {
 }
 
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
-    JsonKeyValuePair *kvp = parent_object->kvps;
-
     JsonValue *jsonValue;
     if ((jsonValue = json_get_value(parent_object, key)) == NULL) {
         return NULL;
     }
 
-    if (jsonValue->dtype == JSONDTYPE_OBJECT) {
-        return jsonValue->object;
+    if (jsonValue->dtype != JSONDTYPE_OBJECT) {
+        return NULL;
     }
 
-    return NULL;
+    return jsonValue->object;
 }
 
 void json_free_object(JsonObject **json_object) {
+    if (*json_object == NULL) {
+        return;
+    }
+
     JsonKeyValuePair *kvp = (*json_object)->kvps;
 
     // Free key-value pairs sequentially

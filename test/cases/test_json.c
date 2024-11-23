@@ -9,101 +9,101 @@
 #include "unity.h"
 #include "test_utils.h"
 
-void setUp(void) {}
-
-void tearDown(void) {}
-
 #define TEST_JSON_FILE "/tmp/test.json"
 
-void test_read_file_for_basic_types(void) {
+// Create a JSON file for the test
+void create_test_json(void) {
     test_util_create_text_file(
         TEST_JSON_FILE,
-        "{\n"
-        "    \"number\": 3.14,\n"
-        "    \"string\": \"foobar\",\n"
-        "    \"bool_true\": true,\n"
-        "    \"bool_false\": false,\n"
-        "    \"null_value\": null\n"
-        "}"
+            "{"
+            "    \"pi\": 3.14,\n"
+            "    \"name\": \"John Doe\",\n"
+            "    \"is_tested\": true,\n"
+            "    \"is_ignored\": false,\n"
+            "    \"dangling\": null,\n"
+            "    \"list\": [\n"
+            "        123, \"foobar\", true, null,\n"
+            "        {\n"
+            "            \"index\": 5\n"
+            "        }\n"
+            "    ],\n"
+            "    \"object\": {\n"
+            "        \"value\": 42\n"
+            "    }\n"
+            "}"
     );
-
-    JsonObject *root_object = json_read_file(TEST_JSON_FILE);
-    TEST_ASSERT_NOT_NULL(root_object);
-
-    TEST_ASSERT_EQUAL_DOUBLE(3.14, json_get_number(root_object, "number"));
-
-    TEST_ASSERT_EQUAL_STRING("foobar", json_get_string(root_object, "string"));
-
-    TEST_ASSERT_TRUE(json_get_boolean(root_object, "bool_true"));
-    TEST_ASSERT_FALSE(json_get_boolean(root_object, "bool_false"));
-
-    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(root_object, "null_value"));
-    TEST_ASSERT_NULL(json_get_string(root_object, "null_value"));
-    TEST_ASSERT_FALSE(json_get_boolean(root_object, "null_value"));
-
-    json_free_object(&root_object);
-    TEST_ASSERT_NULL(root_object);
 }
 
-void test_read_file_for_list(void) {
-    test_util_create_text_file(
-        TEST_JSON_FILE,
-        "{\n"
-        "    \"list\": [\n"
-        "        3.14, \"foobaz\", true, null,\n"
-        "        {\n"
-        "            \"value\": 1\n"
-        "        }\n"
-        "    ]\n"
-        "}"
-    );
+JsonObject *object;
 
-    JsonObject *root_object = json_read_file(TEST_JSON_FILE);
+void setUp(void) {
+    create_test_json();
 
-    JsonValue *value = json_get_value(root_object, "list");
+    object = json_read_file(TEST_JSON_FILE);
+}
 
-    TEST_ASSERT_EQUAL_DOUBLE(3.14, value->number);
+void tearDown(void) {
+    json_free_object(&object);
+}
+
+void test_read_file_and_free(void) {
+    TEST_ASSERT_NOT_NULL(object);
+
+    json_free_object(&object);
+    TEST_ASSERT_NULL(object);
+}
+
+void test_get_number(void) {
+    TEST_ASSERT_EQUAL_DOUBLE(3.14, json_get_number(object, "pi"));
+
+    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(object, "name"));
+    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(object, "is_tested"));
+    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(object, "is_ignored"));
+    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(object, "dangling"));
+
+    TEST_ASSERT_EQUAL_DOUBLE(INFINITY, json_get_number(object, "undefined"));
+}
+
+void test_get_string(void) {
+    TEST_ASSERT_EQUAL_STRING("John Doe", json_get_string(object, "name"));
+
+    TEST_ASSERT_NULL(json_get_string(object, "pi"));
+    TEST_ASSERT_NULL(json_get_string(object, "is_tested"));
+    TEST_ASSERT_NULL(json_get_string(object, "is_ignored"));
+    TEST_ASSERT_NULL(json_get_string(object, "dangling"));
+
+    TEST_ASSERT_NULL(json_get_string(object, "undefined"));
+}
+
+void test_get_boolean(void) {
+    TEST_ASSERT_TRUE(json_get_boolean(object, "is_tested"));
+    TEST_ASSERT_FALSE(json_get_boolean(object, "is_ignored"));
+
+    TEST_ASSERT_FALSE(json_get_boolean(object, "pi"));
+    TEST_ASSERT_FALSE(json_get_boolean(object, "name"));
+    TEST_ASSERT_FALSE(json_get_boolean(object, "dangling"));
+
+    TEST_ASSERT_FALSE(json_get_boolean(object, "undefined"));
+}
+
+void test_get_array(void) {
+    JsonValue *value = json_get_value(object, "list");
+
+    TEST_ASSERT_EQUAL_DOUBLE(123, value->number);
     value = value->next;
-    TEST_ASSERT_EQUAL_STRING("foobaz", value->string);
+    TEST_ASSERT_EQUAL_STRING("foobar", value->string);
     value = value->next;
     TEST_ASSERT_EQUAL(true, value->boolean);
     value = value->next;
     TEST_ASSERT_NULL(value->string);
     value = value->next;
 
-    JsonObject *obj = value->object;
-    JsonValue *val = json_get_value(obj, "value");
-    TEST_ASSERT_EQUAL_DOUBLE(1, val->number);
-
-    json_free_object(&root_object);
+    TEST_ASSERT_EQUAL_DOUBLE(5, json_get_number(value->object, "index"));
 }
 
-void test_read_file_for_nested_object(void) {
-    test_util_create_text_file(
-        TEST_JSON_FILE,
-        "{\n"
-        "    \"obj1\": {\n"
-        "        \"val1\": 1\n"
-        "    },\n"
-        "    \"obj2\": {\n"
-        "        \"obj21\": {\n"
-        "            \"val2\": 2\n"
-        "        }\n"
-        "    }\n"
-        "}"
-    );
+void test_get_object(void) {
+    JsonObject *child_object = json_get_child_object(object, "object");
+    TEST_ASSERT_NOT_NULL(child_object);
 
-    JsonObject *root_object = json_read_file(TEST_JSON_FILE);
-
-    JsonObject *obj1 = json_get_child_object(root_object, "obj1");
-    TEST_ASSERT_NOT_NULL(obj1);
-    TEST_ASSERT_EQUAL_DOUBLE(1, json_get_number(obj1, "val1"));
-
-    JsonObject *obj2 = json_get_child_object(root_object, "obj2");
-    TEST_ASSERT_NOT_NULL(obj2);
-    JsonObject *obj21 = json_get_child_object(obj2, "obj21");
-    TEST_ASSERT_NOT_NULL(obj21);
-    TEST_ASSERT_EQUAL_DOUBLE(2, json_get_number(obj21, "val2"));
-
-    json_free_object(&root_object);
+    TEST_ASSERT_EQUAL_DOUBLE(42, json_get_number(child_object, "value"));
 }

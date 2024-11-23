@@ -56,7 +56,7 @@ typedef struct JsonObject {
 } JsonObject;
 
 /**
- * @brief Read a JSON object fro a JSON file
+ * @brief Read a JSON object from a JSON file
  *
  * @param[in] json_file Path to a JSON file
  * @return Pointer to the root JSON object
