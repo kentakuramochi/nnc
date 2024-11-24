@@ -87,8 +87,12 @@ void test_get_boolean(void) {
 }
 
 void test_get_array(void) {
-    JsonValue *value = json_get_value(object, "list");
+    JsonArray *array = json_get_array(object, "list");
+    TEST_ASSERT_NOT_NULL(array);
 
+    TEST_ASSERT_EQUAL_INT(5, array->size);
+
+    JsonValue *value = array->values;
     TEST_ASSERT_EQUAL_DOUBLE(123, value->number);
     value = value->next;
     TEST_ASSERT_EQUAL_STRING("foobar", value->string);
@@ -97,8 +101,15 @@ void test_get_array(void) {
     value = value->next;
     TEST_ASSERT_NULL(value->string);
     value = value->next;
-
     TEST_ASSERT_EQUAL_DOUBLE(5, json_get_number(value->object, "index"));
+
+    TEST_ASSERT_NULL(json_get_array(object, "pi"));
+    TEST_ASSERT_NULL(json_get_array(object, "name"));
+    TEST_ASSERT_NULL(json_get_array(object, "is_tested"));
+    TEST_ASSERT_NULL(json_get_array(object, "is_ignored"));
+    TEST_ASSERT_NULL(json_get_array(object, "dangling"));
+
+    TEST_ASSERT_NULL(json_get_array(object, "undefined"));
 }
 
 void test_get_object(void) {

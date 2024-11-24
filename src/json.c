@@ -96,6 +96,7 @@ static JsonKeyValuePair *alloc_json_key_value_pair(void) {
     kvp->prev = NULL;
     kvp->next = NULL;
     kvp->key = NULL;
+    kvp->is_array = false;
     kvp->value = NULL;
 
     return kvp;
@@ -168,13 +169,15 @@ static JsonObject *alloc_json_object(
  * @param[in] fp Input file stream
  * @param[in] buffer Bufer which token in the JSON file will be stored in
  * @param[in] buffer_size Size of the buffer
- * @return Pointer to the allocated an array of JSON values
+ * @return Pointer to the allocated array of JSON values
  */
-static JsonValue *alloc_json_array(
+// static JsonValue *alloc_json_array(
+static JsonArray *alloc_json_array(
     FILE *fp, char *buffer, const size_t buffer_size
 ) {
     JsonValue *head = NULL;
     JsonValue *value = NULL;
+    size_t num_elems = 0;
     size_t size = 0;
     while ((size = get_token(buffer, fp, buffer_size)) > 0) {
         if (str_equal(buffer, "]")) {
@@ -204,9 +207,15 @@ static JsonValue *alloc_json_array(
 
             value = value->next;
         }
+
+        num_elems++;
     }
 
-    return head;
+    JsonArray *array = malloc(sizeof(JsonArray));
+    array->size = num_elems;
+    array->values = head;
+
+    return array;
 }
 
 /**
@@ -252,11 +261,14 @@ static JsonObject *alloc_json_object(
             kvp->value = malloc(sizeof(JsonValue));
             kvp->value->prev = NULL;
             kvp->value->next = NULL;
+            kvp->is_array = false;
             kvp->value->object = alloc_json_object(fp, buffer, buffer_size);
             kvp->value->dtype = JSONDTYPE_OBJECT;
         } else if (str_equal(buffer, "[")) {
             // If '[' is read, get succeeding tokens as an array
-            kvp->value = alloc_json_array(fp, buffer, buffer_size);
+            // kvp->value = alloc_json_array(fp, buffer, buffer_size);
+            kvp->array = alloc_json_array(fp, buffer, buffer_size);
+            kvp->is_array = true;
         } else {
             // Otherwise, get succeeding tokens as a single value
             kvp->value = alloc_json_value(buffer, size);
@@ -290,7 +302,14 @@ JsonObject *json_read_file(const char *json_file) {
     return object;
 }
 
-JsonValue *json_get_value(JsonObject *json_object, const char *key) {
+/**
+ * @brief Get a value from the JSON object
+ *
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @return Pointer to the JSON value, NULL if failed
+ */
+static JsonValue *get_value(JsonObject *json_object, const char *key) {
     JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
@@ -305,7 +324,7 @@ JsonValue *json_get_value(JsonObject *json_object, const char *key) {
 
 double json_get_number(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
-    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+    if ((jsonValue = get_value(json_object, key)) == NULL) {
         return INFINITY;
     }
 
@@ -318,7 +337,7 @@ double json_get_number(JsonObject *json_object, const char *key) {
 
 char *json_get_string(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
-    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+    if ((jsonValue = get_value(json_object, key)) == NULL) {
         return NULL;
     }
 
@@ -331,7 +350,7 @@ char *json_get_string(JsonObject *json_object, const char *key) {
 
 bool json_get_boolean(JsonObject *json_object, const char *key) {
     JsonValue *jsonValue;
-    if ((jsonValue = json_get_value(json_object, key)) == NULL) {
+    if ((jsonValue = get_value(json_object, key)) == NULL) {
         return false;
     }
 
@@ -344,7 +363,7 @@ bool json_get_boolean(JsonObject *json_object, const char *key) {
 
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
     JsonValue *jsonValue;
-    if ((jsonValue = json_get_value(parent_object, key)) == NULL) {
+    if ((jsonValue = get_value(parent_object, key)) == NULL) {
         return NULL;
     }
 
@@ -353,6 +372,21 @@ JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
     }
 
     return jsonValue->object;
+}
+
+JsonArray *json_get_array(JsonObject *json_object, const char *key) {
+    JsonKeyValuePair *kvp = json_object->kvps;
+
+    while (kvp != NULL) {
+        if (str_equal(key, kvp->key)) {
+            if (kvp->is_array) {
+                return kvp->array;
+            }
+        }
+        kvp = kvp->next;
+    }
+
+    return NULL;
 }
 
 void json_free_object(JsonObject **json_object) {
@@ -367,9 +401,35 @@ void json_free_object(JsonObject **json_object) {
         free(kvp->key);
         kvp->key = NULL;
 
-        // Free values sequentially
-        JsonValue *value = kvp->value;
-        while (value != NULL) {
+        if (kvp->is_array) {
+            JsonArray *array = kvp->array;
+
+            // Free array's elements sequentially
+            JsonValue *value = array->values;
+            while (value != NULL) {
+                if (value->dtype == JSONDTYPE_OBJECT) {
+                    // If there's a child object, free recursively
+                    json_free_object(&value->object);
+                } else {
+                    if (value->dtype == JSONDTYPE_STRING) {
+                        free(value->string);
+                        value->string = NULL;
+                    }
+                }
+
+                JsonValue *next = value->next;
+
+                free(value);
+                value = NULL;
+
+                value = next;
+            }
+
+            free(array);
+            array = NULL;
+        } else {
+            // Free a single value/object
+            JsonValue *value = kvp->value;
             if (value->dtype == JSONDTYPE_OBJECT) {
                 // If there's a child object, free recursively
                 json_free_object(&value->object);
@@ -380,12 +440,8 @@ void json_free_object(JsonObject **json_object) {
                 }
             }
 
-            JsonValue *next = value->next;
-
             free(value);
             value = NULL;
-
-            value = next;
         }
 
         JsonKeyValuePair *next_kvp = kvp->next;

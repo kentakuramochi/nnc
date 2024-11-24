@@ -9,7 +9,6 @@
 #include <stddef.h>
 
 // Prototype declaration for circular reference
-// between JsonKeyValuePair and JsonObject
 struct JsonObject;
 
 /**
@@ -39,13 +38,25 @@ typedef struct JsonValue {
 } JsonValue;
 
 /**
+ * @brief Array type of the JSON object
+ */
+typedef struct JsonArray {
+    size_t size; //!< Array size
+    JsonValue *values; //!< Elements
+} JsonArray;
+
+/**
  * @brief Key-value pair in the JSON object
  */
 typedef struct JsonKeyValuePair {
     struct JsonKeyValuePair *prev; //!< Previous pair
     struct JsonKeyValuePair *next; //!< Next pair
     char *key; //!< Key string
-    JsonValue *value;
+    bool is_array; //!< Flag for array type
+    union {
+        JsonValue *value; //!< Value
+        JsonArray *array; //!< Array
+    };
 } JsonKeyValuePair;
 
 /**
@@ -62,15 +73,6 @@ typedef struct JsonObject {
  * @return Pointer to the root JSON object
  */
 JsonObject *json_read_file(const char *json_file);
-
-/**
- * @brief Get a value from the JSON object
- *
- * @param[in] json_object JSON object
- * @param[in] key Key of the object
- * @return Pointer to the JSON value, NULL if failed
- */
-JsonValue *json_get_value(JsonObject *json_object, const char *key);
 
 /**
  * @brief Get a number from the JSON object
@@ -110,6 +112,15 @@ bool json_get_boolean(JsonObject *json_object, const char *key);
  * @return Pointer to the object, NULL if failed
  */
 JsonObject *json_get_child_object(JsonObject *parent_object, const char *key);
+
+/**
+ * @brief Get an array from the JSON object
+ *
+ * @param[in] json_object JSON object
+ * @param[in] key Key of the object
+ * @return Pointer to the JSON array, NULL if failed
+ */
+JsonArray *json_get_array(JsonObject *json_object, const char *key);
 
 /**
  * @brief Free JSON object
