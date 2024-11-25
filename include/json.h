@@ -19,31 +19,24 @@ typedef enum {
     JSONDTYPE_NUMBER, //!< Number
     JSONDTYPE_STRING, //!< String
     JSONDTYPE_BOOLEAN, //!< Boolean
-    JSONDTYPE_OBJECT //!< Object
+    JSONDTYPE_OBJECT, //!< Object
+    JSONDTYPE_ARRAY //!< Array
 } JsonDType;
 
 /**
  * @brief Wrapper of a value in the JSON object
  */
 typedef struct JsonValue {
-    struct JsonValue *prev; //!< Previous value
-    struct JsonValue *next; //!< Next value
     JsonDType dtype; //!< Data type
+    size_t size; //!< Size
     union {
         double number; //!< Number
         char *string; //!< Value string
         bool boolean; //!< Boolean
         struct JsonObject *object; //!< JSON object
+        struct JsonValue *values; //!< Array
     };
 } JsonValue;
-
-/**
- * @brief Array type of the JSON object
- */
-typedef struct JsonArray {
-    size_t size; //!< Array size
-    JsonValue *values; //!< Elements
-} JsonArray;
 
 /**
  * @brief Key-value pair in the JSON object
@@ -52,11 +45,7 @@ typedef struct JsonKeyValuePair {
     struct JsonKeyValuePair *prev; //!< Previous pair
     struct JsonKeyValuePair *next; //!< Next pair
     char *key; //!< Key string
-    bool is_array; //!< Flag for array type
-    union {
-        JsonValue *value; //!< Value
-        JsonArray *array; //!< Array
-    };
+    JsonValue *value; //!< Value
 } JsonKeyValuePair;
 
 /**
@@ -120,7 +109,7 @@ JsonObject *json_get_child_object(JsonObject *parent_object, const char *key);
  * @param[in] key Key of the object
  * @return Pointer to the JSON array, NULL if failed
  */
-JsonArray *json_get_array(JsonObject *json_object, const char *key);
+JsonValue *json_get_array(JsonObject *json_object, const char *key);
 
 /**
  * @brief Free JSON object

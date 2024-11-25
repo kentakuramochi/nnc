@@ -96,7 +96,6 @@ static JsonKeyValuePair *alloc_json_key_value_pair(void) {
     kvp->prev = NULL;
     kvp->next = NULL;
     kvp->key = NULL;
-    kvp->is_array = false;
     kvp->value = NULL;
 
     return kvp;
@@ -119,20 +118,15 @@ static char *alloc_json_key(
 }
 
 /**
- * @brief Allocate a JSON value
+ * @brief Load a JSON value from the buffer
  *
+ * @param[out] value Json value
  * @param[in] buffer Bufer which stores a token in the JSON file
  * @param[in] token_size Size of the token
- * @return Pointer to the allocated JSON value
  */
-static JsonValue *alloc_json_value(
-    const char *buffer, const size_t token_size
+static void load_json_value(
+    JsonValue *value, const char *buffer, const size_t token_size
 ) {
-    JsonValue *value = malloc(sizeof(JsonValue));
-    value->prev = NULL;
-    value->next = NULL;
-    value->dtype = JSONDTYPE_NULL;
-
     char *endptr;
     errno = 0;
     double number = strtod(buffer, &endptr);
@@ -148,12 +142,32 @@ static JsonValue *alloc_json_value(
             value->dtype = JSONDTYPE_BOOLEAN;
         } else if (str_equal(buffer, "null")) {
             value->string = NULL;
+            value->dtype = JSONDTYPE_NULL;
         } else {
             value->string = malloc(sizeof(char) * (token_size + 1));
             strncpy(value->string, buffer, (token_size + 1));
             value->dtype = JSONDTYPE_STRING;
         }
     }
+}
+
+/**
+ * @brief Allocate a JSON value
+ *
+ * @param[in] buffer Bufer which stores a token in the JSON file
+ * @param[in] token_size Size of the token
+ * @return Pointer to the allocated JSON value
+ */
+static JsonValue *alloc_json_value(
+    const char *buffer, const size_t token_size
+) {
+    JsonValue *value = malloc(sizeof(JsonValue));
+    if (value == NULL) {
+        return NULL;
+    }
+
+    load_json_value(value, buffer, token_size);
+    value->size = 1;
 
     return value;
 }
@@ -163,6 +177,15 @@ static JsonObject *alloc_json_object(
     FILE *fp, char *buffer, const size_t buffer_size
 );
 
+static void load_json_object(
+    JsonObject *object, FILE *fp, char *buffer, const size_t buffer_size
+);
+
+/**
+ * @brief Initial size of the array
+ */
+#define INITIAL_ARRAY_SIZE 32
+
 /**
  * @brief Allocate an array of JSON values
  *
@@ -171,13 +194,26 @@ static JsonObject *alloc_json_object(
  * @param[in] buffer_size Size of the buffer
  * @return Pointer to the allocated array of JSON values
  */
-// static JsonValue *alloc_json_array(
-static JsonArray *alloc_json_array(
+static JsonValue *alloc_json_array(
     FILE *fp, char *buffer, const size_t buffer_size
 ) {
-    JsonValue *head = NULL;
-    JsonValue *value = NULL;
-    size_t num_elems = 0;
+    JsonValue *wrapper = malloc(sizeof(JsonValue));
+    if (wrapper == NULL) {
+        return NULL;
+    }
+
+    wrapper->dtype = JSONDTYPE_ARRAY;
+
+    JsonValue *values = malloc(sizeof(JsonValue) * INITIAL_ARRAY_SIZE);
+    if (values == NULL) {
+        free(wrapper);
+        wrapper = NULL;
+        return NULL;
+    }
+
+    size_t index = 0;
+    size_t current_size = INITIAL_ARRAY_SIZE;
+
     size_t size = 0;
     while ((size = get_token(buffer, fp, buffer_size)) > 0) {
         if (str_equal(buffer, "]")) {
@@ -185,52 +221,63 @@ static JsonArray *alloc_json_array(
             break;
         }
 
-        if (head == NULL) {
-            value = alloc_json_value(buffer, size);
-            head = value;
+        if (str_equal(buffer, "{")) {
+            // If '{' is read, get succeeding tokens an object
+            values[index].dtype = JSONDTYPE_OBJECT;
+            values[index].size = 1;
+            values[index].object = alloc_json_object(fp, buffer, buffer_size);
         } else {
-            JsonValue *new_value = NULL;
-            if (str_equal(buffer, "{")) {
-                // If '{' is read, get succeeding tokens an object
-                new_value = malloc(sizeof(JsonValue));
-                new_value->prev = NULL;
-                new_value->next = NULL;
-                new_value->object = alloc_json_object(fp, buffer, buffer_size);
-                new_value->dtype = JSONDTYPE_OBJECT;
-            } else {
-                new_value = alloc_json_value(buffer, size);
-            }
-
-            // Append a new value to the current one
-            value->next = new_value;
-            new_value->prev = value;
-
-            value = value->next;
+            // new_value = alloc_json_value(buffer, size);
+            load_json_value(&values[index], buffer, buffer_size);
         }
 
-        num_elems++;
+        index++;
+
+        // If the size is not enough, extend the array
+        if (index == current_size) {
+            current_size *= 2;
+
+            JsonValue *resized_values = realloc(
+                values, sizeof(JsonValue) * current_size
+            );
+            if (resized_values == NULL) {
+                free(values);
+                values = NULL;
+
+                return NULL;
+            }
+
+            values = resized_values;
+        }
     }
 
-    JsonArray *array = malloc(sizeof(JsonArray));
-    array->size = num_elems;
-    array->values = head;
+    wrapper->size = index;
 
-    return array;
+    // Adjust size of the array
+    JsonValue *resized_values = realloc(values, sizeof(JsonValue) *index);
+    if (resized_values == NULL) {
+        free(values);
+        values = NULL;
+
+        return NULL;
+    }
+
+    wrapper->values = resized_values;
+
+    return wrapper;
 }
 
 /**
- * @brief Allocate a JSON object
+ * @brief Load a JSON object from the stream
  *
+ * @param[out] object JSON object
  * @param[in] fp Input file stream
  * @param[in] buffer Bufer which token in the JSON file will be stored in
  * @param[in] buffer_size Size of the buffer
- * @return Pointer to the allocated JSON object
  */
-static JsonObject *alloc_json_object(
-    FILE *fp, char *buffer, const size_t buffer_size
+static void load_json_object(
+    JsonObject *object, FILE *fp, char *buffer, const size_t buffer_size
 ) {
-    JsonObject *object = malloc(sizeof(JsonObject));
-
     JsonKeyValuePair *kvp = NULL;
     size_t size = 0;
     while ((size = get_token(buffer, fp, buffer_size)) > 0) {
@@ -258,22 +305,39 @@ static JsonObject *alloc_json_object(
         size = get_token(buffer, fp, buffer_size);
         if (str_equal(buffer, "{")) {
             // If '{' is read, get succeeding tokens an object
-            kvp->value = malloc(sizeof(JsonValue));
-            kvp->value->prev = NULL;
-            kvp->value->next = NULL;
-            kvp->is_array = false;
-            kvp->value->object = alloc_json_object(fp, buffer, buffer_size);
-            kvp->value->dtype = JSONDTYPE_OBJECT;
+            JsonValue *value = malloc(sizeof(JsonValue));
+            value->dtype = JSONDTYPE_OBJECT;
+            value->size = 1;
+            value->object = alloc_json_object(fp, buffer, buffer_size);
+
+            kvp->value = value;
         } else if (str_equal(buffer, "[")) {
             // If '[' is read, get succeeding tokens as an array
-            // kvp->value = alloc_json_array(fp, buffer, buffer_size);
-            kvp->array = alloc_json_array(fp, buffer, buffer_size);
-            kvp->is_array = true;
+            kvp->value = alloc_json_array(fp, buffer, buffer_size);
         } else {
             // Otherwise, get succeeding tokens as a single value
             kvp->value = alloc_json_value(buffer, size);
         }
     }
+}
+
+/**
+ * @brief Allocate a JSON object
+ *
+ * @param[in] fp Input file stream
+ * @param[in] buffer Bufer which token in the JSON file will be stored in
+ * @param[in] buffer_size Size of the buffer
+ * @return Pointer to the allocated JSON object
+ */
+static JsonObject *alloc_json_object(
+    FILE *fp, char *buffer, const size_t buffer_size
+) {
+    JsonObject *object = malloc(sizeof(JsonObject));
+    if (object == NULL) {
+        return NULL;
+    }
+
+    load_json_object(object, fp, buffer, buffer_size);
 
     return object;
 }
@@ -293,6 +357,9 @@ JsonObject *json_read_file(const char *json_file) {
     while ((size = get_token(buffer, fp, BUFFER_SIZE)) > 0) {
         if (str_equal("{", buffer)) {
             object = alloc_json_object(fp, buffer, BUFFER_SIZE);
+            if (object == NULL) {
+                break;
+            }
         }
         // Currently ignore non-object tokens in the root
     }
@@ -374,13 +441,13 @@ JsonObject *json_get_child_object(JsonObject *parent_object, const char *key) {
     return jsonValue->object;
 }
 
-JsonArray *json_get_array(JsonObject *json_object, const char *key) {
+JsonValue *json_get_array(JsonObject *json_object, const char *key) {
     JsonKeyValuePair *kvp = json_object->kvps;
 
     while (kvp != NULL) {
         if (str_equal(key, kvp->key)) {
-            if (kvp->is_array) {
-                return kvp->array;
+            if (kvp->value->dtype == JSONDTYPE_ARRAY) {
+                return kvp->value;
             }
         }
         kvp = kvp->next;
@@ -401,35 +468,29 @@ void json_free_object(JsonObject **json_object) {
         free(kvp->key);
         kvp->key = NULL;
 
-        if (kvp->is_array) {
-            JsonArray *array = kvp->array;
-
+        JsonValue *value = kvp->value;
+        if (value->dtype == JSONDTYPE_ARRAY) {
             // Free array's elements sequentially
-            JsonValue *value = array->values;
-            while (value != NULL) {
-                if (value->dtype == JSONDTYPE_OBJECT) {
+            JsonValue *array = value->values;
+            for (size_t i = 0; i < kvp->value->size; i++) {
+                if (array[i].dtype == JSONDTYPE_OBJECT) {
                     // If there's a child object, free recursively
-                    json_free_object(&value->object);
+                    json_free_object(&array[i].object);
                 } else {
-                    if (value->dtype == JSONDTYPE_STRING) {
-                        free(value->string);
-                        value->string = NULL;
+                    if (array[i].dtype == JSONDTYPE_STRING) {
+                        free(array[i].string);
+                        array[i].string = NULL;
                     }
                 }
-
-                JsonValue *next = value->next;
-
-                free(value);
-                value = NULL;
-
-                value = next;
             }
 
             free(array);
             array = NULL;
+
+            free(value);
+            value = NULL;
         } else {
             // Free a single value/object
-            JsonValue *value = kvp->value;
             if (value->dtype == JSONDTYPE_OBJECT) {
                 // If there's a child object, free recursively
                 json_free_object(&value->object);

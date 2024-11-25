@@ -15,7 +15,7 @@
 void create_test_json(void) {
     test_util_create_text_file(
         TEST_JSON_FILE,
-            "{"
+            "{\n"
             "    \"pi\": 3.14,\n"
             "    \"name\": \"John Doe\",\n"
             "    \"is_tested\": true,\n"
@@ -30,7 +30,7 @@ void create_test_json(void) {
             "    \"object\": {\n"
             "        \"value\": 42\n"
             "    }\n"
-            "}"
+            "}\n"
     );
 }
 
@@ -87,21 +87,16 @@ void test_get_boolean(void) {
 }
 
 void test_get_array(void) {
-    JsonArray *array = json_get_array(object, "list");
+    JsonValue *array = json_get_array(object, "list");
     TEST_ASSERT_NOT_NULL(array);
 
     TEST_ASSERT_EQUAL_INT(5, array->size);
 
-    JsonValue *value = array->values;
-    TEST_ASSERT_EQUAL_DOUBLE(123, value->number);
-    value = value->next;
-    TEST_ASSERT_EQUAL_STRING("foobar", value->string);
-    value = value->next;
-    TEST_ASSERT_EQUAL(true, value->boolean);
-    value = value->next;
-    TEST_ASSERT_NULL(value->string);
-    value = value->next;
-    TEST_ASSERT_EQUAL_DOUBLE(5, json_get_number(value->object, "index"));
+    TEST_ASSERT_EQUAL_DOUBLE(123, array->values[0].number);
+    TEST_ASSERT_EQUAL_STRING("foobar", array->values[1].string);
+    TEST_ASSERT_EQUAL(true, array->values[2].boolean);
+    TEST_ASSERT_NULL(array->values[3].string);
+    TEST_ASSERT_EQUAL_DOUBLE(5, json_get_number(array->values[4].object, "index"));
 
     TEST_ASSERT_NULL(json_get_array(object, "pi"));
     TEST_ASSERT_NULL(json_get_array(object, "name"));
