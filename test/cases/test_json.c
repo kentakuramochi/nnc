@@ -25,7 +25,10 @@ void create_test_json(void) {
             "        123, \"foobar\", true, null,\n"
             "        {\n"
             "            \"index\": 5\n"
-            "        }\n"
+            "        },\n"
+            "        [\n"
+            "           6, 7\n"
+            "        ]\n"
             "    ],\n"
             "    \"object\": {\n"
             "        \"value\": 42\n"
@@ -90,13 +93,18 @@ void test_get_array(void) {
     JsonValue *array = json_get_array(object, "list");
     TEST_ASSERT_NOT_NULL(array);
 
-    TEST_ASSERT_EQUAL_INT(5, array->size);
+    TEST_ASSERT_EQUAL_INT(6, array->size);
 
     TEST_ASSERT_EQUAL_DOUBLE(123, array->values[0].number);
     TEST_ASSERT_EQUAL_STRING("foobar", array->values[1].string);
     TEST_ASSERT_EQUAL(true, array->values[2].boolean);
     TEST_ASSERT_NULL(array->values[3].string);
     TEST_ASSERT_EQUAL_DOUBLE(5, json_get_number(array->values[4].object, "index"));
+
+    // JsonValue *inner_array = array->values[5].values;
+    // TEST_ASSERT_EQUAL_INT(2, inner_array->size);
+    // TEST_ASSERT_EQUAL_DOUBLE(6, inner_array->values[0].number);
+    // TEST_ASSERT_EQUAL_DOUBLE(7, inner_array->values[1].number);
 
     TEST_ASSERT_NULL(json_get_array(object, "pi"));
     TEST_ASSERT_NULL(json_get_array(object, "name"));

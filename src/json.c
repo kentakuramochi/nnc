@@ -226,6 +226,15 @@ static JsonValue *alloc_json_array(
             values[index].dtype = JSONDTYPE_OBJECT;
             values[index].size = 1;
             values[index].object = alloc_json_object(fp, buffer, buffer_size);
+        } else if (str_equal(buffer, "[")) {
+            JsonValue *tmp_array = alloc_json_array(fp, buffer, buffer_size);
+
+            values[index].dtype = JSONDTYPE_ARRAY;
+            values[index].size = tmp_array->size;
+            values[index].values = tmp_array->values;
+
+            free(tmp_array);
+            tmp_array = NULL;
         } else {
             // new_value = alloc_json_value(buffer, size);
             load_json_value(&values[index], buffer, buffer_size);
